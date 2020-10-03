@@ -23,7 +23,7 @@ function createProgram(prog:Programm): Programm {
             title: 'Презентация без названия',
             slides: [curSlide]
         },
-        selectedSlide: curSlide,
+        selectedSlides: [curSlide],
         archive: {
             past: [],
             future: []
@@ -45,7 +45,8 @@ function addPAHASlide(): Slide {
 
 function addSlide(prog:Programm): Programm {
     let curSlide: Slide = addPAHASlide();
-
+    prog.selectedSlides = [];
+    prog.selectedSlides.push(curSlide);
     return {
         ...prog,
         currentPresentation: {
@@ -54,8 +55,7 @@ function addSlide(prog:Programm): Programm {
                 ...prog.currentPresentation.slides,
                 curSlide
             ]
-        },
-        selectedSlide : curSlide
+        }
     }
 }
 
@@ -65,19 +65,40 @@ function deleteSlide(prog:Programm): Programm {
         currentPresentation: {
             ...prog.currentPresentation,
             slides: [
-                ...prog.currentPresentation.slides.filter(function(e) {
-                    return e !== prog.selectedSlide
-                })
+                ...prog.currentPresentation.slides.filter(
+                      item => prog.selectedSlides.indexOf(item) < 0
+                )
             ]
         },
-        selectedSlide : null    //TODO: здесь будет следующий слайд после удаленного
+        selectedSlides: []   //TODO: здесь будет следующий слайд после удаленного
     }
 }
-
+//let missing = a1.filter(item => a2.indexOf(item) < 0);
 //то что выяснили в пятницу в Zoom'е
 //TODO: Programm.selectedSlide это массив слайдов
 //TODO: в массиве Programm.selectedSlide последний слайд отображается на экране (АКТИВНЫЙ СЛАЙД)
-//TODO: функция перемещения selectedSlide внутри массива слайдов
+//TODO: функция перемещения selectedSlides внутри массива слайдов, можно переносить несколько слайдов
+function moveSlides(prog:Programm, newPosition:number): Programm {
+    let newArray = [];
+    for(var i = 0; i < prog.currentPresentation.slides.length; i++) {
+        let state = 1;
+        for(var i3 = 0; i3 < prog.selectedSlides.length; i3++) {
+            if (i == newPosition) {
+                newArray.push(prog.selectedSlides[i3])
+            }
+            if (prog.currentPresentation.slides[i] == prog.selectedSlides[i3]) state = 0
+        }
+        if (state) newArray.push(prog.currentPresentation.slides[i])
+    } 
+    
+    return {
+        ...prog,
+        currentPresentation: {
+            ...prog.currentPresentation,
+            slides: newArray
+        }
+    }
+}
 
 //TODO: Programm.selectedElement это массив элементов
 //TODO: у массива Programm.selectedElement (если там несколько элементов) можно менять ТОЛЬКО положение и масштабировать и удалять
@@ -94,6 +115,15 @@ function deleteSlide(prog:Programm): Programm {
 //TODO: loadProject()
 //функции Presentation
 //TODO: changeTitle()
+function changeTitle(prog:Programm, newTitle:string): Programm {
+    return {
+        ...prog,
+        currentPresentation: {
+            ...prog.currentPresentation,
+            title : newTitle
+        }
+    }
+}
 //функции Slide
 //TODO: setBackground()
 //TODO: setIsSkip()
