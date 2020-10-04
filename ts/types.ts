@@ -19,7 +19,7 @@ type Programm = {
     currentPresentation: Presentation,
     selectedSlides: Array<Slide>,           
     archive: ArchiveOfState,
-    selectedElements: Array<Element>,
+    selectedElements: Array<PictureObj | TextObj | Triangle | Rect | Circle>,
 };
 
 type Presentation = {

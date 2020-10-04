@@ -178,6 +178,49 @@ function setSlideIsSkip(prog: Programm, newIsSkip: boolean): Programm {
     }
 }
 
+function deleteSelectedElements(prog: Programm): Programm {
+    let copySlides: Array<Slide> = prog.currentPresentation.slides;
+    let newSlides: Array<Slide> = [];
+
+    for (let i = 0; i < copySlides.length; i++) {
+        newSlides.push({
+            ...copySlides[i],
+            elements: [...copySlides[i].elements.filter((e) => !prog.selectedElements.includes(e))]
+        }); 
+    }
+
+    return {
+        ...prog,
+        currentPresentation: {
+            ...prog.currentPresentation,
+            slides: [...newSlides]
+        },
+        selectedElements: []
+    }
+}
+
+
+function goBackAchive(prog: Programm): Programm {
+    //TODO: а если истории нет, всю перемотали?
+    let state: Programm = prog.archive.past[prog.archive.past.length - 1];
+
+    return {
+        ...state,
+        archive: {
+            ...state.archive,
+            future: [
+                {...prog},
+                ...state.archive.future
+            ]
+        }
+    }
+}
+
+function goForwardAchive(prog: Programm): Programm {
+    //TODO: а если истории нет, всю перемотали?    
+    return prog.archive.future[0]
+}
+
 
 //то что выяснили в пятницу в Zoom'е
 //TODO: Programm.selectedSlide это массив слайдов
