@@ -17,9 +17,9 @@ export {
 
 type Programm = {
     currentPresentation: Presentation,
-    selectedSlide: Slide,           
+    selectedSlides: Array<Slide>,           
     archive: ArchiveOfState,
-    selectedElement: Element,
+    selectedElements: Array<Element>,
 };
 
 type Presentation = {

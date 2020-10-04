@@ -15,24 +15,30 @@ import {
     Circle
 } from './types';
 
-function createProgram(prog:Programm): Programm {
-    let curSlide: Slide = addPAHASlide();
+export {
+    createProgram,
+    addSlide,
+    deleteSlide
+}
+
+function createProgram(): Programm {
+    let curSlide: Slide = supportAddSlide();
 
     return {
         currentPresentation: {
             title: 'Презентация без названия',
             slides: [curSlide]
         },
-        selectedSlide: curSlide,
+        selectedSlides: [curSlide],
         archive: {
             past: [],
             future: []
         },
-        selectedElement: null,
+        selectedElements: []
     }
 }
 
-function addPAHASlide(): Slide {
+function supportAddSlide(): Slide {
     return {
         background: {
             hexColor: 0,
@@ -43,8 +49,8 @@ function addPAHASlide(): Slide {
     }
 }
 
-function addSlide(prog:Programm): Programm {
-    let curSlide: Slide = addPAHASlide();
+function addSlide(prog: Programm): Programm {
+    let curSlide: Slide = supportAddSlide();
 
     return {
         ...prog,
@@ -55,24 +61,123 @@ function addSlide(prog:Programm): Programm {
                 curSlide
             ]
         },
-        selectedSlide : curSlide
+        selectedSlides : [curSlide]
     }
 }
 
-function deleteSlide(prog:Programm): Programm {
+function supportSlidesWithoutSelectedSlides(slides: Array<Slide>, selectedSlides: Array<Slide>): Array<Slide> {
+    return [
+        ...slides.filter((e) => !selectedSlides.includes(e))
+    ]
+}
+
+function deleteSlide(prog: Programm): Programm {
+    let oldPos: number = prog.currentPresentation.slides.length - 1;
+    for (let i = 0; i < prog.currentPresentation.slides.length; i++) {
+        if ((prog.selectedSlides.includes(prog.currentPresentation.slides[i])) && (oldPos > i)) {
+            oldPos = i;
+        }
+    }
+
     return {
         ...prog,
         currentPresentation: {
             ...prog.currentPresentation,
-            slides: [
-                ...prog.currentPresentation.slides.filter(function(e) {
-                    return e !== prog.selectedSlide
-                })
-            ]
+            slides: supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides)
         },
-        selectedSlide : null    //TODO: здесь будет следующий слайд после удаленного
+        selectedSlides: 
+            (prog.currentPresentation.slides.length == 0)? 
+                []:
+                (prog.currentPresentation.slides.length-1 <= oldPos)? 
+                    [prog.currentPresentation.slides[oldPos]]: 
+                    [prog.currentPresentation.slides[prog.currentPresentation.slides.length-1]]
     }
 }
+
+function supportSortingSelectedSlides(slides: Array<Slide> , selectedSlides: Array<Slide>): Array<Slide> {
+    let sortedSelectedSlides: Array<Slide> = [];
+    for (let i = 0; i < slides.length; i++) {
+        if (selectedSlides.includes(slides[i])){
+            sortedSelectedSlides = [...sortedSelectedSlides, slides[i]];
+        }
+    }
+
+    return sortedSelectedSlides
+}
+
+
+function moveSlide(prog: Programm, posBefore: number): Programm {
+    let sortedSelectedSlides: Array<Slide> = supportSortingSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
+    let slidesWithoutSelectedSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
+    
+    return {
+        ...prog,
+        currentPresentation: {
+            ...prog.currentPresentation,
+            slides: 
+                (posBefore == 0)?
+                    [...sortedSelectedSlides, ...slidesWithoutSelectedSlides]:
+                    (prog.currentPresentation.slides.length == posBefore)?
+                        [...slidesWithoutSelectedSlides, ...sortedSelectedSlides]:
+                        //TODO: не так как в оригинале!
+                        [...slidesWithoutSelectedSlides.filter((e, i) => i < posBefore),
+                         ...sortedSelectedSlides,
+                         ...slidesWithoutSelectedSlides.filter((e, i) => i >= posBefore)
+                        ]
+        }
+    }
+}
+
+function setSelectedSlides(prog: Programm, selectedSlides: Array<Slide>): Programm {
+    return {
+        ...prog,
+        selectedSlides: selectedSlides
+    }
+}
+
+function saveProject(prog: Programm): string {
+    return JSON.stringify(prog);
+}
+
+function loadProject(prog: Programm, savedProject: string): Programm {
+    return JSON.parse(savedProject);
+}
+
+function changePresentationTitle(prog: Programm, newTitle: string): Programm {
+    return {
+        ...prog,
+        currentPresentation: {
+            ...prog.currentPresentation,
+            title: newTitle
+        }
+    }
+}
+
+function setSlideBackground(prog: Programm, newBackground: Picture | Color): Programm {
+    let changedSlide: Slide = prog.selectedSlides[prog.selectedSlides.length - 1];
+    changedSlide = {
+        ...changedSlide,
+        background: newBackground
+    }
+
+    return {
+        ...prog,
+        selectedSlides: [changedSlide]
+    }
+}
+
+function setSlideIsSkip(prog: Programm, newIsSkip: boolean): Programm {
+    let changedSlides: Array<Slide> = [...prog.selectedSlides];
+    for (let i = 0; i < changedSlides.length; i++) {
+        changedSlides[i].isSkip = newIsSkip; 
+    }
+
+    return {
+        ...prog,
+        selectedSlides: changedSlides
+    }
+}
+
 
 //то что выяснили в пятницу в Zoom'е
 //TODO: Programm.selectedSlide это массив слайдов
