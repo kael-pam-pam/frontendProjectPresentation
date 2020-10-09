@@ -12,12 +12,15 @@ import {
     ShapeObj,
 } from './types';
 
+import {createDefaultSlide,} from './slideMoveInProgramm'
+
 export {
     createProgram,
-    addSlide,
-    deleteSlide,
     changePresentationTitle,
-    createDefaultSlide
+    saveProject,
+    loadProject,
+    goBackAchive,
+    goForwardAchive
 }
 
 function createProgram(): Programm {
@@ -37,157 +40,6 @@ function createProgram(): Programm {
     }
 }
 
-function createNewId(): string {
-    const currDate = new Date()
-    const newId = String(currDate.getTime() % 10 ** 8)
-    return newId
-}
-
-function createDefaultSlide(): Slide {  //createDefaulSlide
-    return {
-        id: createNewId(),
-        background: {
-            hexColor: 0,
-            type: 'color'
-        },
-        elements: [],
-    }
-}
-
-function addSlide(prog: Programm): Programm {         
-    const curSlide: Slide = createDefaultSlide();
-
-    return {
-        ...prog,
-        currentPresentation: {
-            ...prog.currentPresentation,
-            slides: [
-                ...prog.currentPresentation.slides,
-                curSlide
-            ]
-        },
-        selectedSlides: [curSlide.id]
-    }    
-}
-
-function createPictureObj(): PictureObj { 
-    return {
-        id: createNewId(),
-        position: {
-            x: 10,
-            y: 10    
-        },
-        height: 15,
-        wigth: 15,
-        url: 'tutututu',
-        type: 'picture'
-    }
-}
-
-function addPictureObj(prog: Programm): Programm {
-    const newPictureObj = createPictureObj()
-    let changedSlide: Slide = searchChangedSlide(prog)
-    changedSlide = {
-        ...changedSlide,
-        elements: [newPictureObj]
-    }
-    return {
-        ...prog,
-        selectedSlides: [changedSlide.id]
-    }           
-}
-
-function searchChangedSlide(prog: Programm): Slide {
-    const slides = prog.currentPresentation.slides
-    const selectedSlide = prog.selectedSlides[prog.selectedSlides.length - 1]
-    let changedSlide: Slide = null
-    for (let i = 0; i < slides.length; i++) {     
-        if (slides[i].id == selectedSlide) {
-            changedSlide = slides[i]
-        }
-    }
-    return changedSlide
-}
-
-function supportSlidesWithoutSelectedSlides(slides: Array<Slide>, selectedSlides: Array<string>): Array<Slide> {
-    return [
-        ...slides.filter((e) => !selectedSlides.includes(e.id))                                                  // ?                   
-    ]
-}
-
-function deleteSlide(prog: Programm): Programm {
-    let oldPos: number = prog.currentPresentation.slides.length - 1;
-    for (let i = 0; i < prog.currentPresentation.slides.length; i++) {
-        if ((prog.selectedSlides.includes(prog.currentPresentation.slides[i].id)) && (oldPos > i)) { // .id
-            oldPos = i;
-        }
-    }
-
-    return {
-        ...prog,
-        currentPresentation: {
-            ...prog.currentPresentation,
-            slides: supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides)
-        },
-        selectedSlides: 
-            (prog.currentPresentation.slides.length == 0) 
-            ? []
-            : (prog.currentPresentation.slides.length - 1 <= oldPos)
-            ? [prog.currentPresentation.slides[oldPos].id]
-            : [prog.currentPresentation.slides[prog.currentPresentation.slides.length - 1].id]
-    }
-}
-
-
-function supportSortingSelectedSlides(slides: Array<Slide> , selectedSlides: Array<string>): Array<Slide> {
-    let sortedSelectedSlides: Array<Slide> = [];
-    for (let i = 0; i < slides.length; i++) {
-        if (selectedSlides.includes(slides[i].id)){
-            sortedSelectedSlides = [...sortedSelectedSlides, slides[i]];
-        }
-    }
-    return sortedSelectedSlides
-}
-
-
-function moveSlide(prog: Programm, posBefore: number): Programm {
-    let sortedSelectedSlides: Array<Slide> = supportSortingSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
-    let slidesWithoutSelectedSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
-    
-    return {
-        ...prog,
-        currentPresentation: {
-            ...prog.currentPresentation,
-            slides: 
-                (posBefore == 0) 
-                ? [...sortedSelectedSlides, ...slidesWithoutSelectedSlides]
-                : (prog.currentPresentation.slides.length == posBefore)
-                //TODO: не так как в оригинале!
-                ? [...slidesWithoutSelectedSlides, ...sortedSelectedSlides]
-                : [
-                    ...slidesWithoutSelectedSlides.filter((e, i) => i < posBefore),
-                    ...sortedSelectedSlides,
-                    ...slidesWithoutSelectedSlides.filter((e, i) => i >= posBefore)
-                  ]
-        }
-    }
-}
-
-function setSelectedSlides(prog: Programm, selectedSlides: Array<string>): Programm {
-    return {
-        ...prog,
-        selectedSlides: selectedSlides
-    }
-}
-
-function saveProject(prog: Programm): string {
-    return JSON.stringify(prog);
-}
-
-function loadProject(prog: Programm, savedProject: string): Programm {
-    return JSON.parse(savedProject);  // реализовать через blocker export pdf
-}
-
 function changePresentationTitle(prog: Programm, newTitle: string): Programm {
     return {
         ...prog,
@@ -198,39 +50,13 @@ function changePresentationTitle(prog: Programm, newTitle: string): Programm {
     }
 }
 
-function setSlideBackground(prog: Programm, newBackground: Picture | Color): Programm {
-    let changedSlide: Slide = searchChangedSlide(prog)     
 
-    changedSlide = {
-        ...changedSlide,
-        background: newBackground
-    }
-
-    return {
-        ...prog,
-        selectedSlides: [changedSlide.id]
-    }
+function saveProject(prog: Programm): string {
+    return JSON.stringify(prog);
 }
 
-function deleteSelectedElements(prog: Programm): Programm {
-    let copySlides: Array<Slide> = prog.currentPresentation.slides;
-    let newSlides: Array<Slide> = [];
-
-    for (let i = 0; i < copySlides.length; i++) {
-        newSlides.push({
-            ...copySlides[i],
-            elements: [...copySlides[i].elements.filter((e) => !prog.selectedElements.includes(e.id))]
-        })
-    }
-
-    return {
-        ...prog,
-        currentPresentation: {
-            ...prog.currentPresentation,
-            slides: [...newSlides]
-        },
-        selectedElements: []
-    }
+function loadProject(prog: Programm, savedProject: string): Programm {
+    return JSON.parse(savedProject);  // реализовать через blocker export pdf
 }
 
 
