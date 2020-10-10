@@ -10,34 +10,43 @@ import {
   TextObj,
   Color,
   ShapeObj,
-  Triangle,
-  Rect,
-  Circle
-} from './types';
+} from './types'
+
 import {
-  changePresentationTitle, 
+  addTextObj,
+  changeTextObj, 
+} from './changeSlideContent'
+
+import {
   createProgram, 
-  createDefaultSlide, 
-  addSlide,
-  deleteSlide
-} from './functions';
+} from './functions'
+
+import {
+  defaultPoint,
+  createNewId,
+  searchChangedSlideIndex,
+  searchChangedElemIndex,
+  isTextObj,
+  isShapeObj,
+  isPictureObj
+} from './commonFunctionsConst'
 
 
+test('change_Text_In_TextObj', () => {
 
-const emptyProg: Programm = {
-  currentPresentation: {
-    title: null,
-    slides: []
-  },	
-  selectedSlides: [],           
-  archive: {
-    past: [],
-    future: []
-  } ,
-  selectedElements: [],
-}
+  let prog: Programm = createProgram()
+  let newText: string = null
+  const progWithText: Programm = addTextObj(prog) 
+
+  if (isTextObj(progWithText.currentPresentation.slides[0].elements[0])) {
+    newText = progWithText.currentPresentation.slides[0].elements[0].text
+  }
+
+  expect(newText).toEqual('введите текст')
+})
 
 
+/*
 // supportAddSlide
 
 test('support_Add_Slide', () => {
@@ -112,5 +121,5 @@ test('delete_Any_Slide', () => {
 
 // 
 
-
+*/
 

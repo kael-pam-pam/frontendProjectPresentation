@@ -17,7 +17,10 @@ export {
   defaultPoint,
   createNewId,
   searchChangedSlideIndex,
-  searchChangedElemIndex
+  searchChangedElemIndex,
+  isTextObj,
+  isShapeObj,
+  isPictureObj
 }
 
 const defaultPoint: Point = {
@@ -53,4 +56,16 @@ function searchChangedElemIndex(prog: Programm, changedSlideIndex: number): numb
     }
   }
   return changedElemIndex
+}
+
+function isTextObj(elem: any): elem is TextObj {
+  return elem.text !== undefined && elem.fontSize !== undefined
+}
+
+function isShapeObj(elem: any): elem is ShapeObj {
+  return elem.borderColor !== undefined && elem.fillColor !== undefined;
+}
+
+function isPictureObj(elem: any): elem is PictureObj {
+  return elem.url !== undefined
 }

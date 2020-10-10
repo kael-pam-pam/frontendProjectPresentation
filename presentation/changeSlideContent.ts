@@ -16,7 +16,10 @@ import {
   defaultPoint,
   createNewId,
   searchChangedSlideIndex,
-  searchChangedElemIndex
+  searchChangedElemIndex,
+  isTextObj,
+  isShapeObj,
+  isPictureObj
 } from './commonFunctionsConst'
 
 export {
@@ -25,8 +28,10 @@ export {
   addPictureObj,
   createEmtyTextObj,
   addTextObj,
+  changeTextObj,
   createShapeObj,
   addShapeObj,
+  changeShapeObj,
   resizeElement,
   changeElemPosition,
   setSelectedElement,
@@ -47,19 +52,20 @@ function setSlideBackground(prog: Programm, newBackground: Picture | Color): Pro
   }
 }
 
-function createPictureObj(): PictureObj { 
+
+function createPictureObj(url: string): PictureObj { 
   return {
       id: createNewId(),
       position: defaultPoint,
       height: 15,
       wigth: 15,
-      url: 'tutututu',
+      url: url,
       type: 'picture'
   }
 }
 
-function addPictureObj(prog: Programm): Programm {
-  const newPictureObj = createPictureObj()
+function addPictureObj(prog: Programm, url: string): Programm {
+  const newPictureObj = createPictureObj(url)
   const changedSlideIndex: number = searchChangedSlideIndex(prog)
   let copyOfSlides: Array<Slide> = prog.currentPresentation.slides
   copyOfSlides[changedSlideIndex].elements.push(newPictureObj) 
@@ -72,20 +78,6 @@ function addPictureObj(prog: Programm): Programm {
   }           
 }
 
-function changePictureInPictureObj(prog: Programm, newUrl: string): Programm {
-  const changedSlideIndex: number = searchChangedSlideIndex(prog)
-  let copyOfSlides: Array<Slide> = prog.currentPresentation.slides
-  const changedElemIndex: number = searchChangedElemIndex(prog, changedSlideIndex)
-  copyOfSlides[changedSlideIndex].elements[changedElemIndex].url = newUrl         // <===  elements: Array<PictureObj | TextObj | ShapeObj>,
-  return {
-    ...prog,
-    currentPresentation: {
-        ...prog.currentPresentation,
-        slides: copyOfSlides
-    }
-  }  
-}
-
 function createEmtyTextObj(): TextObj {
   return {
       id: createNewId(),
@@ -94,7 +86,7 @@ function createEmtyTextObj(): TextObj {
       wigth: 30,
       text: 'введите текст',
       fontFamily: 'roboto',
-      fontSize: 14,
+      fontSize: '14',
       type: 'text'
   }
 }
@@ -105,30 +97,76 @@ function addTextObj(prog: Programm): Programm {
   let copyOfSlides: Array<Slide> = prog.currentPresentation.slides
   copyOfSlides[changedSlideIndex].elements.push(newTextObj)
   return {
-      ...prog,
-      currentPresentation: {
-          ...prog.currentPresentation,
-          slides: copyOfSlides
-      }
+    ...prog,
+    currentPresentation: {
+        ...prog.currentPresentation,
+        slides: copyOfSlides
+    }
   }
 }
 
-function createShapeObj(prog: Programm, shapeType: string): ShapeObj {
-  let type = 'rect'
-  if (shapeType == 'triangle') {
-      type = 'triangle'
-  } 
-  if (shapeType == 'circle') {
-      type = 'circle'
+
+function changeTextObj(prog: Programm, newParam: string, paramType: string): Programm {
+  const changedSlideIndex: number = searchChangedSlideIndex(prog)
+  const changedElemIndex: number = searchChangedElemIndex(prog, changedSlideIndex)
+  let copyOfSlides: Array<Slide> = prog.currentPresentation.slides
+  
+  let elemToChange = copyOfSlides[changedSlideIndex].elements[changedElemIndex]
+
+  if(isTextObj(elemToChange)) {
+    if (paramType == 'text') {
+      elemToChange.text = newParam
+    }
+    if (paramType == 'fontFamily') {
+      elemToChange.fontFamily = newParam
+    }
+    if (paramType == 'fontSize') {
+      elemToChange.fontSize = newParam
+    }
   }
+  copyOfSlides[changedSlideIndex].elements[changedElemIndex] = elemToChange
   return {
+    ...prog,
+    currentPresentation: {
+        ...prog.currentPresentation,
+        slides: copyOfSlides
+    }
+  }  
+}
+
+function createShapeObj(prog: Programm, shapeType: string): ShapeObj {
+  if (shapeType == 'triangle') {
+    return {
       id: createNewId(),
       position: defaultPoint,
       wigth: 15,
       height: 15,
-      borderColor: 11,
-      fillColor: 11,
-      type: type
+      borderColor: '11',
+      fillColor: '11',
+      type: 'triangle'
+    }
+  } 
+  if (shapeType == 'circle') {
+    return {
+      id: createNewId(),
+      position: defaultPoint,
+      wigth: 15,
+      height: 15,
+      borderColor: '11',
+      fillColor: '11',
+      type: 'circle'
+    }
+  }
+  if (shapeType == 'rect') {
+    return {
+      id: createNewId(),
+      position: defaultPoint,
+      wigth: 15,
+      height: 15,
+      borderColor: '11',
+      fillColor: '11',
+      type: 'rect'
+    }
   }
 } 
 
@@ -144,6 +182,31 @@ function addShapeObj(prog: Programm, shapeType: string): Programm {
           slides: copyOfSlides
       }    
   }
+}
+
+function changeShapeObj(prog: Programm, newParam: string, paramType: string): Programm {
+  const changedSlideIndex: number = searchChangedSlideIndex(prog)
+  const changedElemIndex: number = searchChangedElemIndex(prog, changedSlideIndex)
+  let copyOfSlides: Array<Slide> = prog.currentPresentation.slides
+  
+  let elemToChange = copyOfSlides[changedSlideIndex].elements[changedElemIndex]
+
+  if(isShapeObj(elemToChange)) {
+    if (paramType == 'borderColor') {
+      elemToChange.borderColor = newParam
+    }
+    if (paramType == 'fillColor') {
+      elemToChange.fillColor = newParam
+    }
+  }
+  copyOfSlides[changedSlideIndex].elements[changedElemIndex] = elemToChange
+  return {
+    ...prog,
+    currentPresentation: {
+        ...prog.currentPresentation,
+        slides: copyOfSlides
+    }
+  }  
 }
 
 function resizeElement(prog: Programm, newWidth:number, newHeigth: number): Programm {
@@ -192,19 +255,19 @@ function deleteSelectedElements(prog: Programm): Programm {
   let newSlides: Array<Slide> = [];
 
   for (let i = 0; i < copySlides.length; i++) {
-      newSlides.push({
-          ...copySlides[i],
-          elements: [...copySlides[i].elements.filter((e) => !prog.selectedElements.includes(e.id))]
-      })
+    newSlides.push({
+        ...copySlides[i],
+        elements: [...copySlides[i].elements.filter((e) => !prog.selectedElements.includes(e.id))]
+    })
   }
 
   return {
-      ...prog,
-      currentPresentation: {
-          ...prog.currentPresentation,
-          slides: [...newSlides]
-      },
-      selectedElements: []
+    ...prog,
+    currentPresentation: {
+        ...prog.currentPresentation,
+        slides: [...newSlides]
+    },
+    selectedElements: []
   }
 }
 

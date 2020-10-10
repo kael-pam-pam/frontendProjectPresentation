@@ -32,7 +32,7 @@ type ArchiveOfState = {
 type Slide = {
     id: string,
     background: Picture | Color,
-    elements: Array<PictureObj | TextObj | ShapeObj>,   
+    elements: Array<PictureObj | ShapeObj | TextObj>,   
 };
 
 type Point = {
@@ -57,19 +57,19 @@ type PictureObj = ElementObj & Picture;
 type TextObj = ElementObj & {
     text: string,
 	fontFamily: string,
-	fontSize: number,
+	fontSize: string,
 	type: 'text',
 };
 
 type Color = {
-    hexColor: number, //string
+    hexColor: string, //string
     type: 'color',
 };
 
 type ShapeObj = ElementObj & {
     type: 'triangle' | 'rect' | 'circle',
-    borderColor: number, //borderColor  string
-    fillColor: number,
+    borderColor: string, //borderColor  string
+    fillColor: string,
 };
 
 
