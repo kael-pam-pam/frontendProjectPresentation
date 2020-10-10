@@ -1,4 +1,3 @@
-import { deleteSelectedElements } from './changeSlideContent';
 import {
   Programm,
   Presentation,
@@ -11,7 +10,8 @@ import {
   TextObj,
   Color,
   ShapeObj,
-} from './types';
+} from './types'
+
 
 export {
   defaultPoint,
@@ -20,8 +20,11 @@ export {
   searchChangedElemIndex,
   isTextObj,
   isShapeObj,
-  isPictureObj
+  isPictureObj,
+  delay
 }
+
+
 
 const defaultPoint: Point = {
   x: 10,
@@ -30,6 +33,7 @@ const defaultPoint: Point = {
 
 function createNewId(): string {
   const currDate = new Date()
+  delay(700)                              // kostilishce
   const newId = String(currDate.getTime() % 10 ** 8)
   return newId
 }
@@ -68,4 +72,8 @@ function isShapeObj(elem: any): elem is ShapeObj {
 
 function isPictureObj(elem: any): elem is PictureObj {
   return elem.url !== undefined
+}
+
+function delay(ms: number) {
+  return new Promise( resolve => setTimeout(resolve, ms) );
 }

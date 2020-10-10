@@ -74,7 +74,8 @@ function addPictureObj(prog: Programm, url: string): Programm {
     currentPresentation: {
         ...prog.currentPresentation,
         slides: copyOfSlides
-    }
+    },
+    selectedElements: [newPictureObj.id]
   }           
 }
 
@@ -101,7 +102,8 @@ function addTextObj(prog: Programm): Programm {
     currentPresentation: {
         ...prog.currentPresentation,
         slides: copyOfSlides
-    }
+    },
+    selectedElements: [newTextObj.id]
   }
 }
 
@@ -134,7 +136,7 @@ function changeTextObj(prog: Programm, newParam: string, paramType: string): Pro
   }  
 }
 
-function createShapeObj(prog: Programm, shapeType: string): ShapeObj {
+function createShapeObj(shapeType: string): ShapeObj {
   if (shapeType == 'triangle') {
     return {
       id: createNewId(),
@@ -171,7 +173,7 @@ function createShapeObj(prog: Programm, shapeType: string): ShapeObj {
 } 
 
 function addShapeObj(prog: Programm, shapeType: string): Programm {
-  const newShapeObj = createShapeObj(prog, shapeType)
+  const newShapeObj = createShapeObj(shapeType)
   const changedSlideIndex: number = searchChangedSlideIndex(prog)
   let copyOfSlides: Array<Slide> = prog.currentPresentation.slides
   copyOfSlides[changedSlideIndex].elements.push(newShapeObj)
@@ -180,7 +182,8 @@ function addShapeObj(prog: Programm, shapeType: string): Programm {
       currentPresentation: {
           ...prog.currentPresentation,
           slides: copyOfSlides
-      }    
+      },
+      selectedElements: [newShapeObj.id]    
   }
 }
 
@@ -251,13 +254,14 @@ function setSelectedElement(prog: Programm, selectedElems: Array<string>): Progr
 }
 
 function deleteSelectedElements(prog: Programm): Programm {
-  let copySlides: Array<Slide> = prog.currentPresentation.slides;
+
+  let copySlides: Array<Slide> = prog.currentPresentation.slides
   let newSlides: Array<Slide> = [];
 
   for (let i = 0; i < copySlides.length; i++) {
     newSlides.push({
         ...copySlides[i],
-        elements: [...copySlides[i].elements.filter((e) => !prog.selectedElements.includes(e.id))]
+        elements: [...copySlides[i].elements.filter((elem) => !prog.selectedElements.includes(elem.id))]
     })
   }
 
@@ -265,7 +269,7 @@ function deleteSelectedElements(prog: Programm): Programm {
     ...prog,
     currentPresentation: {
         ...prog.currentPresentation,
-        slides: [...newSlides]
+        slides: newSlides
     },
     selectedElements: []
   }
