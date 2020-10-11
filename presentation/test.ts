@@ -161,7 +161,6 @@ test('changeTextObj', () => {
 })
 
 test('createShapeObj', () => {
-  let prog = createProgram()
   let shapeObj = createShapeObj('rect')
   expect(shapeObj.type).toEqual('rect')
 
