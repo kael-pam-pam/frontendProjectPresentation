@@ -276,9 +276,6 @@ test('deleteSelectedElements', () => {
   prog = addShapeObj(prog, 'rect')
   const thirdId = prog.currentPresentation.slides[0].elements[2].id
 
-  
-  expect(secondId).toEqual(thirdId)
-
   prog.selectedElements = [firstId, secondId, thirdId]
 
   expect(prog.currentPresentation.slides[0].elements.length).toEqual(3)
