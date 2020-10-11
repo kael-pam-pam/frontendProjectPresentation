@@ -33,7 +33,7 @@ const defaultPoint: Point = {
 
 function createNewId(): string {
   const currDate = new Date()
-  delay(700)                              // kostilishce
+  delay(700)                              // Переделать через асинхрон, костылищще
   const newId = String(currDate.getTime() % 10 ** 8)
   return newId
 }
