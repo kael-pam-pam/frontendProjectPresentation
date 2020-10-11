@@ -10,95 +10,81 @@ import {
     TextObj,
     Color,
     ShapeObj,
-    Triangle,
-    Rect,
-    Circle
 } from './types';
 
-function createProgram(prog:Programm): Programm {
-    let curSlide: Slide = addPAHASlide();
+import {createDefaultSlide,} from './slideMoveInProgramm'
 
+export {
+    createProgram,
+    changePresentationTitle,
+    saveProject,
+    loadProject,
+    goBackAchive,
+    goForwardAchive
+}
+
+function createProgram(): Programm {
+    const currSlide: Slide = createDefaultSlide();
     return {
         currentPresentation: {
             title: 'Презентация без названия',
-            slides: [curSlide]
+            slides: [currSlide]
         },
-        selectedSlides: [curSlide],
+        selectedSlides: [currSlide.id],
         archive: {
             past: [],
             future: []
         },
-        selectedElement: null,
+        selectedElements: []
     }
 }
 
-function addPAHASlide(): Slide {
-    return {
-        background: {
-            hexColor: 0,
-            type: 'color'
-        },
-        elements: [],
-        isSkip: false 
-    }
-}
-
-function addSlide(prog:Programm): Programm {
-    let curSlide: Slide = addPAHASlide();
-    prog.selectedSlides = [];
-    prog.selectedSlides.push(curSlide);
+function changePresentationTitle(prog: Programm, newTitle: string): Programm {
     return {
         ...prog,
         currentPresentation: {
             ...prog.currentPresentation,
-            slides: [
-                ...prog.currentPresentation.slides,
-                curSlide
+            title: newTitle
+        }
+    }
+}
+
+
+function saveProject(prog: Programm): string {
+    return JSON.stringify(prog);
+}
+
+function loadProject(prog: Programm, savedProject: string): Programm {
+    return JSON.parse(savedProject);  // реализовать через blocker export pdf
+}
+
+
+function goBackAchive(prog: Programm): Programm {
+    //TODO: а если истории нет, всю перемотали?
+    let state: Programm = prog.archive.past[prog.archive.past.length - 1];
+
+    return {
+        ...state,
+        archive: {
+            ...state.archive,
+            future: [
+                {...prog},
+                ...state.archive.future
             ]
         }
     }
 }
 
-function deleteSlide(prog:Programm): Programm {
-    return {
-        ...prog,
-        currentPresentation: {
-            ...prog.currentPresentation,
-            slides: [
-                ...prog.currentPresentation.slides.filter(
-                      item => prog.selectedSlides.indexOf(item) < 0
-                )
-            ]
-        },
-        selectedSlides: []   //TODO: здесь будет следующий слайд после удаленного
-    }
+function goForwardAchive(prog: Programm): Programm {
+    //TODO: а если истории нет, всю перемотали?    
+    return prog.archive.future[0]
 }
-//let missing = a1.filter(item => a2.indexOf(item) < 0);
+
+
 //то что выяснили в пятницу в Zoom'е
 //TODO: Programm.selectedSlide это массив слайдов
 //TODO: в массиве Programm.selectedSlide последний слайд отображается на экране (АКТИВНЫЙ СЛАЙД)
-//TODO: функция перемещения selectedSlides внутри массива слайдов, можно переносить несколько слайдов
-function moveSlides(prog:Programm, newPosition:number): Programm {
-    let newArray = [];
-    for(var i = 0; i < prog.currentPresentation.slides.length; i++) {
-        let state = 1;
-        for(var i3 = 0; i3 < prog.selectedSlides.length; i3++) {
-            if (i == newPosition) {
-                newArray.push(prog.selectedSlides[i3])
-            }
-            if (prog.currentPresentation.slides[i] == prog.selectedSlides[i3]) state = 0
-        }
-        if (state) newArray.push(prog.currentPresentation.slides[i])
-    } 
-    
-    return {
-        ...prog,
-        currentPresentation: {
-            ...prog.currentPresentation,
-            slides: newArray
-        }
-    }
-}
+//TODO: функция перемещения selectedSlide внутри массива слайдов
 
 //TODO: Programm.selectedElement это массив элементов
 //TODO: у массива Programm.selectedElement (если там несколько элементов) можно менять ТОЛЬКО положение и масштабировать и удалять
@@ -115,15 +101,6 @@ function moveSlides(prog:Programm, newPosition:number): Programm {
 //TODO: loadProject()
 //функции Presentation
 //TODO: changeTitle()
-function changeTitle(prog:Programm, newTitle:string): Programm {
-    return {
-        ...prog,
-        currentPresentation: {
-            ...prog.currentPresentation,
-            title : newTitle
-        }
-    }
-}
 //функции Slide
 //TODO: setBackground()
 //TODO: setIsSkip()

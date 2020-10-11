@@ -10,16 +10,13 @@ export {
     TextObj,
     Color,
     ShapeObj,
-    Triangle,
-    Rect,
-    Circle
 }
 
 type Programm = {
     currentPresentation: Presentation,
-    selectedSlides:  Array<Slide>,           
-    archive: ArchiveOfState,
-    selectedElement: Element,
+    selectedSlides: Array<string>,         
+    archive: ArchiveOfState,  // архив вынести
+    selectedElements: Array<string>,
 };
 
 type Presentation = {
@@ -27,15 +24,15 @@ type Presentation = {
     slides: Array<Slide>, 
 };
 
-type ArchiveOfState = {
+type ArchiveOfState = {  
     past: Array<Programm>,   
     future: Array<Programm>, 
 };
 
 type Slide = {
+    id: string,
     background: Picture | Color,
-    elements: Array<PictureObj | TextObj | Triangle | Rect | Circle>,   
-    isSkip: boolean,
+    elements: Array<PictureObj | ShapeObj | TextObj>,   
 };
 
 type Point = {
@@ -44,6 +41,7 @@ type Point = {
 };
 
 type ElementObj = {
+    id: string,
     position: Point,
     height: number,
     wigth: number,
@@ -59,39 +57,20 @@ type PictureObj = ElementObj & Picture;
 type TextObj = ElementObj & {
     text: string,
 	fontFamily: string,
-	fontSize: number,
+	fontSize: string,
 	type: 'text',
 };
 
 type Color = {
-    hexColor: number,
+    hexColor: string, //string
     type: 'color',
 };
 
 type ShapeObj = ElementObj & {
     type: 'triangle' | 'rect' | 'circle',
-    hexColorCircuit: number,
-    hexColorFill: number,
+    borderColor: string, //borderColor  string
+    fillColor: string,
 };
 
-type Triangle = ShapeObj & {
-	type: 'triangle',
-	v1: Point,
-	v2: Point,
-	v3: Point,  
-};
 
-type Rect = ShapeObj & {
-	type: 'rect',
-	v1: Point,
-	v2: Point,
-    v3: Point,
-    v4: Point,  
-};
-
-type Circle = ShapeObj & {
-	type: 'circle',
-	centre: Point,
-	radius: number,
-};
 
