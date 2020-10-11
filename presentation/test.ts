@@ -123,13 +123,16 @@ test('addTextObj' , () => {
 
 test('searchChangedSlideIndex', () => {
   const prog = createProgram()
-  expect(prog.selectedSlides.length).toEqual(1)
+  const changedSlideIndex = searchChangedSlideIndex(prog)
+  expect(changedSlideIndex).toEqual(0)
 })
 
 test('searchChangedElemIndex', () => {
   let prog = createProgram()
   prog = addTextObj(prog)
-  expect(prog.selectedElements.length).toEqual(1)
+  const changedSlideIndex = searchChangedSlideIndex(prog)
+  const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
+  expect(changedElemIndex).toEqual(0)
 })
 
 test('changeTextObj', () => {
