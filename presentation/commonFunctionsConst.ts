@@ -20,11 +20,8 @@ export {
   searchChangedElemIndex,
   isTextObj,
   isShapeObj,
-  isPictureObj,
-  delay
+  isPictureObj
 }
-
-
 
 const defaultPoint: Point = {
   x: 10,
@@ -32,9 +29,10 @@ const defaultPoint: Point = {
 }
 
 function createNewId(): string {
-  const currDate = new Date()
-  delay(700)                              // Переделать через асинхрон, костылищще
-  const newId = String(currDate.getTime() % 10 ** 8)
+  const max = 300
+  const min = 10
+  const randomNum = Math.floor(Math.random() * (max - min)) + min
+  const newId = String((new Date()).getTime() % 10 ** 8 + randomNum)
   return newId
 }
 
@@ -74,6 +72,4 @@ function isPictureObj(elem: any): elem is PictureObj {
   return elem.url !== undefined
 }
 
-function delay(ms: number) {
-  return new Promise( resolve => setTimeout(resolve, ms) );
-}
+

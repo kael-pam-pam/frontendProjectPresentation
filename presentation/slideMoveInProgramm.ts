@@ -53,7 +53,6 @@ function addSlide(prog: Programm): Programm {
   }    
 }
 
-
 function supportSlidesWithoutSelectedSlides(slides: Array<Slide>, selectedSlides: Array<string>): Array<Slide> {
   return [
       ...slides.filter((e) => !selectedSlides.includes(e.id))                                                  // ?                   
@@ -76,21 +75,21 @@ function moveSlide(prog: Programm, posBefore: number): Programm {
   let slidesWithoutSelectedSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
   
   return {
-      ...prog,
-      currentPresentation: {
-          ...prog.currentPresentation,
-          slides: 
-              (posBefore == 0) 
-              ? [...sortedSelectedSlides, ...slidesWithoutSelectedSlides]
-              : (prog.currentPresentation.slides.length == posBefore)
-              //TODO: не так как в оригинале!
-              ? [...slidesWithoutSelectedSlides, ...sortedSelectedSlides]
-              : [
-                  ...slidesWithoutSelectedSlides.filter((e, i) => i < posBefore),
-                  ...sortedSelectedSlides,
-                  ...slidesWithoutSelectedSlides.filter((e, i) => i >= posBefore)
-                ]
-      }
+    ...prog,
+    currentPresentation: {
+      ...prog.currentPresentation,
+      slides: 
+        (posBefore == 0) 
+        ? [...sortedSelectedSlides, ...slidesWithoutSelectedSlides]
+        : (prog.currentPresentation.slides.length == posBefore)
+        //TODO: не так как в оригинале!
+        ? [...slidesWithoutSelectedSlides, ...sortedSelectedSlides]
+        : [
+            ...slidesWithoutSelectedSlides.filter((e, i) => i < posBefore),
+            ...sortedSelectedSlides,
+            ...slidesWithoutSelectedSlides.filter((e, i) => i >= posBefore)
+          ]
+    }
   }
 }
 
@@ -102,25 +101,28 @@ function setSelectedSlides(prog: Programm, selectedSlides: Array<string>): Progr
 }
 
 function deleteSlide(prog: Programm): Programm {
-  let oldPos: number = prog.currentPresentation.slides.length - 1;
+  /*let oldPos: number = prog.currentPresentation.slides.length - 1;
   for (let i = 0; i < prog.currentPresentation.slides.length; i++) {
-      if ((prog.selectedSlides.includes(prog.currentPresentation.slides[i].id)) && (oldPos > i)) { // .id
+      if ((prog.selectedSlides.includes(prog.currentPresentation.slides[i].id)) && (oldPos > i)) { 
           oldPos = i;
       }
-  }
+  }*/
 
+  const slidesWithoutSelectedSlides = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides)
+  const indexOfSelectedSlide = slidesWithoutSelectedSlides.length - 1
   return {
       ...prog,
       currentPresentation: {
           ...prog.currentPresentation,
-          slides: supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides)
+          slides: slidesWithoutSelectedSlides
       },
       selectedSlides: 
           (prog.currentPresentation.slides.length == 0) 
           ? []
-          : (prog.currentPresentation.slides.length - 1 <= oldPos)
-          ? [prog.currentPresentation.slides[oldPos].id]
-          : [prog.currentPresentation.slides[prog.currentPresentation.slides.length - 1].id]
+          : [slidesWithoutSelectedSlides[indexOfSelectedSlide].id]
+          //: (prog.currentPresentation.slides.length - 1 <= oldPos)
+          //? [prog.currentPresentation.slides[oldPos].id]
+          //: [prog.currentPresentation.slides[prog.currentPresentation.slides.length - 1].id]
   }
 }
 

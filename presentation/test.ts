@@ -61,7 +61,7 @@ import {
 
 test('createProgramm', () => {     
   const newTittle = 'Презентация без названия'
-  const newProgState: Programm = createProgram()
+  let newProgState: Programm = createProgram()
 
   expect(newProgState.currentPresentation.title).toEqual(newTittle)
   expect(newProgState.currentPresentation.slides.length).toEqual(1)
@@ -276,6 +276,10 @@ test('deleteSelectedElements', () => {
   prog = addShapeObj(prog, 'rect')
   const thirdId = prog.currentPresentation.slides[0].elements[2].id
 
+  //expect(firstId).toEqual(secondId)
+  //expect(secondId).toEqual(thirdId)
+  //expect(thirdId).toEqual(firstId)
+
   prog.selectedElements = [firstId, secondId, thirdId]
 
   expect(prog.currentPresentation.slides[0].elements.length).toEqual(3)
@@ -285,4 +289,120 @@ test('deleteSelectedElements', () => {
 
   expect(prog.currentPresentation.slides[0].elements.length).toEqual(0)
   expect(prog.selectedElements.length).toEqual(0)
+})
+
+//========================================================================
+
+test('setSelectedSlides', () => {     
+  const prog = createProgram();
+  const currSlide1: Slide = createDefaultSlide();
+  const currSlide2: Slide = createDefaultSlide();
+  const currSlide3: Slide = createDefaultSlide();
+  const currSlide4: Slide = createDefaultSlide();
+  const currSlide5: Slide = createDefaultSlide();
+  prog.currentPresentation.slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5];
+  
+  const newProgState: Programm = setSelectedSlides(prog, [currSlide2.id, currSlide4.id]);
+
+  expect(newProgState.selectedSlides.length).toEqual(2)
+  expect(newProgState.selectedSlides[0]).toEqual(currSlide2.id)
+  expect(newProgState.selectedSlides[1]).toEqual(currSlide4.id)
+})
+
+test('addSlide', () => {     
+  let prog = createProgram();
+  const currSlide1: Slide = createDefaultSlide();
+  const currSlide2: Slide = createDefaultSlide();
+  const currSlide3: Slide = createDefaultSlide();
+  const currSlide4: Slide = createDefaultSlide();
+  const currSlide5: Slide = createDefaultSlide();
+  prog.currentPresentation.slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5];
+
+  prog = addSlide(prog);
+
+  expect(prog.selectedSlides.length).toEqual(1)
+  expect(prog.selectedSlides[0]).toEqual(prog.currentPresentation.slides[prog.currentPresentation.slides.length - 1].id)
+  expect(prog.currentPresentation.slides.length).toEqual(6)
+})
+
+//supportSlidesWithoutSelectedSlides(slides: Array<Slide>, selectedSlides: Array<string>): Array<Slide>
+
+test('supportSortingSelectedSlides', () => {
+  let slides: Array<Slide> = [];
+  let selectedSlides: Array<string> = [];
+  const currSlide1: Slide = createDefaultSlide()
+  const currSlide2: Slide = createDefaultSlide()
+  const currSlide3: Slide = createDefaultSlide()
+  const currSlide4: Slide = createDefaultSlide()
+  const currSlide5: Slide = createDefaultSlide()
+
+  slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5]
+  selectedSlides = [currSlide4.id, currSlide1.id, currSlide2.id]
+
+  const sortedSelectSlides = supportSortingSelectedSlides(slides, selectedSlides)
+
+  expect(sortedSelectSlides.length).toEqual(3)
+  expect(sortedSelectSlides[0]).toEqual(currSlide1)
+  expect(sortedSelectSlides[1]).toEqual(currSlide2)
+  expect(sortedSelectSlides[2]).toEqual(currSlide4)
+})
+
+test('supportSlidesWithoutSelectedSlides', () => {     
+  let slides: Array<Slide> = [];
+  let selectedSlides: Array<string> = [];
+  const currSlide1: Slide = createDefaultSlide();
+  const currSlide2: Slide = createDefaultSlide();
+  const currSlide3: Slide = createDefaultSlide();
+  const currSlide4: Slide = createDefaultSlide();
+  const currSlide5: Slide = createDefaultSlide();
+  slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5];
+  selectedSlides = [currSlide2.id, currSlide4.id];
+
+  const newSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(slides, selectedSlides);
+  expect(newSlides.length).toEqual(3);
+  expect(newSlides[0].id).toEqual(currSlide1.id);
+  expect(newSlides[1].id).toEqual(currSlide3.id);
+  expect(newSlides[2].id).toEqual(currSlide5.id);
+})
+
+
+test('deleteSlide', () => {     
+  let prog = createProgram();
+  const currSlide1: Slide = createDefaultSlide();
+  const currSlide2: Slide = createDefaultSlide();
+  const currSlide3: Slide = createDefaultSlide();
+  const currSlide4: Slide = createDefaultSlide();
+  const currSlide5: Slide = createDefaultSlide();
+  prog.currentPresentation.slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5];
+  prog.selectedSlides = [currSlide2.id, currSlide5.id];
+
+  prog = deleteSlide(prog);
+
+  expect(prog.selectedSlides.length).toEqual(1)
+  expect(prog.selectedSlides[0]).toEqual(currSlide4.id)
+  expect(prog.currentPresentation.slides.length).toEqual(3)
+  expect(prog.currentPresentation.slides[0].id).toEqual(currSlide1.id)
+  expect(prog.currentPresentation.slides[1].id).toEqual(currSlide3.id)
+  expect(prog.currentPresentation.slides[2].id).toEqual(currSlide4.id)
+})
+
+
+// moveSlide(prog: Programm, posBefore: number)
+test('moveSlide', () => {     
+  let prog = createProgram();
+  const currSlide1: Slide = createDefaultSlide();
+  const currSlide2: Slide = createDefaultSlide();
+  const currSlide3: Slide = createDefaultSlide();
+  const currSlide4: Slide = createDefaultSlide();
+  const currSlide5: Slide = createDefaultSlide();
+  prog.currentPresentation.slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5];
+  prog.selectedSlides = [currSlide3.id, currSlide5.id];
+
+  prog = moveSlide(prog, 1);
+
+  expect(prog.currentPresentation.slides[0].id).toEqual(currSlide1.id)
+  expect(prog.currentPresentation.slides[1].id).toEqual(currSlide3.id)
+  expect(prog.currentPresentation.slides[2].id).toEqual(currSlide5.id)
+  expect(prog.currentPresentation.slides[3].id).toEqual(currSlide2.id)
+  expect(prog.currentPresentation.slides[4].id).toEqual(currSlide4.id)
 })

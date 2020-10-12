@@ -9,7 +9,7 @@ export {
     PictureObj,
     TextObj,
     Color,
-    ShapeObj,
+    ShapeObj
 }
 
 type Programm = {
