@@ -37,7 +37,7 @@ function createDefaultSlide(): Slide {
   }
 }
 
-function addSlide(prog: Programm): Programm {         
+function addSlide(prog: Programm): Programm {        // delete allSlides from selected slides 
   const curSlide: Slide = createDefaultSlide();
 
   return {
@@ -69,7 +69,6 @@ function supportSortingSelectedSlides(slides: Array<Slide> , selectedSlides: Arr
   return sortedSelectedSlides
 }
 
-
 function moveSlide(prog: Programm, posBefore: number): Programm {
   let sortedSelectedSlides: Array<Slide> = supportSortingSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
   let slidesWithoutSelectedSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
@@ -83,12 +82,12 @@ function moveSlide(prog: Programm, posBefore: number): Programm {
         ? [...sortedSelectedSlides, ...slidesWithoutSelectedSlides]
         : (prog.currentPresentation.slides.length == posBefore)
         //TODO: не так как в оригинале!
-        ? [...slidesWithoutSelectedSlides, ...sortedSelectedSlides]
-        : [
-            ...slidesWithoutSelectedSlides.filter((e, i) => i < posBefore),
-            ...sortedSelectedSlides,
-            ...slidesWithoutSelectedSlides.filter((e, i) => i >= posBefore)
-          ]
+          ? [...slidesWithoutSelectedSlides, ...sortedSelectedSlides]
+          : [
+              ...slidesWithoutSelectedSlides.filter((e, i) => i < posBefore),
+              ...sortedSelectedSlides,
+              ...slidesWithoutSelectedSlides.filter((e, i) => i >= posBefore)
+            ]
     }
   }
 }
@@ -101,28 +100,28 @@ function setSelectedSlides(prog: Programm, selectedSlides: Array<string>): Progr
 }
 
 function deleteSlide(prog: Programm): Programm {
-  /*let oldPos: number = prog.currentPresentation.slides.length - 1;
+  let oldPos: number = prog.currentPresentation.slides.length - 1;
+
   for (let i = 0; i < prog.currentPresentation.slides.length; i++) {
-      if ((prog.selectedSlides.includes(prog.currentPresentation.slides[i].id)) && (oldPos > i)) { 
-          oldPos = i;
-      }
-  }*/
+    if ((prog.selectedSlides.includes(prog.currentPresentation.slides[i].id)) && (oldPos > i)) {
+    oldPos = i;
+    }
+  }
 
   const slidesWithoutSelectedSlides = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides)
-  const indexOfSelectedSlide = slidesWithoutSelectedSlides.length - 1
+
   return {
-      ...prog,
-      currentPresentation: {
-          ...prog.currentPresentation,
-          slides: slidesWithoutSelectedSlides
-      },
-      selectedSlides: 
-          (prog.currentPresentation.slides.length == 0) 
-          ? []
-          : [slidesWithoutSelectedSlides[indexOfSelectedSlide].id]
-          //: (prog.currentPresentation.slides.length - 1 <= oldPos)
-          //? [prog.currentPresentation.slides[oldPos].id]
-          //: [prog.currentPresentation.slides[prog.currentPresentation.slides.length - 1].id]
-  }
+    ...prog,
+    currentPresentation: {
+    ...prog.currentPresentation,
+    slides: slidesWithoutSelectedSlides
+    },
+    selectedSlides:
+    (slidesWithoutSelectedSlides.length == 0)
+    ? []
+    : (slidesWithoutSelectedSlides.length - 1 <= oldPos)
+    ? [slidesWithoutSelectedSlides[oldPos].id]
+    : [slidesWithoutSelectedSlides[slidesWithoutSelectedSlides.length - 1].id]
+  } 
 }
 

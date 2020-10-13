@@ -1,4 +1,5 @@
-export {
+
+/*export {
     Programm,
     Presentation,
     ArchiveOfState,
@@ -10,64 +11,64 @@ export {
     TextObj,
     Color,
     ShapeObj
-}
+}*/
 
-type Programm = {
+export type Programm = {
     currentPresentation: Presentation,
     selectedSlides: Array<string>,         
     archive: ArchiveOfState,  // архив вынести
     selectedElements: Array<string>,
 };
 
-type Presentation = {
+export type Presentation = {
     title: string,
     slides: Array<Slide>, 
 };
 
-type ArchiveOfState = {  
+export type ArchiveOfState = {  
     past: Array<Programm>,   
     future: Array<Programm>, 
 };
 
-type Slide = {
+export type Slide = {
     id: string,
     background: Picture | Color,
-    elements: Array<PictureObj | ShapeObj | TextObj>,   
+    elements: Array<PictureObj | ShapeObj | TextObj>, //make one type   in isObject
 };
 
-type Point = {
+export type Point = {
     x: number,
     y: number,
 };
 
-type ElementObj = {
+export type ElementObj = {
     id: string,
     position: Point,
     height: number,
     wigth: number,
 };
 
-type Picture = {
+export type Picture = {
     url: string,
     type: 'picture',
 };
 
-type PictureObj = ElementObj & Picture;
+export type PictureObj = ElementObj & Picture;
 
-type TextObj = ElementObj & {
+export type TextObj = ElementObj & {
     text: string,
 	fontFamily: string,
 	fontSize: string,
 	type: 'text',
 };
 
-type Color = {
+export type Color = {
     hexColor: string, //string
     type: 'color',
 };
 
-type ShapeObj = ElementObj & {
-    type: 'triangle' | 'rect' | 'circle',
+export type ShapeObj = ElementObj & {
+    type: 'triangle' | 'rect' | 'circle' | 'empty',
     borderColor: string, //borderColor  string
     fillColor: string,
 };

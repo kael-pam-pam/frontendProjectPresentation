@@ -31,7 +31,7 @@ function createProgram(): Programm {
             slides: [currSlide]
         },
         selectedSlides: [currSlide.id],
-        archive: {
+        archive: {//delete archive
             past: [],
             future: []
         },

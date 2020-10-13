@@ -39,7 +39,7 @@ function createNewId(): string {
 function searchChangedSlideIndex(prog: Programm): number {
   const slides = prog.currentPresentation.slides
   const selectedSlide = prog.selectedSlides[prog.selectedSlides.length - 1]
-  let changedSlideIndex: number = null
+  let changedSlideIndex: number = 0
   for (let i = 0; i < slides.length; i++) {     
       if (slides[i].id == selectedSlide) {
           changedSlideIndex = i
@@ -51,7 +51,7 @@ function searchChangedSlideIndex(prog: Programm): number {
 function searchChangedElemIndex(prog: Programm, changedSlideIndex: number): number {
   const elems = prog.currentPresentation.slides[changedSlideIndex].elements
   const selectedElem = prog.selectedElements[prog.selectedElements.length - 1]
-  let changedElemIndex: number = null
+  let changedElemIndex: number = 0
   for (let i = 0; i < elems.length; i++) {     
     if (elems[i].id == selectedElem) {
         changedElemIndex = i

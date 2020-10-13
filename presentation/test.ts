@@ -111,7 +111,7 @@ test('createEmtyTextObj', () => {
   expect(newTextObj.type).toEqual('text')  
 })
 
-test('addTextObj' , () => {
+/*test('addTextObj' , () => {
   const prog = createProgram()
   const newProgState = addTextObj(prog)
   if(isTextObj(newProgState.currentPresentation.slides[0].elements[0]))
@@ -119,7 +119,7 @@ test('addTextObj' , () => {
     expect(newProgState.currentPresentation.slides[0].elements[0].type).toEqual('text')
     expect(newProgState.currentPresentation.slides[0].elements[0].text).toEqual('введите текст')
   }
-})
+})*/
 
 test('searchChangedSlideIndex', () => {
   const prog = createProgram()
@@ -374,14 +374,14 @@ test('deleteSlide', () => {
   const currSlide4: Slide = createDefaultSlide();
   const currSlide5: Slide = createDefaultSlide();
   prog.currentPresentation.slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5];
-  prog.selectedSlides = [currSlide2.id, currSlide5.id];
+  prog.selectedSlides = [currSlide5.id, currSlide1.id];
 
-  prog = deleteSlide(prog);
+  prog = deleteSlide(prog); // add such tests 
 
   expect(prog.selectedSlides.length).toEqual(1)
   expect(prog.selectedSlides[0]).toEqual(currSlide4.id)
   expect(prog.currentPresentation.slides.length).toEqual(3)
-  expect(prog.currentPresentation.slides[0].id).toEqual(currSlide1.id)
+  expect(prog.currentPresentation.slides[0].id).toEqual(currSlide2.id)
   expect(prog.currentPresentation.slides[1].id).toEqual(currSlide3.id)
   expect(prog.currentPresentation.slides[2].id).toEqual(currSlide4.id)
 })
@@ -398,7 +398,7 @@ test('moveSlide', () => {
   prog.currentPresentation.slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5];
   prog.selectedSlides = [currSlide3.id, currSlide5.id];
 
-  prog = moveSlide(prog, 1);
+  prog = moveSlide(prog, 1); // add some tests
 
   expect(prog.currentPresentation.slides[0].id).toEqual(currSlide1.id)
   expect(prog.currentPresentation.slides[1].id).toEqual(currSlide3.id)

@@ -40,7 +40,7 @@ export {
 
 function setSlideBackground(prog: Programm, newBackground: Picture | Color): Programm {
   const changedSlideIndex: number = searchChangedSlideIndex(prog)     
-  let copyOfSlides: Array<Slide> = prog.currentPresentation.slides
+  let copyOfSlides: Array<Slide> = prog.currentPresentation.slides  // [...]   object.freeze(prog) | deepfreeze
   copyOfSlides[changedSlideIndex].background = newBackground
 
   return {
@@ -59,7 +59,7 @@ function createPictureObj(url: string): PictureObj {
       position: defaultPoint,
       height: 15,
       wigth: 15,
-      url: url,
+      url: url, // w/h take from url 
       type: 'picture'
   }
 }
@@ -85,7 +85,7 @@ function createEmtyTextObj(): TextObj {
       position: defaultPoint,
       height: 15,
       wigth: 30,
-      text: 'введите текст',
+      text: 'введите текст', //  ' '      in vieu=>textObj.text || placeholder(enter text)
       fontFamily: 'roboto',
       fontSize: '14',
       type: 'text'
@@ -108,7 +108,7 @@ function addTextObj(prog: Programm): Programm {
 }
 
 
-function changeTextObj(prog: Programm, newParam: string, paramType: string): Programm {
+function changeTextObj(prog: Programm, newParam: string, paramType: string): Programm {  // add type ParameterType = 'text' |  'Font
   const changedSlideIndex: number = searchChangedSlideIndex(prog)
   const changedElemIndex: number = searchChangedElemIndex(prog, changedSlideIndex)
   let copyOfSlides: Array<Slide> = prog.currentPresentation.slides
@@ -137,6 +137,8 @@ function changeTextObj(prog: Programm, newParam: string, paramType: string): Pro
 }
 
 function createShapeObj(shapeType: string): ShapeObj {
+
+
   if (shapeType == 'triangle') {
     return {
       id: createNewId(),
@@ -148,7 +150,7 @@ function createShapeObj(shapeType: string): ShapeObj {
       type: 'triangle'
     }
   } 
-  if (shapeType == 'circle') {
+  else if (shapeType == 'circle') {
     return {
       id: createNewId(),
       position: defaultPoint,
@@ -159,7 +161,7 @@ function createShapeObj(shapeType: string): ShapeObj {
       type: 'circle'
     }
   }
-  if (shapeType == 'rect') {
+  else if (shapeType == 'rect') {
     return {
       id: createNewId(),
       position: defaultPoint,
@@ -168,6 +170,17 @@ function createShapeObj(shapeType: string): ShapeObj {
       borderColor: '11',
       fillColor: '11',
       type: 'rect'
+    }
+  }
+  else {
+    return {
+      id: createNewId(),
+      position: defaultPoint,
+      wigth: 15,
+      height: 15,
+      borderColor: '11',
+      fillColor: '11',
+      type: 'empty'
     }
   }
 } 
@@ -212,7 +225,7 @@ function changeShapeObj(prog: Programm, newParam: string, paramType: string): Pr
   }  
 }
 
-function resizeElement(prog: Programm, newWidth:number, newHeigth: number): Programm {
+function resizeElement(prog: Programm, newWidth:number, newHeigth: number): Programm {  // add points for resize
   const changedSlideIndex: number = searchChangedSlideIndex(prog)
   let copyOfSlides: Array<Slide> = prog.currentPresentation.slides
   
@@ -253,7 +266,7 @@ function setSelectedElement(prog: Programm, selectedElems: Array<string>): Progr
   }
 }
 
-function deleteSelectedElements(prog: Programm): Programm {
+function deleteSelectedElements(prog: Programm): Programm { //only redraw selected slide
 
   let copySlides: Array<Slide> = prog.currentPresentation.slides
   let newSlides: Array<Slide> = [];
