@@ -37,7 +37,7 @@ function createDefaultSlide(): Slide {
   }
 }
 
-function addSlide(prog: Programm): Programm {        // delete allSlides from selected slides 
+function addSlide(prog: Programm): Programm {       
   const curSlide: Slide = createDefaultSlide();
 
   return {
@@ -49,7 +49,8 @@ function addSlide(prog: Programm): Programm {        // delete allSlides from se
               curSlide
           ]
       },
-      selectedSlides: [curSlide.id]
+      selectedSlides: [curSlide.id],
+      selectedElements: []
   }    
 }
 

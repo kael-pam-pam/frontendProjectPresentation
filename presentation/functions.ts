@@ -19,8 +19,6 @@ export {
     changePresentationTitle,
     saveProject,
     loadProject,
-    goBackAchive,
-    goForwardAchive
 }
 
 function createProgram(): Programm {
@@ -31,10 +29,6 @@ function createProgram(): Programm {
             slides: [currSlide]
         },
         selectedSlides: [currSlide.id],
-        archive: {//delete archive
-            past: [],
-            future: []
-        },
         selectedElements: []
     }
 }
@@ -59,7 +53,7 @@ function loadProject(prog: Programm, savedProject: string): Programm {
 }
 
 
-function goBackAchive(prog: Programm): Programm {
+/*function goBackAchive(prog: Programm): Programm {
     //TODO: а если истории нет, всю перемотали?
     let state: Programm = prog.archive.past[prog.archive.past.length - 1];
 
@@ -79,7 +73,7 @@ function goForwardAchive(prog: Programm): Programm {
     //TODO: а если истории нет, всю перемотали?    
     return prog.archive.future[0]
 }
-
+*/
 
 //то что выяснили в пятницу в Zoom'е
 //TODO: Programm.selectedSlide это массив слайдов

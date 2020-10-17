@@ -18,8 +18,6 @@ import {
   changePresentationTitle,
   saveProject,
   loadProject,
-  goBackAchive,
-  goForwardAchive
 } from './functions'
 
 import {
@@ -71,7 +69,8 @@ test('changePresentationTitle', () => {
   const newTittle = 'secondPresentation'
   const prog: Programm = createProgram()
   const newProgState: Programm = changePresentationTitle(prog, newTittle)
-	expect(newProgState.currentPresentation.title).toEqual(newTittle)
+  expect(newProgState.currentPresentation.title).toEqual(newTittle)
+  expect(prog.currentPresentation.title).toEqual('Презентация без названия')
 })
 
 test('setSlideBackgroundAsPicture', () => {
@@ -79,6 +78,7 @@ test('setSlideBackgroundAsPicture', () => {
   const prog = createProgram()
   const newProgState = setSlideBackground(prog, newBackground)
   expect(newProgState.currentPresentation.slides[0].background).toMatchObject(newBackground)
+  expect(prog.currentPresentation.slides[0].background).not.toMatchObject(newBackground)
 })
 
 test('setSlideBackgroundAsColor', () => {
@@ -89,12 +89,14 @@ test('setSlideBackgroundAsColor', () => {
   const prog = createProgram()
   const newProgState = setSlideBackground(prog, newBackground)
   expect(newProgState.currentPresentation.slides[0].background).toMatchObject(newBackground)
+  expect(prog.currentPresentation.slides[0].background).not.toMatchObject(newBackground)
 })
 
 test('createPictureObj', () => {
   const newPictureObj = createPictureObj('newUrl')
   expect(newPictureObj.wigth).toEqual(15)
   expect(newPictureObj.url).toEqual('newUrl')
+
 })
 
 test('addPictureObj', () => {
@@ -104,6 +106,7 @@ test('addPictureObj', () => {
   {
     expect(newProgState.currentPresentation.slides[0].elements[0].url).toEqual('newUrl')
   }
+  expect(prog.currentPresentation.slides[0].elements.length).toEqual(0)
 })
 
 test('createEmtyTextObj', () => {
@@ -111,52 +114,71 @@ test('createEmtyTextObj', () => {
   expect(newTextObj.type).toEqual('text')  
 })
 
-/*test('addTextObj' , () => {
+test('addTextObj' , () => {
   const prog = createProgram()
   const newProgState = addTextObj(prog)
   if(isTextObj(newProgState.currentPresentation.slides[0].elements[0]))
   {
     expect(newProgState.currentPresentation.slides[0].elements[0].type).toEqual('text')
-    expect(newProgState.currentPresentation.slides[0].elements[0].text).toEqual('введите текст')
+    expect(newProgState.currentPresentation.slides[0].elements[0].text).toEqual('')
   }
-})*/
+  expect(prog.currentPresentation.slides[0].elements.length).toEqual(0)
+})
 
 test('searchChangedSlideIndex', () => {
-  const prog = createProgram()
-  const changedSlideIndex = searchChangedSlideIndex(prog)
-  expect(changedSlideIndex).toEqual(0)
+  const firstProgState  = createProgram()
+
+  const secondProgState = addSlide(firstProgState)
+  let changedSlideIndex = searchChangedSlideIndex(secondProgState)
+  expect(changedSlideIndex).toEqual(1)
+
+  const thirdProgState = addSlide(secondProgState)
+  changedSlideIndex = searchChangedSlideIndex(thirdProgState)
+  expect(changedSlideIndex).toEqual(2)
 })
 
 test('searchChangedElemIndex', () => {
-  let prog = createProgram()
-  prog = addTextObj(prog)
-  const changedSlideIndex = searchChangedSlideIndex(prog)
-  const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
+  const firstProgState  = createProgram()
+
+  const secondProgState = addTextObj(firstProgState)
+
+  let changedSlideIndex = searchChangedSlideIndex(secondProgState)
+  let changedElemIndex = searchChangedElemIndex(secondProgState, changedSlideIndex)
   expect(changedElemIndex).toEqual(0)
+
+  const thirdProgState = addTextObj(secondProgState)
+  changedSlideIndex = searchChangedSlideIndex(thirdProgState)
+  changedElemIndex = searchChangedElemIndex(thirdProgState, changedSlideIndex)
+
+  expect(changedElemIndex).toEqual(1)
 })
 
 test('changeTextObj', () => {
   let prog = createProgram()
-  prog = addTextObj(prog)
+  let secondProg = addTextObj(prog)
 
-  let newProgState = changeTextObj(prog, 'новый текст', 'text')
-  
-
+  let newProgState = changeTextObj(secondProg, 'новый текст', 'text')
   if(isTextObj(newProgState.currentPresentation.slides[0].elements[0]))
   {
     expect(newProgState.currentPresentation.slides[0].elements[0].text).toEqual('новый текст')
   }
 
-  newProgState = changeTextObj(prog, '20', 'fontSize')
+  newProgState = changeTextObj(secondProg, '20', 'fontSize')
   if(isTextObj(newProgState.currentPresentation.slides[0].elements[0]))
   {
     expect(newProgState.currentPresentation.slides[0].elements[0].fontSize).toEqual('20')
   }
 
-  newProgState = changeTextObj(prog, 'Arial', 'fontFamily')
+  newProgState = changeTextObj(secondProg, 'Arial', 'fontFamily')
   if(isTextObj(newProgState.currentPresentation.slides[0].elements[0]))
   {
     expect(newProgState.currentPresentation.slides[0].elements[0].fontFamily).toEqual('Arial')
+  }
+
+  if(isTextObj(secondProg.currentPresentation.slides[0].elements[0])){
+    expect(secondProg.currentPresentation.slides[0].elements[0].text).toEqual('')
+    expect(secondProg.currentPresentation.slides[0].elements[0].fontFamily).toEqual('roboto')
+    expect(secondProg.currentPresentation.slides[0].elements[0].fontSize).toEqual('14')
   }
 })
 
@@ -172,70 +194,76 @@ test('createShapeObj', () => {
 })
 
 test('addShapeObj', () => {
-  let prog = createProgram()
+  const prog = createProgram()
 
-  prog = addShapeObj(prog, 'rect')
-  if(isShapeObj(prog.currentPresentation.slides[0].elements[0])) {
-    expect(prog.currentPresentation.slides[0].elements[0].type).toEqual('rect')  
+  let newProg = addShapeObj(prog, 'rect')
+  if(isShapeObj(newProg.currentPresentation.slides[0].elements[0])) {
+    expect(newProg.currentPresentation.slides[0].elements[0].type).toEqual('rect')  
   }
   
-  prog = addShapeObj(prog, 'circle')
-  if(isShapeObj(prog.currentPresentation.slides[0].elements[1])) {
-    expect(prog.currentPresentation.slides[0].elements[1].type).toEqual('circle')  
+  newProg = addShapeObj(newProg, 'circle')
+  if(isShapeObj(newProg.currentPresentation.slides[0].elements[1])) {
+    expect(newProg.currentPresentation.slides[0].elements[1].type).toEqual('circle')  
   }
 
-  prog = addShapeObj(prog, 'triangle')
-  if(isShapeObj(prog.currentPresentation.slides[0].elements[2])) {
-    expect(prog.currentPresentation.slides[0].elements[2].type).toEqual('triangle')  
+  newProg = addShapeObj(newProg, 'triangle')
+  if(isShapeObj(newProg.currentPresentation.slides[0].elements[2])) {
+    expect(newProg.currentPresentation.slides[0].elements[2].type).toEqual('triangle')  
   }  
+
+  expect(prog.currentPresentation.slides[0].elements.length).not.toEqual(newProg.currentPresentation.slides[0].elements.length)
 })
 
 test('changeShapeObj', () => {
-  let prog = createProgram()
-  prog = addShapeObj(prog, 'rect')
+  const firstProg = createProgram()
+  const secondProg = addShapeObj(firstProg, 'rect')
 
-  let newProgState = changeShapeObj(prog, 'FFFFF', 'borderColor')
+  let newProgState = changeShapeObj(secondProg, 'FFFFF', 'borderColor')
   if(isShapeObj(newProgState.currentPresentation.slides[0].elements[0]))
   {
     expect(newProgState.currentPresentation.slides[0].elements[0].borderColor).toEqual('FFFFF')
   }
 
-  newProgState = changeShapeObj(prog, '11111', 'fillColor')
+  newProgState = changeShapeObj(secondProg, '11111', 'fillColor')
   if(isShapeObj(newProgState.currentPresentation.slides[0].elements[0]))
   {
     expect(newProgState.currentPresentation.slides[0].elements[0].fillColor).toEqual('11111')
   }
+
+  expect(firstProg.currentPresentation.slides[0].elements.length).toEqual(0)
 })
 
 test('resizeElement', () => {
   let prog = createProgram()
 
-  prog = addPictureObj(prog, 'newUrl')
+  let newProg = addPictureObj(prog, 'newUrl')
   let newWidth = 30
   let newHeigth = 20
-  prog = resizeElement(prog, newWidth, newHeigth)
-  expect(prog.currentPresentation.slides[0].elements[0].wigth).toEqual(newWidth)
-  expect(prog.currentPresentation.slides[0].elements[0].height).toEqual(newHeigth)
+  newProg = resizeElement(newProg, newWidth, newHeigth)
+  expect(newProg.currentPresentation.slides[0].elements[0].wigth).toEqual(newWidth)
+  expect(newProg.currentPresentation.slides[0].elements[0].height).toEqual(newHeigth)
 
-  prog = addTextObj(prog)
+  newProg = addTextObj(newProg)
   newWidth = 50
   newHeigth = 20
-  prog = resizeElement(prog, newWidth, newHeigth)
-  expect(prog.currentPresentation.slides[0].elements[1].wigth).toEqual(newWidth)
-  expect(prog.currentPresentation.slides[0].elements[1].height).toEqual(newHeigth)
+  newProg = resizeElement(newProg, newWidth, newHeigth)
+  expect(newProg.currentPresentation.slides[0].elements[1].wigth).toEqual(newWidth)
+  expect(newProg.currentPresentation.slides[0].elements[1].height).toEqual(newHeigth)
 
-  prog = addShapeObj(prog, 'rect')
+  newProg = addShapeObj(newProg, 'rect')
   newWidth = 15
   newHeigth = 10
-  prog = resizeElement(prog, newWidth, newHeigth)
-  expect(prog.currentPresentation.slides[0].elements[2].wigth).toEqual(newWidth)
-  expect(prog.currentPresentation.slides[0].elements[2].height).toEqual(newHeigth)
+  newProg = resizeElement(newProg, newWidth, newHeigth)
+  expect(newProg.currentPresentation.slides[0].elements[2].wigth).toEqual(newWidth)
+  expect(newProg.currentPresentation.slides[0].elements[2].height).toEqual(newHeigth)
+
+  expect(prog.currentPresentation.slides[0].elements.length).toEqual(0)
 })
 
 test('changeElemPosition', () => {
-  let prog = createProgram()
+  let firstProg = createProgram()
 
-  prog = addPictureObj(prog, 'newUrl')
+  let prog = addPictureObj(firstProg, 'newUrl')
   let newX = 10
   let newY = 15
   prog = changeElemPosition(prog, newX, newY)
@@ -255,14 +283,16 @@ test('changeElemPosition', () => {
   prog = changeElemPosition(prog, newX, newY)
   expect(prog.currentPresentation.slides[0].elements[2].position.x).toEqual(newX)
   expect(prog.currentPresentation.slides[0].elements[2].position.y).toEqual(newY)
+
+  expect(firstProg.currentPresentation.slides[0].elements.length).toEqual(0)
 })
 
 test('setSelectedElement', () => {
-  let prog = createProgram()
+  let firstProg = createProgram()
   const arrOfIdOfSelectedElems = ['21324', '37464', '76564', '84756', '38475']
- 
-  prog = setSelectedElement(prog, arrOfIdOfSelectedElems)
-  expect(prog.selectedElements.length).toEqual(arrOfIdOfSelectedElems.length)
+  const secondProg = setSelectedElement(firstProg, arrOfIdOfSelectedElems)
+  expect(secondProg.selectedElements.length).toEqual(arrOfIdOfSelectedElems.length)
+  expect(firstProg.selectedElements.length).toEqual(0)
 })
 
 test('deleteSelectedElements', () => {
@@ -276,19 +306,16 @@ test('deleteSelectedElements', () => {
   prog = addShapeObj(prog, 'rect')
   const thirdId = prog.currentPresentation.slides[0].elements[2].id
 
-  //expect(firstId).toEqual(secondId)
-  //expect(secondId).toEqual(thirdId)
-  //expect(thirdId).toEqual(firstId)
-
   prog.selectedElements = [firstId, secondId, thirdId]
+
+  const newProg = deleteSelectedElements(prog)
+
+  expect(newProg.currentPresentation.slides[0].elements.length).toEqual(0)
+  expect(newProg.selectedElements.length).toEqual(0)
 
   expect(prog.currentPresentation.slides[0].elements.length).toEqual(3)
   expect(prog.selectedElements.length).toEqual(3)
 
-  prog = deleteSelectedElements(prog)
-
-  expect(prog.currentPresentation.slides[0].elements.length).toEqual(0)
-  expect(prog.selectedElements.length).toEqual(0)
 })
 
 //========================================================================
@@ -376,14 +403,17 @@ test('deleteSlide', () => {
   prog.currentPresentation.slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5];
   prog.selectedSlides = [currSlide5.id, currSlide1.id];
 
-  prog = deleteSlide(prog); // add such tests 
+  const newProg = deleteSlide(prog); // add such tests 
 
-  expect(prog.selectedSlides.length).toEqual(1)
-  expect(prog.selectedSlides[0]).toEqual(currSlide4.id)
-  expect(prog.currentPresentation.slides.length).toEqual(3)
-  expect(prog.currentPresentation.slides[0].id).toEqual(currSlide2.id)
-  expect(prog.currentPresentation.slides[1].id).toEqual(currSlide3.id)
-  expect(prog.currentPresentation.slides[2].id).toEqual(currSlide4.id)
+  expect(newProg.selectedSlides.length).toEqual(1)
+  expect(newProg.selectedSlides[0]).toEqual(currSlide4.id)
+  expect(newProg.currentPresentation.slides.length).toEqual(3)
+  expect(newProg.currentPresentation.slides[0].id).toEqual(currSlide2.id)
+  expect(newProg.currentPresentation.slides[1].id).toEqual(currSlide3.id)
+  expect(newProg.currentPresentation.slides[2].id).toEqual(currSlide4.id)
+
+  expect(prog.currentPresentation.slides.length).toEqual(5)
+  expect(prog.selectedSlides.length).toEqual(2)
 })
 
 
@@ -398,11 +428,18 @@ test('moveSlide', () => {
   prog.currentPresentation.slides = [currSlide1, currSlide2, currSlide3, currSlide4, currSlide5];
   prog.selectedSlides = [currSlide3.id, currSlide5.id];
 
-  prog = moveSlide(prog, 1); // add some tests
+  const newProg = moveSlide(prog, 1); // add some tests
+
+  expect(newProg.currentPresentation.slides[0].id).toEqual(currSlide1.id)
+  expect(newProg.currentPresentation.slides[1].id).toEqual(currSlide3.id)
+  expect(newProg.currentPresentation.slides[2].id).toEqual(currSlide5.id)
+  expect(newProg.currentPresentation.slides[3].id).toEqual(currSlide2.id)
+  expect(newProg.currentPresentation.slides[4].id).toEqual(currSlide4.id)
 
   expect(prog.currentPresentation.slides[0].id).toEqual(currSlide1.id)
-  expect(prog.currentPresentation.slides[1].id).toEqual(currSlide3.id)
-  expect(prog.currentPresentation.slides[2].id).toEqual(currSlide5.id)
-  expect(prog.currentPresentation.slides[3].id).toEqual(currSlide2.id)
-  expect(prog.currentPresentation.slides[4].id).toEqual(currSlide4.id)
+  expect(prog.currentPresentation.slides[1].id).toEqual(currSlide2.id)
+  expect(prog.currentPresentation.slides[2].id).toEqual(currSlide3.id)
+  expect(prog.currentPresentation.slides[3].id).toEqual(currSlide4.id)
+  expect(prog.currentPresentation.slides[4].id).toEqual(currSlide5.id)
+
 })
