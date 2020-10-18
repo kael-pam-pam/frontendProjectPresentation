@@ -1,0 +1,23 @@
+.Commands {
+    margin-bottom: 5px;
+    padding-left: 10px;
+}
+
+.MenuItem {
+    padding: 4px 6px;
+    font: 14px sans-serif;
+}
+
+.MenuItem::selection
+{
+    background: transparent;
+}
+
+.MenuItem:hover
+{
+    background-color: #dadce0;
+    width: 16px;
+    cursor: pointer;
+    border-width: 0;
+    border-radius: 4px;
+}

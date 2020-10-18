@@ -1,0 +1,19 @@
+.SlidesPanel {
+    box-sizing: border-box;
+    width: 220px;
+    background-color: white;
+    border-right: 1px solid #dadce0;
+    display: flex;
+    flex-direction: column;
+    padding-right: 30px;
+    align-items: flex-end;
+}
+
+.Slide {
+    width: 152px;
+    height: 88px;
+    background-color: white;
+    border-radius: 4px;
+    margin: 8px 0;
+    border: 2px solid #dadce0;
+}
