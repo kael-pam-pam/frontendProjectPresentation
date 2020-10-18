@@ -19,7 +19,6 @@ import {
   searchChangedSlideIndex,
   searchChangedElemIndex,
   deepFreeze,
-  deepCopy,
   getCopyOfSlidesArr,
   isTextObj,
   isShapeObj,

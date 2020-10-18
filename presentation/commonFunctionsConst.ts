@@ -20,7 +20,6 @@ export {
   searchChangedSlideIndex,
   searchChangedElemIndex,
   deepFreeze,
-  deepCopy,
   getCopyOfSlidesArr,
   isTextObj,
   isShapeObj,
@@ -73,7 +72,7 @@ function searchChangedElemIndex(prog: Programm, changedSlideIndex: number): numb
   return changedElemIndex
 }
 
-function deepFreeze (o) {
+function deepFreeze (o: any) {
   Object.freeze(o);
 
   Object.getOwnPropertyNames(o).forEach(function (prop) {
@@ -100,7 +99,7 @@ function deepFreeze (o) {
   return Object.freeze(obj);
 }*/
 
-function deepCopy(inputObject) {
+/*function deepCopy(inputObject) {
   if (!inputObject) {
     return inputObject;
   }
@@ -114,7 +113,7 @@ function deepCopy(inputObject) {
   }
 
   return outputObject;
-}
+}*/
 
 
 function getCopyOfSlidesArr(slideArr: Array<Slide>): Array<Slide> {
