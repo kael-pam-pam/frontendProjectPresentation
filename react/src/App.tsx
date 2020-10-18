@@ -13,6 +13,38 @@ const slid: Array<Slide> = [
   {
     id: '222',
     background: 'белый'
+  },
+  {
+    id: '310',
+    background: 'красный'
+  },
+  {
+    id: '311',
+    background: 'красный'
+  },
+  {
+    id: '312',
+    background: 'красный'
+  },
+  {
+    id: '313',
+    background: 'красный'
+  },
+  {
+    id: '314',
+    background: 'красный'
+  },
+  {
+    id: '315',
+    background: 'красный'
+  },
+  {
+    id: '316',
+    background: 'красный'
+  },
+  {
+    id: '317',
+    background: 'красный'
   }
 ]
 
