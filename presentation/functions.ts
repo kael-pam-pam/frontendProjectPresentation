@@ -25,6 +25,7 @@ export {
 
 function createProgram(): Programm {
     const currSlide: Slide = createDefaultSlide();
+
     return {
         currentPresentation: {
             title: 'Презентация без названия',
