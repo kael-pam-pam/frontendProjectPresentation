@@ -24,9 +24,10 @@ export function SmallElementMain(props: PictureObj | TextObj | ShapeObj) {
   let text = ''
   let commonStyles = {
     display: 'block',
-    marginLeft: props.position.x / 10 + 'px',
-    marginTop: props.position.y / 10 + 'px', 
-    width: props.wigth / 10 + 'px',
+    position: 'absolute',
+    left: props.position.x / 10 + 'px',
+    top: props.position.y / 10 + 'px', 
+    width: props.wigth  / 10 + 'px',
     height: props.height / 10 + 'px',
   } 
 
@@ -48,15 +49,40 @@ export function SmallElementMain(props: PictureObj | TextObj | ShapeObj) {
   }
 
   if (isShapeObj(props)) {
-    elemStyles = {
-      ...commonStyles,
-      borderColor: props.borderColor,
-      backgroundColor: props.fillColor
+    if (props.type == 'rect') {
+      elemStyles = {
+        ...commonStyles,
+        borderColor: props.borderColor,
+        backgroundColor: props.fillColor,
+      }
+    }  
+
+    if (props.type == 'circle') {
+      elemStyles = {
+        ...commonStyles,
+        borderColor: props.borderColor,
+        backgroundColor: props.fillColor,
+        borderRadius: '50%'
+      }          
     }
+
+    if (props.type == 'triangle') {
+      elemStyles = {
+        ...commonStyles,  
+        width: '0',
+        height: '0',
+        left: props.position.x / 10 + 'px',
+        top: props.position.y / 10 + 'px',     
+        borderLeft: props.wigth / 20 + 'px solid transparent',
+        borderRight: props.wigth / 20 + 'px solid transparent',
+        borderBottom: props.wigth / 10 + 'px solid' + props.fillColor,
+        borderColor: props.borderColor,
+      }          
+    } 
   }
-  
+
   return (
-  <div id={elemId} style={elemStyles}>{text}</div>
+    <div id={elemId} style={elemStyles}>{text}</div>
   )
 }
 
@@ -68,8 +94,9 @@ export function ElementMain(props: PictureObj | TextObj | ShapeObj) {
   let text = ''
   let commonStyles = {
     display: 'block',
-    marginLeft: props.position.x + 'px',
-    marginTop: props.position.y + 'px', 
+    position: 'absolute',
+    left: props.position.x + 'px',
+    top: props.position.y + 'px', 
     width: props.wigth + 'px',
     height: props.height + 'px',
   } 
@@ -92,11 +119,36 @@ export function ElementMain(props: PictureObj | TextObj | ShapeObj) {
   }
 
   if (isShapeObj(props)) {
-    elemStyles = {
-      ...commonStyles,
-      borderColor: props.borderColor,
-      backgroundColor: props.fillColor
+    if (props.type == 'rect') {
+      elemStyles = {
+        ...commonStyles,
+        borderColor: props.borderColor,
+        backgroundColor: props.fillColor,
+      }
+    }  
+
+    if (props.type == 'circle') {
+      elemStyles = {
+        ...commonStyles,
+        borderColor: props.borderColor,
+        backgroundColor: props.fillColor,
+        borderRadius: '50%'
+      }          
     }
+
+    if (props.type == 'triangle') {
+      elemStyles = {
+        ...commonStyles,  
+        width: '0',
+        height: '0',
+        left: props.position.x + 'px',
+        top: props.position.y + 'px',     
+        borderLeft: props.wigth / 2 + 'px solid transparent',
+        borderRight: props.wigth / 2 + 'px solid transparent',
+        borderBottom: props.wigth + 'px solid' + props.fillColor,
+        borderColor: props.borderColor,
+      }          
+    } 
   }
   
   return (

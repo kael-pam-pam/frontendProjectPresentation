@@ -55,9 +55,19 @@ prog = addShapeObj(prog, 'circle')
 
 prog = changeShapeObj(prog, 'yellow', 'fillColor')
 
-prog = resizeElement(prog, 200, 300)
+prog = resizeElement(prog, 300, 300)
 
-prog = changeElemPosition(prog, 100, -300)
+prog = addShapeObj(prog, 'triangle')
+
+prog = resizeElement(prog, 230, 230)
+
+prog = changeElemPosition(prog, 700, 500)
+
+prog = addShapeObj(prog, 'rect')
+
+prog = changeElemPosition(prog, 1000, 100)
+
+prog = changeShapeObj(prog, 'red' ,'fillColor')
 
 /*prog = setSelectedSlides(prog, [prog.currentPresentation.slides[1].id])
 
