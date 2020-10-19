@@ -24,6 +24,7 @@ export {
   isTextObj,
   isShapeObj,
   isPictureObj,
+  isColor,
   getSlidesWithoutChangedSlide,
   getChangedSlideObj,
   getNewTextElem,
@@ -132,13 +133,17 @@ function isPictureObj(elem: any): elem is PictureObj {
   return elem.url !== undefined
 }
 
+function isColor(elem: any): elem is Color {
+  return elem.hexColor !== undefined
+}
+
 
 function getChangedSlideObj(prog: Programm, changedSlideIndex: number): Slide {
   return {...prog.currentPresentation.slides[changedSlideIndex]}
 }
 
 function getSlidesWithoutChangedSlide(prog: Programm, changedSlideIndex: number): Array<Slide> {
-  return [...prog.currentPresentation.slides.filter((elem) => !prog.currentPresentation.slides[changedSlideIndex])]
+  return [...prog.currentPresentation.slides.filter((elem) => elem != prog.currentPresentation.slides[changedSlideIndex])]
 }
 
 function getNewTextElem(changedElem: TextObj, newParam: string, paramToChange: 'text' | 'fontSize' | 'fontFamily'): TextObj {

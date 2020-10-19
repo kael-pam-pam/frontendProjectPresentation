@@ -117,12 +117,15 @@ function addPictureObj(prog: Programm, url: string): Programm {
 function createEmtyTextObj(): TextObj {
   return {
       id: createNewId(),
-      position: defaultPoint,
-      height: 15,
-      wigth: 30,
-      text: '', //  ' '      in vieu=>textObj.text || placeholder(enter text)
-      fontFamily: 'roboto',
-      fontSize: '14',
+      position: {
+        x: 550,
+        y: 400
+      },
+      height: 100,
+      wigth: 300,
+      text: "введите текст", //  ' '      in vieu=>textObj.text || placeholder(enter text)
+      fontFamily: 'oblique',
+      fontSize: '50',
       type: 'text'
   }
 }
@@ -194,10 +197,10 @@ function createShapeObj(type: 'rect' | 'triangle' | 'circle'): ShapeObj {
   return {
     id: createNewId(),
     position: defaultPoint,
-    wigth: 15,
-    height: 15,
-    borderColor: '11',
-    fillColor: '11',
+    wigth: 100,
+    height: 100,
+    borderColor: 'fff',
+    fillColor: '#7ef507',
     type
   }
 } 

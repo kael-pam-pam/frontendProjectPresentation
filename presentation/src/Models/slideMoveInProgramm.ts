@@ -30,7 +30,7 @@ function createDefaultSlide(): Slide {
   return {
       id: createNewId(),
       background: {
-          hexColor: '0',
+          hexColor: 'grey',
           type: 'color'
       },
       elements: [],
