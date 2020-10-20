@@ -30,14 +30,15 @@ function createDefaultSlide(): Slide {
   return {
       id: createNewId(),
       background: {
-          hexColor: 'grey',
+          hexColor: '#7a4545',
           type: 'color'
       },
       elements: [],
   }
 }
 
-function addSlide(prog: Programm): Programm {       
+function addSlide(prog: Programm): Programm {  
+       
   const curSlide: Slide = createDefaultSlide();
 
   return {

@@ -37,7 +37,8 @@ function createDefaultSlide(): Slide {
   }
 }
 
-function addSlide(prog: Programm): Programm {       
+function addSlide(prog: Programm): Programm {  
+       
   const curSlide: Slide = createDefaultSlide();
 
   return {

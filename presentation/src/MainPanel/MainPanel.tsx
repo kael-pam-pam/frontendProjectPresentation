@@ -15,16 +15,14 @@ import {
     ShapeObj
 } from '../Models/types'
 import { SlideMain } from '../Slide/Slide';
+import { searchChangedSlideIndex } from '../Models/commonFunctionsConst';
 
-interface MainPanelProps {
-    text: string,
-    slide: Slide
-}
 
-function MainPanel(props: Slide) {
+function MainPanel(props: Programm) {
+    const changedSlideIndex = searchChangedSlideIndex(props)
     return (
         <div className="MainPanel">
-            <SlideMain slide={props} isSmallSlide={false}/>      
+            <SlideMain prog={props} numberOfSlide={changedSlideIndex} isSmallSlide={false}/>      
         </div>
     )
 }

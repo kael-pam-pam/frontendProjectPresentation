@@ -1,0 +1,160 @@
+
+{
+  "currentPresentation": {
+    "title": "My presentation",
+    "slides": [
+      {
+        "id": "1",
+        "background": {
+            "hexColor": "grey",
+            "type": "color"
+        },
+        "elements": [
+          {
+            "id": "11",
+            "position": { 
+              "x": "300",
+              "y": "300"
+            },  
+            "height": 50,
+            "wigth": 50,
+            "borderColor": "green",
+            "fillColor": "orange",
+            "type": "circle"
+          },
+          {
+            "id": "12",
+            "position": { 
+              "x": "500",
+              "y": "300"
+            },  
+            "height": 100,
+            "wigth": 300,
+            "text": "Хоп-хей ла-ла-лай",
+            "fontFamily": "Arial",
+            "fontSize": 50,
+            "type": "text"
+          },
+          {
+            "id": "13",
+            "position": { 
+              "x": "900",
+              "y": "300"
+            },  
+            "wigth": 100,
+            "height": 100,
+            "borderColor": "fff",
+            "fillColor": "orange",
+            "type": "triangle"
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "background": {
+            "hexColor": "#d19494",
+            "type": "color"
+        },
+        "elements": [
+          {
+            "id": "121",
+            "position": { 
+              "x": "300",
+              "y": "300"
+            },  
+            "height": 50,
+            "wigth": 50,
+            "borderColor": "green",
+            "fillColor": "orange",
+            "type": "circle"
+          },
+          {
+            "id": "312",
+            "position": { 
+              "x": "500",
+              "y": "300"
+            },  
+            "height": 100,
+            "wigth": 300,
+            "borderColor": "green",
+            "fillColor": "black",
+            "type": "rect"
+          },
+          {
+            "id": "143",
+            "position": { 
+              "x": "900",
+              "y": "300"
+            },  
+            "wigth": 300,
+            "height": 0,
+            "borderColor": "fff",
+            "fillColor": "green",
+            "type": "triangle"
+          }
+        ]
+      },
+      {
+        "id": "3",
+        "background": {
+            "hexColor": "#77777a",
+            "type": "color"
+        },
+        "elements": [
+          {
+            "id": "191",
+            "position": { 
+              "x": "500",
+              "y": "300"
+            },  
+            "height": 210,
+            "wigth": 150,
+            "borderColor": "green",
+            "fillColor": "#9ccc35",
+            "type": "circle"
+          },
+          {
+            "id": "128",
+            "position": { 
+              "x": "50",
+              "y": "100"
+            },  
+            "height": 100,
+            "wigth": 300,
+            "borderColor": "green",
+            "fillColor": "red",
+            "type": "rect"
+          },
+          {
+            "id": "137",
+            "position": { 
+              "x": "900",
+              "y": "500"
+            },  
+            "wigth": 300,
+            "height": 0,
+            "borderColor": "fff",
+            "fillColor": "#4235cc",
+            "type": "triangle"
+          },
+          {
+            "id": "12",
+            "position": { 
+              "x": "1000",
+              "y": "100"
+            },  
+            "height": 100,
+            "wigth": 300,
+            "text": "DiMiPa",
+            "fontFamily": "sans-serif cursive",
+            "fontSize": 70,
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  "selectedSlides": ["0"],
+  "selectedElements": []
+}
+    

@@ -75,7 +75,7 @@ export function SmallElementMain(props: PictureObj | TextObj | ShapeObj) {
         top: props.position.y / 10 + 'px',     
         borderLeft: props.wigth / 20 + 'px solid transparent',
         borderRight: props.wigth / 20 + 'px solid transparent',
-        borderBottom: props.wigth / 10 + 'px solid' + props.fillColor,
+        borderBottom: props.wigth / 10 + 'px solid ' + props.fillColor,
         borderColor: props.borderColor,
       }          
     } 
@@ -114,7 +114,7 @@ export function ElementMain(props: PictureObj | TextObj | ShapeObj) {
   if (isPictureObj(props)) {
     elemStyles = {
       ...commonStyles,
-      backgroundImage: props.url  
+      background: `url(${props.url})`  
     }
   }
 
@@ -145,13 +145,13 @@ export function ElementMain(props: PictureObj | TextObj | ShapeObj) {
         top: props.position.y + 'px',     
         borderLeft: props.wigth / 2 + 'px solid transparent',
         borderRight: props.wigth / 2 + 'px solid transparent',
-        borderBottom: props.wigth + 'px solid' + props.fillColor,
+        borderBottom: props.wigth + 'px solid ' + props.fillColor,
         borderColor: props.borderColor,
       }          
     } 
   }
   
   return (
-  <div id={elemId} style={elemStyles}>{text}</div>
+  <div id={elemId}  style={elemStyles}>{text}</div>
   )
 }

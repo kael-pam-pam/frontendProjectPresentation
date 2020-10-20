@@ -20,7 +20,6 @@ export {
   searchChangedSlideIndex,
   searchChangedElemIndex,
   deepFreeze,
-  getCopyOfSlidesArr,
   isTextObj,
   isShapeObj,
   isPictureObj,
@@ -32,7 +31,10 @@ export {
   getChangedElem,
   getNewShapeElem,
   getNewResizedElem,
-  getNewElemWithNewPosition
+  getNewElemWithNewPosition,
+  getSlideWithNewBackground,
+  getSlidesWithChangedSlide,
+  getElemsWithChangedElem
 }
 
 const defaultPoint: Point = {
@@ -72,7 +74,7 @@ function searchChangedElemIndex(prog: Programm, changedSlideIndex: number): numb
   return changedElemIndex
 }
 
-function deepFreeze (o: any) {
+function deepFreeze (o) {
   Object.freeze(o);
 
   Object.getOwnPropertyNames(o).forEach(function (prop) {
@@ -99,26 +101,7 @@ function deepFreeze (o: any) {
   return Object.freeze(obj);
 }*/
 
-/*function deepCopy(inputObject) {
-  if (!inputObject) {
-    return inputObject;
-  }
 
-  let elemValue;
-
-  let outputObject = Array.isArray(inputObject) ? [] : {};
-  for (const elem in inputObject) {
-    elemValue = inputObject[elem];
-    outputObject[elem] = (typeof elemValue === "object") ? deepCopy(elemValue) : elemValue;
-  }
-
-  return outputObject;
-}*/
-
-
-function getCopyOfSlidesArr(slideArr: Array<Slide>): Array<Slide> {
-  return JSON.parse(JSON.stringify(slideArr))
-}
 
 function isTextObj(elem: any): elem is TextObj {
   return elem.text !== undefined && elem.fontFamily !== undefined;
@@ -138,7 +121,7 @@ function getChangedSlideObj(prog: Programm, changedSlideIndex: number): Slide {
 }
 
 function getSlidesWithoutChangedSlide(prog: Programm, changedSlideIndex: number): Array<Slide> {
-  return [...prog.currentPresentation.slides.filter((elem) => !prog.currentPresentation.slides[changedSlideIndex])]
+  return [...prog.currentPresentation.slides.filter((elem) => elem != prog.currentPresentation.slides[changedSlideIndex])]
 }
 
 function getNewTextElem(changedElem: TextObj, newParam: string, paramToChange: 'text' | 'fontSize' | 'fontFamily'): TextObj {
@@ -212,3 +195,32 @@ function getNewElemWithNewPosition(changedElem: PictureObj | TextObj | ShapeObj,
     }
   }
 }
+
+function getSlideWithNewBackground(prog: Programm, changedSlideIndex: number, newBackground: Picture | Color): Slide {
+  return {
+    ...prog.currentPresentation.slides[changedSlideIndex],
+    background: newBackground
+  }
+}
+
+function getSlidesWithChangedSlide(prog: Programm, changedSlide: Slide, changedSlideIndex: number): Array<Slide> {
+  let slidesWithChangedSlide: Array<Slide> = [] 
+  for(let i = 0; i < prog.currentPresentation.slides.length; i++) {
+    i == changedSlideIndex
+    ? slidesWithChangedSlide[i] = changedSlide
+    : slidesWithChangedSlide[i] = prog.currentPresentation.slides[i]
+  }
+  return slidesWithChangedSlide
+}
+
+function getElemsWithChangedElem(prog: Programm, changedSlideIndex: number, changedElemIndex: number, changedElem: PictureObj | TextObj | ShapeObj): SlideElements {
+  let changedElemsArr = []
+
+  for(let i = 0; i < prog.currentPresentation.slides[changedSlideIndex].elements.length; i++) {
+    i == changedElemIndex
+    ? changedElemsArr[i] = changedElem
+    : changedElemsArr[i] = prog.currentPresentation.slides[i]
+  }
+
+  return changedElemsArr
+} 

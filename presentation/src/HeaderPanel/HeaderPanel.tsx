@@ -2,23 +2,45 @@ import React from 'react';
 import './HeaderPanel.css';
 import { Commands, MenuItem } from '../Commands/Commands';
 import { Tool, Tools } from '../Tools/Tools';
+import { Program } from 'typescript';
+import {
+  Programm,
+  Presentation,
+  ArchiveOfState,
+  Slide,
+  Point,
+  ElementObj,
+  SlideElements,
+  Picture,
+  PictureObj,
+  TextObj,
+  Color,
+  ShapeObj
+} from '../Models/types'
 
 interface HeaderPanelProps {
     text: string,
 }
 
-function HeaderPanel(props: HeaderPanelProps) {
+function HeaderPanel(props: Programm) {
     const menu: Array<MenuItem> = [
-      {title: "Файл", onClick: () => console.log('Файл')}, {title: "Правка", onClick: () => console.log('Правка')}, {title: "Вид", onClick: () => console.log('Вид')}, {title: "Вставка", onClick: () => console.log('Вставка')}, 
-      {title: "Формат", onClick: () => console.log('Формат')}, {title: "Слайд", onClick: () => console.log('Слайд')}, {title: "Объект", onClick: () => console.log('Объект')}, {title: "Инструменты", onClick: () => console.log('Инструменты')}, 
-      {title: "Дополнения", onClick: () => console.log('Дополнения')}, {title: "Справка", onClick: () => console.log('Справка')}
+      {title: "Файл", onClick: () => console.log('Файл')},
+      {title: "Правка", onClick: () => console.log('Правка')}, 
+      {title: "Вид", onClick: () => console.log('Вид')}, 
+      {title: "Вставка", onClick: () => console.log('Вставка')}, 
+      {title: "Формат", onClick: () => console.log('Формат')}, 
+      {title: "Слайд", onClick: () => console.log('Слайд')}, 
+      {title: "Объект", onClick: () => console.log('Объект')}, 
+      {title: "Инструменты", onClick: () => console.log('Инструменты')}, 
+      {title: "Дополнения", onClick: () => console.log('Дополнения')}, 
+      {title: "Справка", onClick: () => console.log('Справка')}
     ];
 
     return (
       <div className="HeaderPanel">
-        <span className="Title">{props.text}</span>
+        <span className="Title">{props.currentPresentation.title}</span>
         <Commands menu={menu} />
-        <Tools />
+        <Tools {...props}/>
       </div>
     )
 }

@@ -86,15 +86,16 @@ test('setSlideBackgroundAsColor', () => {
     hexColor: '100',
     type: 'color'
   } 
-  const prog = createProgram()
+  let prog = createProgram()
+  prog = addSlide(prog)
   const newProgState = setSlideBackground(prog, newBackground)
-  expect(newProgState.currentPresentation.slides[0].background).toMatchObject(newBackground)
-  expect(prog.currentPresentation.slides[0].background).not.toMatchObject(newBackground)
+  expect(newProgState.currentPresentation.slides[1].background).toMatchObject(newBackground)
+  expect(prog.currentPresentation.slides[1].background).not.toMatchObject(newBackground)
 })
 
 test('createPictureObj', () => {
   const newPictureObj = createPictureObj('newUrl')
-  expect(newPictureObj.wigth).toEqual(15)
+  expect(newPictureObj.wigth).toEqual(100)
   expect(newPictureObj.url).toEqual('newUrl')
 
 })
@@ -120,7 +121,7 @@ test('addTextObj' , () => {
   if(isTextObj(newProgState.currentPresentation.slides[0].elements[0]))
   {
     expect(newProgState.currentPresentation.slides[0].elements[0].type).toEqual('text')
-    expect(newProgState.currentPresentation.slides[0].elements[0].text).toEqual('')
+    expect(newProgState.currentPresentation.slides[0].elements[0].text).toEqual('введите текст')
   }
   expect(prog.currentPresentation.slides[0].elements.length).toEqual(0)
 })
@@ -176,9 +177,9 @@ test('changeTextObj', () => {
   }
 
   if(isTextObj(secondProg.currentPresentation.slides[0].elements[0])){
-    expect(secondProg.currentPresentation.slides[0].elements[0].text).toEqual('')
-    expect(secondProg.currentPresentation.slides[0].elements[0].fontFamily).toEqual('roboto')
-    expect(secondProg.currentPresentation.slides[0].elements[0].fontSize).toEqual('14')
+    expect(secondProg.currentPresentation.slides[0].elements[0].text).toEqual('введите текст')
+    expect(secondProg.currentPresentation.slides[0].elements[0].fontFamily).toEqual('oblique')
+    expect(secondProg.currentPresentation.slides[0].elements[0].fontSize).toEqual('50')
   }
 })
 

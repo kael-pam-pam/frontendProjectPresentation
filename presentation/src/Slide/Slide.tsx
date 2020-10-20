@@ -1,8 +1,12 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+import App from '../App';
+
 import { getAutomaticTypeDirectiveNames } from 'typescript';
 import { ElementMain, SmallElementMain } from '../Element/Element';
 import '../Models/commonFunctionsConst'
-import { isColor, isPictureObj } from '../Models/commonFunctionsConst';
+import { isColor, isPictureObj, searchChangedSlideIndex } from '../Models/commonFunctionsConst';
+import { setSelectedSlides } from '../Models/slideMoveInProgramm';
 
 
 import {
@@ -22,25 +26,36 @@ import {
 
 import './Slide.css'
 
-
+function renderProgWithNewSelectedSlide(props: Programm, checkedSlideId: string) {
+  const changedSlideIndex = searchChangedSlideIndex(props)
+  const newProgState = setSelectedSlides(props, [checkedSlideId])
+  ReactDOM.render(
+    <React.StrictMode>
+      <App {...newProgState}/>
+    </React.StrictMode>,
+    document.getElementById('root')
+  )
+}
 
 type SlideProps = {
-  slide: Slide,
+  prog: Programm,
+  numberOfSlide: number
   isSmallSlide: boolean
 }
 
 export function SlideMain(props: SlideProps) {
   
+  let currSlide: Slide = props.prog.currentPresentation.slides[props.numberOfSlide]
   let propsBackground = ''
-  if(isColor(props.slide.background)) {
-    propsBackground = props.slide.background.hexColor
+  if(isColor(currSlide.background)) {
+    propsBackground = currSlide.background.hexColor
   }
 
-  let width = '1520px'
+  let width = '1400px'
   let height = '850px'
   
   if (props.isSmallSlide) {
-    width = '152px'
+    width = '140px'
     height = '85px'
   }
 
@@ -50,44 +65,27 @@ export function SlideMain(props: SlideProps) {
     height: height,
   }
 
-  const elems = props.slide.elements
+  const elems = currSlide.elements
   let slideElems: any = []
   const elemsLength = Object.keys(elems).length
   for(let i = 0; i < elemsLength; i++) {
     slideElems.push(
       props.isSmallSlide
-      ? <SmallElementMain {...props.slide.elements[i]}/>
-      : <ElementMain {...props.slide.elements[i]}/> 
+      ? <SmallElementMain {...currSlide.elements[i]}/>
+      : <ElementMain {...currSlide.elements[i]}/> 
     )
   }
   
-     
-
-  const slideElements = [props.slide.elements]
+  const slideElements = [currSlide.elements]
 
   return (    
-    <div id={props.slide.id} className="SlideCss"  style={propsStyles}>
+    <div id={currSlide.id} onClick={() => renderProgWithNewSelectedSlide(props.prog, currSlide.id)}   
+        className="SlideCss"  style={propsStyles}>
       {slideElems}
     </div>
   )
 }
 
-
-
-
-
-
-/*SlidesPanel(props: SlidesPanelProps) {
-  const slides: Array<Slide> = props.slides;
-  const listSlides = slides.map((item, index) =>
-    <div key={index} className="Slide"></div>
-  );
-  return (
-      <div className="SlidesPanel">
-          {listSlides}
-      </div>
-  )
-}*/
 
 
 

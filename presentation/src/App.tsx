@@ -27,16 +27,15 @@ import {
 function App(props: Programm) {
 
   const slides: Array<Slide> = props.currentPresentation.slides
-  const currSlide = slides[searchChangedSlideIndex(props)]
 
   return (
     <div className="App">
       <div className="App-header">      
-        <HeaderPanel text={'Презентация без названия'} />
+        <HeaderPanel {...props}/>
       </div>
       <div className="App-body">
-        <SlidesPanel {...slides}/>
-        <MainPanel {...currSlide} />
+        <SlidesPanel {...props}/>
+        <MainPanel {...props}/>
       </div>
       <div className="App-footer">
       </div>

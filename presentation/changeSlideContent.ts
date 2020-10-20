@@ -19,7 +19,6 @@ import {
   searchChangedSlideIndex,
   searchChangedElemIndex,
   deepFreeze,
-  getCopyOfSlidesArr,
   isTextObj,
   isShapeObj,
   isPictureObj,
@@ -31,7 +30,10 @@ import {
   getChangedElem,
   getNewShapeElem,
   getNewResizedElem,
-  getNewElemWithNewPosition
+  getNewElemWithNewPosition,
+  getSlideWithNewBackground,
+  getSlidesWithChangedSlide,
+  getElemsWithChangedElem
 } from './commonFunctionsConst'
 import { textChangeRangeIsUnchanged } from 'typescript'
 
@@ -55,16 +57,10 @@ function setSlideBackground(prog: Programm, newBackground: Picture | Color): Pro
   deepFreeze(prog)
   
   const changedSlideIndex: number = searchChangedSlideIndex(prog)
-  
-  const changedSlide = getChangedSlideObj(prog, changedSlideIndex)
-  const slidesWithoutChangedSlide: Array<Slide> = getSlidesWithoutChangedSlide(prog, changedSlideIndex)
-  const slidesWithChangedSlide: Array<Slide> = [
-    ...slidesWithoutChangedSlide,
-    {
-      ...changedSlide,
-      background: newBackground
-    }
-  ]  
+
+  const changedSlide =  getSlideWithNewBackground(prog, changedSlideIndex, newBackground)
+
+  const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, changedSlide, changedSlideIndex)
 
   return {
       ...prog,
@@ -79,10 +75,18 @@ function createPictureObj(url: string): PictureObj {
   return {
       id: createNewId(),
       position: defaultPoint,
-      height: 15,
-      wigth: 15,
+      height: 100,
+      wigth: 100,
       url: url, // w/h take from url 
       type: 'picture'
+  }
+}
+
+
+function getSlideWithChangedElems(prog: Programm, changedElems: Array<PictureObj | TextObj | ShapeObj>, changedSlideIndex: number): Slide {
+  return {
+    ...prog.currentPresentation.slides[changedSlideIndex],
+    elements: changedElems
   }
 }
 
@@ -92,17 +96,10 @@ function addPictureObj(prog: Programm, url: string): Programm {
   const changedSlideIndex = searchChangedSlideIndex(prog)
 
   const newPictureObj = createPictureObj(url)
-  const elemsWithNewElem = getElemsWithNewElem(prog, newPictureObj, changedSlideIndex)
+  const changedElems = getElemsWithNewElem(prog, newPictureObj, changedSlideIndex)
 
-  const changedSlide = getChangedSlideObj(prog, changedSlideIndex)
-  const slidesWithoutChangedSlide: Array<Slide> = getSlidesWithoutChangedSlide(prog, changedSlideIndex)
-  const slidesWithChangedSlide: Array<Slide> = [
-    ...slidesWithoutChangedSlide,
-    {
-      ...changedSlide,
-      elements: elemsWithNewElem
-    }
-  ]
+  const slideWithChangedElems = getSlideWithChangedElems(prog, changedElems, changedSlideIndex)
+  const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex)
 
   return {
     ...prog,
@@ -116,14 +113,17 @@ function addPictureObj(prog: Programm, url: string): Programm {
 
 function createEmtyTextObj(): TextObj {
   return {
-      id: createNewId(),
-      position: defaultPoint,
-      height: 15,
-      wigth: 30,
-      text: '', //  ' '      in vieu=>textObj.text || placeholder(enter text)
-      fontFamily: 'roboto',
-      fontSize: '14',
-      type: 'text'
+    id: createNewId(),
+    position: {
+      x: 550,
+      y: 400
+    },
+    height: 100,
+    wigth: 300,
+    text: "введите текст", //  ' '      in vieu=>textObj.text || placeholder(enter text)
+    fontFamily: 'oblique',
+    fontSize: '50',
+    type: 'text'
   }
 }
 
@@ -133,17 +133,11 @@ function addTextObj(prog: Programm): Programm {
   const changedSlideIndex = searchChangedSlideIndex(prog)
 
   const newTextObj = createEmtyTextObj()
-  const elemsWitNewElem = getElemsWithNewElem(prog, newTextObj, changedSlideIndex) 
 
-  const changedSlide = getChangedSlideObj(prog, changedSlideIndex)
-  const slidesWithoutChangedSlide = getSlidesWithoutChangedSlide(prog, changedSlideIndex)
-  const slidesWithChangedSlide: Array<Slide> = [
-    ...slidesWithoutChangedSlide,
-    {
-      ...changedSlide,
-      elements: elemsWitNewElem
-    }
-  ]
+  const changedElems = getElemsWithNewElem(prog, newTextObj, changedSlideIndex)
+
+  const slideWithChangedElems = getSlideWithChangedElems(prog, changedElems, changedSlideIndex)
+  const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex)
 
   return {
     ...prog,
@@ -151,35 +145,24 @@ function addTextObj(prog: Programm): Programm {
         ...prog.currentPresentation,
         slides: slidesWithChangedSlide
     },
-    selectedElements: [newTextObj.id]
+    selectedElements: [newTextObj.id]           
   }
 }
 
-
-function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' | 'fontSize' | 'fontFamily'): Programm {  // add type ParameterType = 'text' |  'Font
+function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' | 'fontSize' | 'fontFamily'): Programm { 
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
   
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
-  const elemsWithoutChangedElem = getElemsWithoutChangedElem(prog, changedElemIndex, changedSlideIndex)
   if (isTextObj(changedElem)) {
     changedElem = getNewTextElem(changedElem, newParam, paramToChange)
   }
 
-  const changedSlide = getChangedSlideObj(prog, changedSlideIndex)
-  const slidesWithoutChangedSlide = getSlidesWithoutChangedSlide(prog, changedSlideIndex)
-  const slidesWithChangedSlide: Array<Slide> = [
-    ...slidesWithoutChangedSlide,
-    {
-      ...changedSlide,
-      elements: [
-        ...elemsWithoutChangedElem,
-        changedElem  
-      ]      
-    }          
-  ]  
+  const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
+  const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
+  const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex)
 
   return {
     ...prog,
@@ -194,10 +177,10 @@ function createShapeObj(type: 'rect' | 'triangle' | 'circle'): ShapeObj {
   return {
     id: createNewId(),
     position: defaultPoint,
-    wigth: 15,
-    height: 15,
-    borderColor: '11',
-    fillColor: '11',
+    wigth: 100,
+    height: 100,
+    borderColor: 'fff',
+    fillColor: '#7ef507',
     type
   }
 } 
@@ -207,17 +190,10 @@ function addShapeObj(prog: Programm, shapeType: 'rect' | 'triangle' | 'circle'):
   
   const changedSlideIndex = searchChangedSlideIndex(prog)
   const newShapeObj = createShapeObj(shapeType)
-  const elemsWitNewElem = getElemsWithNewElem(prog, newShapeObj, changedSlideIndex) 
 
-  const changedSlide = getChangedSlideObj(prog, changedSlideIndex)
-  const slidesWithoutChangedSlide = getSlidesWithoutChangedSlide(prog, changedSlideIndex)
-  const slidesWithChangedSlide: Array<Slide> = [
-    ...slidesWithoutChangedSlide,
-    {
-      ...changedSlide,
-      elements: elemsWitNewElem
-    }
-  ]
+  const changedElems = getElemsWithNewElem(prog, newShapeObj, changedSlideIndex)
+  const slideWithChangedElems = getSlideWithChangedElems(prog, changedElems, changedSlideIndex)
+  const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex)
 
   return {
       ...prog,
@@ -240,19 +216,9 @@ function changeShapeObj(prog: Programm, newParam: string, paramToChange: 'border
     changedElem = getNewShapeElem(changedElem, newParam, paramToChange)
   }
 
-  const changedSlide = getChangedSlideObj(prog, changedSlideIndex)
-  const slidesWithoutChangedSlide = getSlidesWithoutChangedSlide(prog, changedSlideIndex)
-  const elemsWithoutChangedElem = getElemsWithoutChangedElem(prog, changedElemIndex, changedSlideIndex)
-  const slidesWithChangedSlide: Array<Slide> = [
-    ...slidesWithoutChangedSlide,
-    {
-      ...changedSlide,
-      elements: [
-        ...elemsWithoutChangedElem,
-        changedElem  
-      ]      
-    }          
-  ]    
+  const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
+  const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
+  const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex) 
 
   return {
     ...prog,
@@ -270,21 +236,11 @@ function resizeElement(prog: Programm, newWidth:number, newHeigth: number): Prog
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
 
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
-  const elemsWithoutChangedElem = getElemsWithoutChangedElem(prog, changedElemIndex, changedSlideIndex)
   changedElem = getNewResizedElem(changedElem, newWidth, newHeigth)
 
-  const changedSlide = getChangedSlideObj(prog, changedSlideIndex)
-  const slidesWithoutChangedSlide = getSlidesWithoutChangedSlide(prog, changedSlideIndex)  
-  const slidesWithChangedSlide: Array<Slide> = [
-    ...slidesWithoutChangedSlide,
-    {
-      ...changedSlide,
-      elements: [
-        ...elemsWithoutChangedElem,
-        changedElem  
-      ]      
-    }          
-  ]  
+  const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
+  const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
+  const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex)
 
   return {
     ...prog,
@@ -304,19 +260,9 @@ function changeElemPosition(prog: Programm, newX: number, newY: number): Program
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
   changedElem = getNewElemWithNewPosition(changedElem, newX, newY)
 
-  const changedSlide = getChangedSlideObj(prog, changedSlideIndex)
-  const slidesWithoutChangedSlide = getSlidesWithoutChangedSlide(prog, changedSlideIndex)
-  const elemsWithoutChangedElem = getElemsWithoutChangedElem(prog, changedElemIndex, changedSlideIndex)
-  const slidesWithChangedSlide: Array<Slide> = [
-    ...slidesWithoutChangedSlide,
-    {
-      ...changedSlide,
-      elements: [
-        ...elemsWithoutChangedElem,
-        changedElem  
-      ]      
-    }          
-  ]  
+  const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
+  const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
+  const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex) 
 
   return {
     ...prog,

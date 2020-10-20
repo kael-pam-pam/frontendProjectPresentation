@@ -17,14 +17,26 @@ import {
   Color,
   ShapeObj
 } from './Models/types'
-import { createProgram } from './Models/functions';
+import { changePresentationTitle, createProgram } from './Models/functions';
 import { addSlide, deleteSlide, setSelectedSlides } from './Models/slideMoveInProgramm';
-import { addShapeObj, addTextObj, changeElemPosition, changeShapeObj, changeTextObj, deleteSelectedElements, resizeElement, setSlideBackground } from './Models/changeSlideContent';
+import { addPictureObj, addShapeObj, addTextObj, changeElemPosition, changeShapeObj, changeTextObj, deleteSelectedElements, resizeElement, setSlideBackground } from './Models/changeSlideContent';
+import { Program } from 'typescript';
 
-let prog: Programm = createProgram()    //создать программу
-prog = addTextObj(prog)                 //добавить стандартный текст  
-prog = addShapeObj(prog, 'rect')        //добавить фигуру(пока только квадрат)
+const prog = require('./importFiles/testPresent2.json');
+
+//let prog: Programm = createProgram()    //создать программу
+
+//newProg = jsonProg
+
+
+
+/*prog = addTextObj(prog)                 //добавить стандартный текст
+prog = addSlide(prog)
+prog = addShapeObj(prog, 'circle')
+prog = addSlide(prog)  
+prog = addShapeObj(prog, 'rect')        
 prog = changeElemPosition(prog, 1000, 100) //поменять позицию
+
 prog = setSlideBackground(              //поменять бэкграунд слайда
   prog,
   {
@@ -44,36 +56,25 @@ prog = setSlideBackground(              //поменять бэкграунд с
 )
 
 prog = setSelectedSlides(prog, [prog.currentPresentation.slides[0].id]) // переключились на первый слайд
-
 prog = addSlide(prog)
-
 prog = addTextObj(prog)
-
 prog = changeTextObj(prog,'Hello DiMiPa!', 'text')
-
 prog = addShapeObj(prog, 'circle')
-
 prog = changeShapeObj(prog, 'yellow', 'fillColor')
-
 prog = resizeElement(prog, 300, 300)
-
 prog = addShapeObj(prog, 'triangle')
-
 prog = resizeElement(prog, 230, 230)
-
 prog = changeElemPosition(prog, 700, 500)
-
 prog = addShapeObj(prog, 'rect')
-
 prog = changeElemPosition(prog, 1000, 100)
-
 prog = changeShapeObj(prog, 'red' ,'fillColor')
+prog = setSelectedSlides(prog, [prog.currentPresentation.slides[2].id])
+prog = addShapeObj(prog, 'rect')
+prog = addPictureObj(prog, "home/mishan/Изображения/481997.jpg")
+prog = changePresentationTitle(prog, 'DiMiPa presentation 1')
 
-/*prog = setSelectedSlides(prog, [prog.currentPresentation.slides[1].id])
-
-prog = deleteSlide(prog)*/   //удалить 2 слайд
-
-//prog = deleteSelectedElements(prog)
+//prog = setSelectedSlides(prog, [prog.currentPresentation.slides[3].id])
+*/
 
 ReactDOM.render(
   <React.StrictMode>
