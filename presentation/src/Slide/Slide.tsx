@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import App from '../App';
 
 import { getAutomaticTypeDirectiveNames } from 'typescript';
-import { ElementMain, SmallElementMain } from '../Element/Element';
+import { BigSlideElement, SmallSlideElement } from '../Element/Element';
 import '../Models/commonFunctionsConst'
-import { isColor, isPictureObj, searchChangedSlideIndex } from '../Models/commonFunctionsConst';
+import { createNewId, isColor, isPictureObj, searchChangedSlideIndex } from '../Models/commonFunctionsConst';
 import { setSelectedSlides } from '../Models/slideMoveInProgramm';
 
 
@@ -71,20 +71,24 @@ export function SlideMain(props: SlideProps) {
   for(let i = 0; i < elemsLength; i++) {
     slideElems.push(
       props.isSmallSlide
-      ? <SmallElementMain {...currSlide.elements[i]}/>
-      : <ElementMain {...currSlide.elements[i]}/> 
+      ? <SmallSlideElement {...currSlide.elements[i]}/>
+      : <BigSlideElement {...currSlide.elements[i]}/> 
     )
   }
   
   const slideElements = [currSlide.elements]
 
   return (    
-    <div id={currSlide.id} onClick={() => renderProgWithNewSelectedSlide(props.prog, currSlide.id)}   
-        className="SlideCss"  style={propsStyles}>
-      {slideElems}
+    <div id={currSlide.id} onClick={() => renderProgWithNewSelectedSlide(props.prog, currSlide.id)} className="SlideCss"  style={propsStyles}>
+        <svg id={createNewId()} xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="100%" height="100%">
+          {slideElems}
+        </svg>
     </div>
   )
 }
+
+
+
 
 
 

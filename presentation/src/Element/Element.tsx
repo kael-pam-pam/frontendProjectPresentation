@@ -18,140 +18,187 @@ import {
 import './Element.css'
 
 
-export function SmallElementMain(props: PictureObj | TextObj | ShapeObj) {
+export function SmallSlideElement(props: PictureObj | TextObj | ShapeObj) {
   const elemId = props.id
-  let elemStyles = {}
-  let text = ''
-  let commonStyles = {
-    display: 'block',
-    position: 'absolute',
-    left: props.position.x / 10 + 'px',
-    top: props.position.y / 10 + 'px', 
-    width: props.wigth  / 10 + 'px',
-    height: props.height / 10 + 'px',
-  } 
+  let width = props.wigth / 10
+  let height = props.height / 10
+  let posX = props.position.x  / 10
+  let posY = props.position.y  / 10
+  let id = props.id
+  let svgElem: any
 
   if (isTextObj(props)) {
-    elemStyles = {
-      ...commonStyles,  
-      fontFamily: props.fontFamily,
-      fontSize: Number(props.fontSize) / 10 + 'px',
-      textAlign: 'center'
-    }
-    text = props.text
+    svgElem =
+      <text 
+        id={id + '.txt'}
+        x={posX}
+        y={posY}
+        width={width}
+        height={height}
+        fontFamily={props.fontFamily}
+        fontSize={Number(props.fontSize) / 10}
+      >
+        {props.text}
+      </text>
   }
 
   if (isPictureObj(props)) {
-    elemStyles = {
-      ...commonStyles,
-      backgroundImage: props.url  
-    }
+    svgElem =
+      <image 
+        x={posX}
+        y={posY}
+        width={width} 
+        height={height}
+        href={props.url} 
+      />
   }
 
   if (isShapeObj(props)) {
     if (props.type == 'rect') {
-      elemStyles = {
-        ...commonStyles,
-        borderColor: props.borderColor,
-        backgroundColor: props.fillColor,
-      }
+      svgElem = 
+        <rect
+          id={id}
+          x={posX}
+          y={posY}  
+          width={width}
+          height={height}
+          stroke={props.borderColor} 
+          fill={props.fillColor}
+        />
     }  
 
     if (props.type == 'circle') {
-      elemStyles = {
-        ...commonStyles,
-        borderColor: props.borderColor,
-        backgroundColor: props.fillColor,
-        borderRadius: '50%'
-      }          
+      svgElem = 
+        <circle 
+          id={id}
+          cx={posX} 
+          cy={posY} 
+          r={width/2} 
+          fill={props.fillColor} 
+          stroke={props.borderColor} 
+        />          
     }
 
     if (props.type == 'triangle') {
-      elemStyles = {
-        ...commonStyles,  
-        width: '0',
-        height: '0',
-        left: props.position.x / 10 + 'px',
-        top: props.position.y / 10 + 'px',     
-        borderLeft: props.wigth / 20 + 'px solid transparent',
-        borderRight: props.wigth / 20 + 'px solid transparent',
-        borderBottom: props.wigth / 10 + 'px solid ' + props.fillColor,
-        borderColor: props.borderColor,
-      }          
+      const leftPoint= {
+        x: posX,
+        y: Number(posY) + Number(height)
+      }  
+      const rightPoint = {
+        x: Number(posX) + Number(width),
+        y: Number(posY) + Number(height)
+      } 
+      const pickPoint = {
+        x: Number(posX) + width/2,
+        y: posY
+      }
+
+      svgElem = 
+        <polygon 
+          id={id}      
+          points= {
+            leftPoint.x + ' ' + leftPoint.y + ', ' +
+            rightPoint.x + ' ' + rightPoint.y + ', ' +
+            pickPoint.x + ' ' + pickPoint.y
+          }
+          fill={props.fillColor} 
+          stroke={props.borderColor} 
+        />         
     } 
   }
 
-  return (
-    <div id={elemId} style={elemStyles}>{text}</div>
-  )
+  return (svgElem)
 }
 
 
 
-export function ElementMain(props: PictureObj | TextObj | ShapeObj) {
+export function BigSlideElement(props: PictureObj | TextObj | ShapeObj) {
   const elemId = props.id
-  let elemStyles = {}
-  let text = ''
-  let commonStyles = {
-    display: 'block',
-    position: 'absolute',
-    left: props.position.x + 'px',
-    top: props.position.y + 'px', 
-    width: props.wigth + 'px',
-    height: props.height + 'px',
-  } 
+  let width = props.wigth
+  let height = props.height
+  let posX = props.position.x  
+  let posY = props.position.y
+  let id = props.id
+  let svgElem: any
 
   if (isTextObj(props)) {
-    elemStyles = {
-      ...commonStyles,  
-      fontFamily: props.fontFamily,
-      fontSize: props.fontSize + 'px',
-      textAlign: 'center'
-    }
-    text = props.text
+    svgElem =
+      <text 
+        id={id + '.txt'}
+        x={posX}
+        y={posY}
+        width={width}
+        height={height}
+        fontFamily={props.fontFamily}
+        fontSize={props.fontSize}
+      >
+        {props.text}
+      </text>
   }
 
   if (isPictureObj(props)) {
-    elemStyles = {
-      ...commonStyles,
-      background: `url(${props.url})`  
-    }
+    svgElem =
+      <image 
+        x={posX}
+        y={posY}
+        width={width} 
+        height={height}
+        href={props.url} 
+      />
   }
 
   if (isShapeObj(props)) {
     if (props.type == 'rect') {
-      elemStyles = {
-        ...commonStyles,
-        borderColor: props.borderColor,
-        backgroundColor: props.fillColor,
-      }
+      svgElem = 
+        <rect
+          id={id}
+          x={posX}
+          y={posY}  
+          width={width}
+          height={height}
+          stroke={props.borderColor} 
+          fill={props.fillColor}
+        />
     }  
 
     if (props.type == 'circle') {
-      elemStyles = {
-        ...commonStyles,
-        borderColor: props.borderColor,
-        backgroundColor: props.fillColor,
-        borderRadius: '50%'
-      }          
+      svgElem = 
+        <circle 
+          id={id}
+          cx={posX} 
+          cy={posY} 
+          r={props.wigth/2} 
+          fill={props.fillColor} 
+          stroke={props.borderColor} 
+        />          
     }
 
     if (props.type == 'triangle') {
-      elemStyles = {
-        ...commonStyles,  
-        width: '0',
-        height: '0',
-        left: props.position.x + 'px',
-        top: props.position.y + 'px',     
-        borderLeft: props.wigth / 2 + 'px solid transparent',
-        borderRight: props.wigth / 2 + 'px solid transparent',
-        borderBottom: props.wigth + 'px solid ' + props.fillColor,
-        borderColor: props.borderColor,
-      }          
+      const leftPoint= {
+        x: posX,
+        y: Number(posY) + Number(height)
+      }  
+      const rightPoint = {
+        x: Number(posX) + Number(width),
+        y: Number(posY) + Number(height)
+      } 
+      const pickPoint = {
+        x: Number(posX) + width/2,
+        y: posY
+      }
+
+      svgElem = 
+        <polygon 
+          id={id}      
+          points= {
+            leftPoint.x + ' ' + leftPoint.y + ', ' +
+            rightPoint.x + ' ' + rightPoint.y + ', ' +
+            pickPoint.x + ' ' + pickPoint.y
+          }
+          fill={props.fillColor} 
+          stroke={props.borderColor} 
+        />         
     } 
   }
-  
-  return (
-  <div id={elemId}  style={elemStyles}>{text}</div>
-  )
+  return (svgElem)
 }

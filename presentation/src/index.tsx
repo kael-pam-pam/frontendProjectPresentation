@@ -22,14 +22,9 @@ import { addSlide, deleteSlide, setSelectedSlides } from './Models/slideMoveInPr
 import { addPictureObj, addShapeObj, addTextObj, changeElemPosition, changeShapeObj, changeTextObj, deleteSelectedElements, resizeElement, setSlideBackground } from './Models/changeSlideContent';
 import { Program } from 'typescript';
 
-const prog = require('./importFiles/testPresent2.json');
+const prog: Programm = require('./importFiles/testPresent2.json');
 
 //let prog: Programm = createProgram()    //создать программу
-
-//newProg = jsonProg
-
-
-
 /*prog = addTextObj(prog)                 //добавить стандартный текст
 prog = addSlide(prog)
 prog = addShapeObj(prog, 'circle')
@@ -75,6 +70,7 @@ prog = changePresentationTitle(prog, 'DiMiPa presentation 1')
 
 //prog = setSelectedSlides(prog, [prog.currentPresentation.slides[3].id])
 */
+
 
 ReactDOM.render(
   <React.StrictMode>

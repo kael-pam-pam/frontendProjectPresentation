@@ -115,7 +115,7 @@ function createEmtyTextObj(): TextObj {
   return {
     id: createNewId(),
     position: {
-      x: 550,
+      x: 600,
       y: 400
     },
     height: 100,
@@ -174,13 +174,32 @@ function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' |
 }
 
 function createShapeObj(type: 'rect' | 'triangle' | 'circle'): ShapeObj {
+  let fillColor = '#2ff211'
+  let position = {
+    x: 250,
+    y: 500
+  }
+  if (type == 'triangle') {
+    fillColor = '#999c1c'
+    position = {
+      x: 500,
+      y: 500
+    }
+  }
+  if (type == 'circle') {
+    fillColor = '#9c331c'
+    position = {
+      x: 750,
+      y: 550
+    }
+  }
   return {
     id: createNewId(),
-    position: defaultPoint,
+    position: position,
     wigth: 100,
     height: 100,
     borderColor: 'fff',
-    fillColor: '#7ef507',
+    fillColor: fillColor,
     type
   }
 } 

@@ -38,8 +38,6 @@
     visibility: visible;
 }
 
-
-
 .ToolAddSlide {
     background: rgb(112, 111, 111) url("./pic/addSlide.png");
 }
@@ -65,5 +63,43 @@
 }
 
 .ToolShapeObj {
+    display: block;
+    position: relative;
     background: rgb(112, 111, 111) url("./pic/shapeObj.png");
 }
+
+.ToolShapeObj_shape {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    position: absolute;
+    list-style: none;
+    top: 20px;
+    width: 130px;
+    height: 60px;
+    z-index: 1;
+    background: white;
+    border: 1px solid #dadce0;
+}
+
+.ToolShapeObj_shape_elem {
+    display: block;
+    text-indent: 20px;
+    width: 130px;
+    height: 20px;
+}
+
+.ToolShapeObj_shape_elem:hover {
+    background-color: rgb(112, 111, 111) ;
+}
+
+
+.ToolShapePanel {
+    display: block;
+    position: absolute;           
+    top: 20px;
+    width: 100px;
+    height: 100px;
+    z-index: 1;
+}
+

@@ -90,18 +90,6 @@ function deepFreeze (o: any) {
   return o;
 };
 
-/*function deepFreeze(obj) {
-  let propNames = Object.getOwnPropertyNames(obj);
-  propNames.forEach(function(name) {
-    let prop = obj[name]
-
-    if (typeof prop == 'object' && prop !== null) {
-      deepFreeze(prop)
-    }  
-  })
-  return Object.freeze(obj);
-}*/
-
 
 
 function isTextObj(elem: any): elem is TextObj {
