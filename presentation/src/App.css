@@ -1,0 +1,21 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  background-color: darkgreen;
+  height: 100vh;
+}
+
+.App-header {
+  flex-grow: 0;
+}
+
+.App-body {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  flex-grow: 1;
+}
+
+.App-footer {
+  flex-grow: 0;
+}

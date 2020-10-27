@@ -1,0 +1,9 @@
+.HeaderPanel {
+    min-height: 80px;
+    background-color: white;
+}
+
+.Title {
+    padding-left: 16px;
+    font: 18px/30px sans-serif; 
+}

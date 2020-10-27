@@ -1,0 +1,92 @@
+
+{
+  "currentPresentation": {
+    "title": "My presentation",
+    "slides": [
+      {
+        "id": "2",
+        "background": {
+            "hexColor": "#d19494",
+            "type": "color"
+        },
+        "elements": [
+          {
+            "id": "32",
+            "position": { 
+              "x": "100",
+              "y": "200"
+            },  
+            "height": 100,
+            "wigth": 300,
+            "borderColor": "green",
+            "fillColor": "yellow",
+            "type": "rect"
+          },
+          {
+            "id": "312",
+            "position": { 
+              "x": "0",
+              "y": "0"
+            },  
+            "height": 100,
+            "wigth": 300,
+            "borderColor": "green",
+            "fillColor": "#682a37",
+            "type": "rect"
+          },
+          {
+            "id": "3",
+            "position": { 
+              "x": "700",
+              "y": "200"
+            },  
+            "height": 100,
+            "wigth": 300,
+            "borderColor": "green",
+            "fillColor": "blue",
+            "type": "circle"
+          },
+          {
+            "id": "4",
+            "position": { 
+              "x": "70",
+              "y": "330"
+            },  
+            "height": 400,
+            "wigth": 300,
+            "borderColor": "green",
+            "fillColor": "orange",
+            "type": "triangle"
+          },
+          {
+            "id": "221",
+            "position": {
+              "x": "250",
+              "y": "500"
+            },
+            "height": 100,
+            "wigth": 200,
+            "text": "Котяра2",
+            "fontFamily": "Arial",
+            "fontSize": 50,
+            "type": "text"
+          },
+          {
+            "id": "21",
+            "position": {
+              "x": "600",
+              "y": "400"
+            },
+            "height": 300,
+            "wigth": 300,
+            "url": "https://nastol.net/wallpaper/big/2/8377058-kote-fon-kotyara-koshak-vzglyad-koshki.jpg",
+            "type": "picture"
+          }
+        ]
+      }
+    ]
+  },
+  "selectedSlides": ["0"],
+  "selectedElements": []
+}
+    

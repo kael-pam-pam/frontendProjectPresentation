@@ -1,0 +1,109 @@
+.Tools {
+    height: 30px;
+    background-color: white;
+    border-top: 1px solid #dadce0;
+    border-bottom: 1px solid #dadce0;
+    padding-left: 10px;
+    display: flex;
+}
+
+.Tool {
+    width: 24px;
+    height: 24px;
+    margin: 3px 3px;
+    cursor: pointer;
+    border-width: 0;
+    border-radius: 4px;
+    position: relative;
+}
+
+.Tooltip {
+    visibility: hidden;
+    display: inline-block;
+    background-color: black;
+    z-index: 1;
+    top: 30px;
+    color: white;
+    font: 12px sans-serif;
+    padding: 5px;
+}
+
+.Tool:hover {
+    background-blend-mode: overlay;
+}
+
+.Tool:hover .Tooltip {
+    transition-delay: 0.5s;
+    position: absolute;
+    visibility: visible;
+}
+
+.ToolAddSlide {
+    background: rgb(112, 111, 111) url("./pic/addSlide.png");
+}
+
+.ToolBackHistory {
+    background: rgb(112, 111, 111) url("./pic/backHist.png");
+}
+
+.ToolFutureHistory {
+    background: rgb(112, 111, 111) url("./pic/futureHist.png");
+}
+
+.ToolCursor {
+    background: rgb(112, 111, 111) url("./pic/cursor.png");
+}
+
+.ToolTextObj {
+    background: rgb(112, 111, 111) url("./pic/textObj.png");
+}
+
+.ToolPicObj {
+    background: rgb(112, 111, 111) url("./pic/picObj.png");
+}
+
+.ToolSavePres {
+    background: rgb(112, 111, 111) url("./pic/savePres.png");
+}
+
+.ToolShapeObj {
+    display: block;
+    position: relative;
+    background: rgb(112, 111, 111) url("./pic/shapeObj.png");
+}
+
+.ToolShapeObj_shape {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    position: absolute;
+    list-style: none;
+    top: 20px;
+    width: 130px;
+    height: 60px;
+    z-index: 1;
+    background: white;
+    border: 1px solid #dadce0;
+}
+
+.ToolShapeObj_shape_elem {
+    display: block;
+    text-indent: 20px;
+    width: 130px;
+    height: 20px;
+}
+
+.ToolShapeObj_shape_elem:hover {
+    background-color: rgb(112, 111, 111) ;
+}
+
+
+.ToolShapePanel {
+    display: block;
+    position: absolute;           
+    top: 20px;
+    width: 100px;
+    height: 100px;
+    z-index: 1;
+}
+

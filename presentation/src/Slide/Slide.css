@@ -1,0 +1,8 @@
+.SlideCss {
+  display: block;
+  position: relative;
+  margin: 10px auto;
+  background-color: black;
+  border-radius: 4px;
+  border: 2px solid #dadce0;
+}
