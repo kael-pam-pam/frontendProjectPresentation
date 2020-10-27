@@ -1,8 +1,10 @@
+import { setSelectedSlides } from './slideMoveInProgramm'
 import {
   Programm,
   Presentation,
   ArchiveOfState,
   Slide,
+  SlideId,
   Point,
   ElementObj,
   Picture,
@@ -20,10 +22,13 @@ export {
   searchChangedSlideIndex,
   searchChangedElemIndex,
   deepFreeze,
+  isProgramm,
+  isSlideId,
   isTextObj,
   isShapeObj,
   isPictureObj,
   isColor,
+  isSlide,
   getSlidesWithoutChangedSlide,
   getChangedSlideObj,
   getNewTextElem,
@@ -90,7 +95,17 @@ function deepFreeze (o: any) {
   return o;
 };
 
+function isProgramm(elem: any): elem is Programm {
+  return elem.currentPresentation !== undefined
+}
 
+function isSlideId(elem: any): elem is SlideId {
+  return typeof elem == "string"
+}
+
+function isSlide(elem: any): elem is Slide {
+  return elem.elements !== undefined
+}
 
 function isTextObj(elem: any): elem is TextObj {
   return elem.text !== undefined && elem.fontFamily !== undefined;

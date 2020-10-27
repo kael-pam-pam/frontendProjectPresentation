@@ -18,11 +18,10 @@ import {
   ShapeObj
 } from '../Models/types'
 
-interface HeaderPanelProps {
-    text: string,
-}
+import { actualProgState } from '../Models/dispatcher'
 
-function HeaderPanel(props: Programm) {
+
+function HeaderPanel() {
     const menu: Array<MenuItem> = [
       {title: "Файл", onClick: () => console.log('Файл')},
       {title: "Правка", onClick: () => console.log('Правка')}, 
@@ -38,9 +37,9 @@ function HeaderPanel(props: Programm) {
 
     return (
       <div className="HeaderPanel">
-        <span className="Title">{props.currentPresentation.title}</span>
+        <span className="Title">{actualProgState.currentPresentation.title}</span>
         <Commands menu={menu} />
-        <Tools {...props}/>
+        <Tools/>
       </div>
     )
 }

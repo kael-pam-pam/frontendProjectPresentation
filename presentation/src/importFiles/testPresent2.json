@@ -1,7 +1,6 @@
-
 {
   "currentPresentation": {
-    "title": "My presentation",
+    "title": "DiMiPaKe Presentation",
     "slides": [
       {
         "id": "2",
@@ -61,12 +60,12 @@
           {
             "id": "221",
             "position": {
-              "x": "300",
+              "x": "800",
               "y": "500"
             },
             "height": 100,
-            "wigth": 200,
-            "text": "Котяра2",
+            "wigth": 300,
+            "text": "Котан",
             "fontFamily": "Arial",
             "fontSize": 50,
             "type": "text"
@@ -74,8 +73,8 @@
           {
             "id": "21",
             "position": {
-              "x": "600",
-              "y": "400"
+              "x": "800",
+              "y": "500"
             },
             "height": 300,
             "wigth": 300,
@@ -83,10 +82,79 @@
             "type": "picture"
           }
         ]
+      },
+      {
+        "id": "231",
+        "background": {
+            "hexColor": "#783a6d",
+            "type": "picture"
+        },
+        "elements": [
+          {
+            "id": "342",
+            "position": { 
+              "x": "400",
+              "y": "200"
+            },  
+            "height": 200,
+            "wigth": 300,
+            "borderColor": "green",
+            "fillColor": "yellow",
+            "type": "rect"
+          },
+          {
+            "id": "343",
+            "position": { 
+              "x": "950",
+              "y": "200"
+            },  
+            "height": 100,
+            "wigth": 150,
+            "borderColor": "green",
+            "fillColor": "#42783a",
+            "type": "circle"
+          },
+          {
+            "id": "456",
+            "position": { 
+              "x": "70",
+              "y": "330"
+            },  
+            "height": 150,
+            "wigth": 200,
+            "borderColor": "green",
+            "fillColor": "#185ade",
+            "type": "triangle"
+          },
+          {
+            "id": "2261",
+            "position": {
+              "x": "50",
+              "y": "100"
+            },
+            "height": 100,
+            "wigth": 200,
+            "text": "Морковка ван лав",
+            "fontFamily": "Arial",
+            "fontSize": 50,
+            "type": "text"
+          },
+          {
+            "id": "212",
+            "position": {
+              "x": "800",
+              "y": "350"
+            },
+            "height": 400,
+            "wigth": 500,
+            "url": "https://liveberlin.ru/wp-content/uploads/2019/04/grass-flower-pxhere.com-cover.jpg",
+            "type": "picture"
+          }
+        ]
       }
     ]
   },
-  "selectedSlides": ["0"],
+  "selectedSlides": ["2"],
   "selectedElements": []
 }
     

@@ -74,5 +74,41 @@ export type ShapeObj = ElementObj & {
     fillColor: string,
 }
 
+export type SlideId = string
+
+export type ChangedParams = Programm | ShapeObj | TextObj | PictureObj | SlideId | null
+
+//type Dispatch <Actions> = dispatch((prog:Programm, props:Actions): void, props:Actions): void) 
+
+export type Actions =
+
+  | "CREATE_NEW_PROGRAMM" 
+
+  | "LOAD_PROGRAMM"
+
+  | "ADD_NEW_SLIDE"
+
+  | "SELECT_SLIDES"
+
+  | "ADD_TEXT_OBJ"
+
+  | "ADD_PICTURE"
+
+  | "ADD_RECT"
+
+  | "ADD_TRIANGLE"
+
+  | "ADD_CIRCLE"  
+
+  | "CHANGE_TEXT_IN_TEXT" 
+
+  | "CHANGE_FONT_FAMILY_IN_TEXT" 
+
+  | "CHANGE_FONT_SIZE_IN_TEXT" 
+
+
+
+
+
 
 

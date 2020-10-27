@@ -176,28 +176,28 @@ function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' |
 function createShapeObj(type: 'rect' | 'triangle' | 'circle'): ShapeObj {
   let fillColor = '#2ff211'
   let position = {
-    x: 250,
+    x: 150,
     y: 500
   }
   if (type == 'triangle') {
     fillColor = '#999c1c'
     position = {
       x: 500,
-      y: 500
+      y: 200
     }
   }
   if (type == 'circle') {
     fillColor = '#9c331c'
     position = {
-      x: 750,
-      y: 550
+      x: 950,
+      y: 600
     }
   }
   return {
     id: createNewId(),
     position: position,
-    wigth: 100,
-    height: 100,
+    wigth: 200,
+    height: 200,
     borderColor: 'fff',
     fillColor: fillColor,
     type

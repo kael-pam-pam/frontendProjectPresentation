@@ -23,20 +23,18 @@ import {
 import { 
   searchChangedSlideIndex
 } from './Models/commonFunctionsConst';
+import { dispatch, actualProgState } from './Models/dispatcher'
 
 
-function App(props: Programm) {
-
-  const slides: Array<Slide> = props.currentPresentation.slides
-
+function App() {
   return (
     <div className="App">
       <div className="App-header">      
-        <HeaderPanel {...props}/>
+        <HeaderPanel/>
       </div>
       <div className="App-body">
-        <SlidesPanel {...props}/>
-        <MainPanel {...props}/>
+        <SlidesPanel/>
+        <MainPanel/>
       </div>
       <div className="App-footer">
       </div>

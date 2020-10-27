@@ -16,13 +16,14 @@ import {
 } from '../Models/types'
 import { SlideMain } from '../Slide/Slide';
 import { searchChangedSlideIndex } from '../Models/commonFunctionsConst';
+import { dispatch, actualProgState } from '../Models/dispatcher'
 
 
-function MainPanel(props: Programm) {
-    const changedSlideIndex = searchChangedSlideIndex(props)
+function MainPanel() {
+    const changedSlideIndex = searchChangedSlideIndex(actualProgState)
     return (
         <div className="MainPanel">
-            <SlideMain prog={props} numberOfSlide={changedSlideIndex} isSmallSlide={false}/>      
+            <SlideMain numberOfSlide={changedSlideIndex} isSmallSlide={false}/>      
         </div>
     )
 }

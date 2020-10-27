@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import App from '../App';
 
 import { getAutomaticTypeDirectiveNames } from 'typescript';
@@ -7,6 +6,8 @@ import { BigSlideElement, SmallSlideElement } from '../Element/Element';
 import '../Models/commonFunctionsConst'
 import { createNewId, isColor, isPictureObj, searchChangedSlideIndex } from '../Models/commonFunctionsConst';
 import { setSelectedSlides } from '../Models/slideMoveInProgramm';
+import { dispatch, actualProgState } from '../Models/dispatcher'
+import { render } from '../index'
 
 
 import {
@@ -26,29 +27,22 @@ import {
 
 import './Slide.css'
 
-function renderProgWithNewSelectedSlide(props: Programm, checkedSlideId: string) {
-  const changedSlideIndex = searchChangedSlideIndex(props)
-  const newProgState = setSelectedSlides(props, [checkedSlideId])
-  ReactDOM.render(
-    <React.StrictMode>
-      <App {...newProgState}/>
-    </React.StrictMode>,
-    document.getElementById('root')
-  )
-}
-
 type SlideProps = {
-  prog: Programm,
   numberOfSlide: number
   isSmallSlide: boolean
 }
 
 export function SlideMain(props: SlideProps) {
   
-  let currSlide: Slide = props.prog.currentPresentation.slides[props.numberOfSlide]
+  let currSlide: Slide = actualProgState.currentPresentation.slides[props.numberOfSlide]
   let propsBackground = ''
+
   if(isColor(currSlide.background)) {
     propsBackground = currSlide.background.hexColor
+  }
+
+  if (isPictureObj(currSlide.background)) {
+    propsBackground = currSlide.background.url
   }
 
   let width = '1400px'
@@ -79,7 +73,7 @@ export function SlideMain(props: SlideProps) {
   const slideElements = [currSlide.elements]
 
   return (    
-    <div id={currSlide.id} onClick={() => renderProgWithNewSelectedSlide(props.prog, currSlide.id)} className="SlideCss"  style={propsStyles}>
+    <div id={currSlide.id} onClick={() => dispatch(setSelectedSlides, ([...actualProgState.selectedSlides, currSlide.id]))} className="SlideCss"  style={propsStyles}>
         <svg id={createNewId()} xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="100%" height="100%">
           {slideElems}
         </svg>
