@@ -29,6 +29,7 @@ export {
   isPictureObj,
   isColor,
   isSlide,
+  isPoint,
   getSlidesWithoutChangedSlide,
   getChangedSlideObj,
   getNewTextElem,
@@ -71,7 +72,7 @@ function searchChangedSlideIndex(prog: Programm): number {
 function searchChangedElemIndex(prog: Programm, changedSlideIndex: number): number {
   const elems = prog.currentPresentation.slides[changedSlideIndex].elements
   const selectedElem = prog.selectedElements[prog.selectedElements.length - 1]
-  let changedElemIndex: number = 0
+  let changedElemIndex: number = -1
   for (let i = 0; i < elems.length; i++) {     
     if (elems[i].id == selectedElem) {
         changedElemIndex = i
@@ -121,6 +122,10 @@ function isPictureObj(elem: any): elem is PictureObj {
 
 function isColor(elem: any): elem is Color {
   return elem.hexColor !== undefined
+}
+
+function isPoint(elem: any): elem is Point {
+  return elem.x !== undefined
 }
 
 

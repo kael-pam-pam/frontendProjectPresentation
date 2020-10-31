@@ -38,7 +38,7 @@ function HeaderPanel() {
     return (
       <div className="HeaderPanel">
         <span className="Title">{actualProgState.currentPresentation.title}</span>
-        <Commands menu={menu} />
+        <Commands menu={menu}/>
         <Tools/>
       </div>
     )

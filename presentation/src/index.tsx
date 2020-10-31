@@ -15,8 +15,7 @@ import {
   PictureObj,
   TextObj,
   Color,
-  ShapeObj,
-  Actions
+  ShapeObj
 } from './Models/types'
 import { changePresentationTitle, createProgram } from './Models/functions';
 import { addSlide, deleteSlide, setSelectedSlides } from './Models/slideMoveInProgramm';
@@ -26,9 +25,9 @@ import { dispatch, actualProgState, loadProgramm } from './Models/dispatcher';
 
 const prog: Programm = require('./importFiles/testPresent2.json');
 
-//dispatch(createProgram, ({}))
+dispatch(createProgram, ({}))
 
-dispatch(loadProgramm, (prog))
+//dispatch(loadProgramm, (prog))
 
 export function render(){
   ReactDOM.render(

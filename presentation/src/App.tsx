@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { createRef, useEffect, useRef, useState } from 'react';
 import './App.css';
 import { HeaderPanel } from './HeaderPanel/HeaderPanel';
 import { MainPanel } from './MainPanel/MainPanel';
 import { SlideMain } from './Slide/Slide';
 import { SlidesPanel } from './SlidesPanel/SlidesPanel'
 import { Program } from 'typescript';
-import { ShapesMenu } from './Tools/Tools';
+//import { ShapesMenu } from './Tools/Tools';
 import {
   Programm,
   Presentation,
@@ -23,12 +23,18 @@ import {
 import { 
   searchChangedSlideIndex
 } from './Models/commonFunctionsConst';
-import { dispatch, actualProgState } from './Models/dispatcher'
+import { dispatch, actualProgState} from './Models/dispatcher'
+import { render } from './index';
 
 
 function App() {
+
+  
+  const appRef = React.useRef()
+
+  
   return (
-    <div className="App">
+    <div ref={appRef.current} className="App">
       <div className="App-header">      
         <HeaderPanel/>
       </div>

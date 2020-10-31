@@ -1,5 +1,9 @@
-import React from 'react';
+import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
+import React, { useState } from 'react';
+import { render } from 'react-dom';
+import { changeElemPosition, setSelectedElement } from '../Models/changeSlideContent';
 import { isPictureObj, isShapeObj, isTextObj } from '../Models/commonFunctionsConst';
+import { actualProgState, dispatch, dispatchTwoParams } from '../Models/dispatcher';
 import {
   Programm,
   Presentation,
@@ -113,6 +117,7 @@ export function SmallSlideElement(props: PictureObj | TextObj | ShapeObj) {
 
 
 export function BigSlideElement(props: PictureObj | TextObj | ShapeObj) {
+
   const elemId = props.id
   let width = props.wigth
   let height = props.height
@@ -121,9 +126,41 @@ export function BigSlideElement(props: PictureObj | TextObj | ShapeObj) {
   let id = props.id
   let svgElem: any
 
+  const mainSvgProps = document.querySelector('.mainSlideSvg')?.getBoundingClientRect()
+  const leftSvgBorder = Number(mainSvgProps?.x)
+  const rightSvgBorder =  Number(mainSvgProps?.x) +  Number(mainSvgProps?.width)
+  const topSvgBorder = Number(mainSvgProps?.y)
+  const bottomSvgBorder = Number(mainSvgProps?.y) +  Number(mainSvgProps?.height)
+
+  const [deltaCoord, setDeltaCoord] = useState({x: 0, y: 0})
+
+  function setDeltaCoordSelectElem(event: React.MouseEvent, id: string): void {  
+    dispatch(setSelectedElement, ([id]));
+    setDeltaCoord ({ 
+      x: event.clientX - posX, 
+      y: event.clientY - posY
+    })
+  }
+
+  function getNewCoordChangeElemPos(event: React.MouseEvent): void {
+    let newX = event.clientX - deltaCoord.x
+    let newY = event.clientY - deltaCoord.y
+    if (
+        leftSvgBorder + newX >= leftSvgBorder
+        && leftSvgBorder + newX + width <= rightSvgBorder
+        && topSvgBorder + newY >= topSvgBorder
+        && topSvgBorder + newY + height <= bottomSvgBorder
+      ) {
+      dispatchTwoParams(changeElemPosition, newX, newY)
+    }
+  }
+
+  onmouseup = () => dispatch(setSelectedElement, ([]))
+
   if (isTextObj(props)) {
     svgElem =
-      <text 
+      <text
+        onMouseDown = {() => dispatch(setSelectedElement, ([id]))} 
         id={id + '.txt'}
         x={posX}
         y={posY}
@@ -139,6 +176,7 @@ export function BigSlideElement(props: PictureObj | TextObj | ShapeObj) {
   if (isPictureObj(props)) {
     svgElem =
       <image 
+        onMouseDown = {() => dispatch(setSelectedElement, ([id]))}
         x={posX}
         y={posY}
         width={width} 
@@ -151,6 +189,8 @@ export function BigSlideElement(props: PictureObj | TextObj | ShapeObj) {
     if (props.type == 'rect') {
       svgElem = 
         <rect
+          onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)}
+          onMouseMove = {(event) => getNewCoordChangeElemPos(event)}
           id={id}
           x={posX}
           y={posY}  
@@ -163,7 +203,9 @@ export function BigSlideElement(props: PictureObj | TextObj | ShapeObj) {
 
     if (props.type == 'circle') {
       svgElem = 
-        <circle 
+        <circle
+          onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)} 
+          onMouseMove = {(event) => getNewCoordChangeElemPos(event)}
           id={id}
           cx={posX} 
           cy={posY} 
@@ -188,7 +230,9 @@ export function BigSlideElement(props: PictureObj | TextObj | ShapeObj) {
       }
 
       svgElem = 
-        <polygon 
+        <polygon       
+          onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)}
+          onMouseMove = {(event) => getNewCoordChangeElemPos(event)}
           id={id}      
           points= {
             leftPoint.x + ' ' + leftPoint.y + ', ' +
@@ -198,7 +242,8 @@ export function BigSlideElement(props: PictureObj | TextObj | ShapeObj) {
           fill={props.fillColor} 
           stroke={props.borderColor} 
         />         
-    } 
+    }
+
   }
   return (svgElem)
 }

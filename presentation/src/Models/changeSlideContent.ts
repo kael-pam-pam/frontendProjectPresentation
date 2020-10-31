@@ -220,7 +220,7 @@ function addShapeObj(prog: Programm, shapeType: 'rect' | 'triangle' | 'circle'):
           ...prog.currentPresentation,
           slides: slidesWithChangedSlide
       },
-      selectedElements: [newShapeObj.id]    
+      selectedElements: []    
   }
 }
 

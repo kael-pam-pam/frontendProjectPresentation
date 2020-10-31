@@ -1,4 +1,5 @@
-import React from 'react';
+import ReactDOM from 'react-dom';
+import React, { useRef } from 'react';
 import App from '../App';
 
 import { getAutomaticTypeDirectiveNames } from 'typescript';
@@ -6,7 +7,7 @@ import { BigSlideElement, SmallSlideElement } from '../Element/Element';
 import '../Models/commonFunctionsConst'
 import { createNewId, isColor, isPictureObj, searchChangedSlideIndex } from '../Models/commonFunctionsConst';
 import { setSelectedSlides } from '../Models/slideMoveInProgramm';
-import { dispatch, actualProgState } from '../Models/dispatcher'
+import { dispatch, actualProgState, dispatchTwoParams} from '../Models/dispatcher'
 import { render } from '../index'
 
 
@@ -26,6 +27,8 @@ import {
 } from '../Models/types'
 
 import './Slide.css'
+import { changeElemPosition, setSelectedElement } from '../Models/changeSlideContent';
+import { ReactComponent } from '*.svg';
 
 type SlideProps = {
   numberOfSlide: number
@@ -36,6 +39,9 @@ export function SlideMain(props: SlideProps) {
   
   let currSlide: Slide = actualProgState.currentPresentation.slides[props.numberOfSlide]
   let propsBackground = ''
+  let divClassName = 'mainSlideDiv'
+  let svgClassName = 'mainSlideSvg'
+
 
   if(isColor(currSlide.background)) {
     propsBackground = currSlide.background.hexColor
@@ -45,18 +51,13 @@ export function SlideMain(props: SlideProps) {
     propsBackground = currSlide.background.url
   }
 
-  let width = '1400px'
-  let height = '850px'
-  
   if (props.isSmallSlide) {
-    width = '140px'
-    height = '85px'
+    divClassName = 'mainSlideDiv_small'
+    svgClassName = 'smallMainSlideSvg'
   }
 
   const propsStyles = {
-    backgroundColor: propsBackground,
-    width: width,
-    height: height,
+    backgroundColor: propsBackground
   }
 
   const elems = currSlide.elements
@@ -73,10 +74,13 @@ export function SlideMain(props: SlideProps) {
   const slideElements = [currSlide.elements]
 
   return (    
-    <div id={currSlide.id} onClick={() => dispatch(setSelectedSlides, ([...actualProgState.selectedSlides, currSlide.id]))} className="SlideCss"  style={propsStyles}>
-        <svg id={createNewId()} xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="100%" height="100%">
-          {slideElems}
-        </svg>
+    <div id={currSlide.id} className={divClassName} 
+      onClick={() => dispatch(setSelectedSlides, ([...actualProgState.selectedSlides, currSlide.id]))}
+      style={propsStyles}
+    >
+      <svg id={createNewId()} className={svgClassName} xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" >
+        {slideElems}
+      </svg>
     </div>
   )
 }

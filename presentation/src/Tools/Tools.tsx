@@ -16,16 +16,15 @@ import {
   PictureObj,
   TextObj,
   Color,
-  ShapeObj,
-  Actions
+  ShapeObj
 } from '../Models/types'
 
 import './Tools.css';
 import { addSlide } from '../Models/slideMoveInProgramm';
 import { render } from '@testing-library/react';
 import { KeyObject } from 'crypto';
-import { addShapeObj, createShapeObj } from '../Models/changeSlideContent';
-import { dispatch, actualProgState } from '../Models/dispatcher'
+import { addShapeObj, changeElemPosition, createShapeObj } from '../Models/changeSlideContent';
+import { dispatch, actualProgState, dispatchTwoParams } from '../Models/dispatcher'
 
 export type Tool = {
   hint: string,
@@ -34,12 +33,13 @@ export type Tool = {
 }
 
 let textObj: TextObj 
-  
 
-function ShapeCheckBox() {
+let window: Window
+
+function ShapeToolBox() {
   return (
-    <div className="ToolShapeObj_shape">
-      <span className="ToolShapeObj_shape_elem " onClick={() => dispatch(addShapeObj, ('rect'))} >Квадрат</span>
+    <div className="ToolShapeObj_shape"> 
+      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj, ('rect'))} >Квадрат</span>
       <span className="ToolShapeObj_shape_elem " onClick={() => dispatch(addShapeObj, ('triangle'))} >Треугольник</span>
       <span className="ToolShapeObj_shape_elem " onClick={() => dispatch(addShapeObj, ('circle'))}>Круг</span>
     </div>
@@ -47,42 +47,32 @@ function ShapeCheckBox() {
 }
 
 
-export function ShapesMenu() {
-  const [ShapeCheckBoxIsOpen, setShapeMenu] = useState(false);   // state
+export function ToolElemWithToolBox() {
+  const [toolBoxIsOpen, setShapeMenu] = useState(false)
 
   return (
-    <div key={6} className="Tool ToolShapeObj" onClick={() => setShapeMenu(!ShapeCheckBoxIsOpen)}>
+    <div key={6} className='Tool ToolShapeObj' onClick={() => setShapeMenu(!toolBoxIsOpen)}>
       <span className="Tooltip">Фигуры</span> 
-      {ShapeCheckBoxIsOpen && <ShapeCheckBox/>}
+      {toolBoxIsOpen && <ShapeToolBox/>}
     </div>
-  )
-  /*if (ShapeCheckBoxIsOpen) {
-   return (
-    <div key={6} className="Tool ToolShapeObj" onClick={() => setShapeMenu(false)}>
-      <span className="Tooltip">Фигуры</span> 
-      <ShapeCheckBox/>
-    </div>
-  )} else {
-    return (
-      <div key={6} className="Tool ToolShapeObj" onClick={() => setShapeMenu(true)}>
-        <span className="Tooltip">Фигуры</span>
-      </div>
-    )
-  }*/ 
+  ) 
 }
 
+
+
 function Tools() {  
-    return (                                                    
-        <div className="Tools">
-          <div key={0} className="Tool ToolAddSlide" onClick={() => dispatch(addSlide, ({}))}><span className="Tooltip">Новый слайд</span></div>
-          <div key={1} className="Tool ToolBackHistory" onClick={() => console.log('Назад по истории')}><span className="Tooltip">Отменить</span></div>
-          <div key={2} className="Tool ToolFutureHistory" onClick={() => console.log('Вперед по истории')}><span className="Tooltip">Повторить</span></div>
-          <div key={3} className="Tool ToolCursor" onClick={() => console.log('Курсор')}><span className="Tooltip">Выбрать</span></div>
-          <div key={4} className="Tool ToolTextObj" onClick={() => console.log('Текст')}><span className="Tooltip">Текстовое поле</span></div>
-          <div key={5} className="Tool ToolPicObj" onClick={() => console.log('Картинка')}><span className="Tooltip">Вставить изображение</span></div>
-          <ShapesMenu/>
-        </div>
-    )
+    
+  return (                                                    
+      <div className="Tools">
+        <div key={0} className="Tool ToolAddSlide" onClick={() => dispatch(addSlide, ({}))}><span className="Tooltip">Новый слайд</span></div>
+        <div key={1} className="Tool ToolBackHistory" onClick={() => console.log('Назад по истории')}><span className="Tooltip">Отменить</span></div>
+        <div key={2} className="Tool ToolFutureHistory" onClick={() => console.log('Вперед по истории')}><span className="Tooltip">Повторить</span></div>
+        <div key={3} className="Tool ToolCursor" onClick={() => console.log('Курсор')}><span className="Tooltip">Выбрать</span></div>
+        <div key={4} className="Tool ToolTextObj" onClick={() => console.log('Текст')}><span className="Tooltip">Текстовое поле</span></div>
+        <div key={5} className="Tool ToolPicObj" onClick={() => console.log('Картинка')}><span className="Tooltip">Вставить изображение</span></div>
+        <ToolElemWithToolBox/>
+      </div>
+  )
 }
 
 export {
