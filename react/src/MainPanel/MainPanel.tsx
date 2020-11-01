@@ -1,13 +1,17 @@
 import React from 'react';
 import './MainPanel.css';
+import { MainSlide } from '../Slide/Slide';
 
-interface MainPanelProps {
-    text: string,
-}
+import { searchChangedSlideIndex } from '../Models/commonFunctionsConst';
+import { actualProgState } from '../Models/dispatcher'
+//<MainSlide text={"slide"} />
 
-function MainPanel(props: MainPanelProps) {
+function MainPanel() {
+    const selectedSlideIndex: number = searchChangedSlideIndex(actualProgState)
     return (
-        <div className="MainPanel">{props.text}</div>
+        <div className="MainPanel">
+            <MainSlide slideIndex={selectedSlideIndex} />    
+        </div>
     )
 }
 
