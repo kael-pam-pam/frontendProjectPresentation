@@ -3,7 +3,7 @@ import './Commands.css';
 
 export type MenuItem = {
   title: string,
-  onClick: () => void,
+  onClick: (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void,
 }
 
 type CommandsProps = {

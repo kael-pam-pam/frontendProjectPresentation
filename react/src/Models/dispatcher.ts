@@ -21,6 +21,8 @@ import { render } from '../index';
 
 export {
     actualProgState,
+    setGlobalActiveTool,
+    globalActiveTool,
     dispatch,
 }
 
@@ -103,6 +105,15 @@ let actualProgState: Programm = {
       selectedSlides: [],
       selectedElements: [],
   }
+
+//необходимо состояние activeTool компонента Tools, которое влияет на отображение.
+//т.к. к хуку я не знаю, как можно обратиться из компонента MainPanel, то вынес сюда.
+//Думаю, что в будущем нам с этим поможет Redux. Пока в Tools состояние оставил.
+let globalActiveTool: number = 0;
+
+function setGlobalActiveTool(state: number): void {
+    globalActiveTool = state;
+} 
 
 function dispatch<T>(func: { (prog: Programm, obj?: T): Programm }, obj?: T): void { 
     /*

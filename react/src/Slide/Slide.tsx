@@ -22,6 +22,9 @@ import {
 
 import {actualProgState} from '../Models/dispatcher'
 
+
+
+
 interface SlideProps {
     slideIndex: number,
 }
@@ -30,7 +33,8 @@ function MainSlide(props: SlideProps) {
     const currSlide: Slide = actualProgState.currentPresentation.slides[props.slideIndex];
     //?! а если пусто
     return (
-        <div className="MainSlide"></div>
+        <div className="MainSlide">
+        </div>
     )
 }
 

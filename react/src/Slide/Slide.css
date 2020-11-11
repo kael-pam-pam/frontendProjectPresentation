@@ -1,6 +1,6 @@
 .MainSlide {
-    height: 77vmin;
-    width: 133vmin;
+    height: calc(800px);
+    width: calc(800px * 19/11);
     
     background-color: white;
     box-shadow: 0 1px 3px 1px rgba(60,64,67,.15);
