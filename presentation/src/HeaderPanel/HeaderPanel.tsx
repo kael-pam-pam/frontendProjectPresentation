@@ -1,45 +1,112 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import './HeaderPanel.css';
 import { Commands, MenuItem } from '../Commands/Commands';
-import { Tool, Tools } from '../Tools/Tools';
-import { Program } from 'typescript';
-import {
-  Programm,
-  Presentation,
-  ArchiveOfState,
-  Slide,
-  Point,
-  ElementObj,
-  SlideElements,
-  Picture,
-  PictureObj,
-  TextObj,
-  Color,
-  ShapeObj
-} from '../Models/types'
+import { Tools } from '../Tools/Tools';
 
 import { actualProgState } from '../Models/dispatcher'
 
+import { useSetPopup } from '../Popup/PopupContext';
+import { PropsPopup } from '../Popup/Popup'
+
+
+
 
 function HeaderPanel() {
+    const setPopup = useSetPopup();
+    const defSubMenu: PropsPopup = {
+      items: [
+        {
+            caption: '<Пусто>',
+            action: () => {}
+        },
+      ],
+      pos: {
+        x: 0,
+        y: 0,
+      },
+      visible: true,
+      width: 150,
+    };
+
     const menu: Array<MenuItem> = [
-      {title: "Файл", onClick: () => console.log('Файл')},
-      {title: "Правка", onClick: () => console.log('Правка')}, 
+      {title: "Файл", onClick: (e) => 
+        setPopup({...defSubMenu, 
+          items: [
+            {
+                caption: 'Добавить слайд',
+                action: () => {console.log('Добавить слайд')}
+            },
+            {
+                caption: 'Сохранить',
+                action: () => {console.log('Сохранить')}
+            },
+            {
+              caption: 'Экспорт в PDF',
+              action: () => {console.log('Экспорт в PDF')}
+          },
+          ],
+          pos: {
+            x: e.currentTarget.offsetLeft,
+            y: e.currentTarget.offsetTop + e.currentTarget.offsetHeight,
+          },
+        })
+      }, 
+      {title: "Правка", onClick: (e) => console.log(e.currentTarget.offsetLeft, e.currentTarget.offsetTop, e.currentTarget.offsetHeight)}, 
       {title: "Вид", onClick: () => console.log('Вид')}, 
       {title: "Вставка", onClick: () => console.log('Вставка')}, 
       {title: "Формат", onClick: () => console.log('Формат')}, 
       {title: "Слайд", onClick: () => console.log('Слайд')}, 
       {title: "Объект", onClick: () => console.log('Объект')}, 
       {title: "Инструменты", onClick: () => console.log('Инструменты')}, 
-      {title: "Дополнения", onClick: () => console.log('Дополнения')}, 
-      {title: "Справка", onClick: () => console.log('Справка')}
+      {title: "Дополнения", onClick: (e) => 
+        setPopup({...defSubMenu, 
+          items: [
+            {
+                caption: 'Дополнение 1',
+                action: () => {console.log('Дополнение 1')}
+            },
+            {
+                caption: 'Дополнение 2',
+                action: () => {console.log('Дополнение 2')}
+            },
+          ],
+          pos: {
+            x: e.currentTarget.offsetLeft,
+            y: e.currentTarget.offsetTop + e.currentTarget.offsetHeight,
+          },
+        })
+      }, 
+      {title: "Справка", onClick: (e) => 
+        setPopup({...defSubMenu, 
+          items: [
+              {
+                  caption: 'Справка 1',
+                  action: () => {console.log('Справка 1')}
+              },
+              {
+                caption: 'Справка 2',
+                action: () => {console.log('Справка 2')}
+              },
+              {
+                caption: 'Справка 3',
+                action: () => {console.log('Справка 3')}
+              },
+          ],
+          pos: {
+            x: e.currentTarget.offsetLeft,
+            y: e.currentTarget.offsetTop + e.currentTarget.offsetHeight,
+          },
+        })
+      }
     ];
 
+    
+
     return (
-      <div className="HeaderPanel">
-        <span className="Title">{actualProgState.currentPresentation.title}</span>
-        <Commands menu={menu}/>
-        <Tools/>
+      <div className="header-panel">
+        <span className="title">{actualProgState.currentPresentation.title}</span>
+        <Commands menu={menu} />
+        <Tools />
       </div>
     )
 }
@@ -47,62 +114,3 @@ function HeaderPanel() {
 export {
     HeaderPanel,
 }
-
-
-/*
-<header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-*/
-
-/*
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-*/

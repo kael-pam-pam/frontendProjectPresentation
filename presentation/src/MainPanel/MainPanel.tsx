@@ -1,29 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './MainPanel.css';
-import {
-    Programm,
-    Presentation,
-    ArchiveOfState,
-    Slide,
-    Point,
-    ElementObj,
-    SlideElements,
-    Picture,
-    PictureObj,
-    TextObj,
-    Color,
-    ShapeObj
-} from '../Models/types'
-import { SlideMain } from '../Slide/Slide';
-import { searchChangedSlideIndex } from '../Models/commonFunctionsConst';
-import { dispatch, actualProgState } from '../Models/dispatcher'
+import { MainSlide, } from '../Slide/Slide';
 
+import { searchChangedSlideIndex } from '../Models/commonFunctionsConst';
+import { actualProgState, globalActiveTool } from '../Models/dispatcher'
+//<MainSlide text={"slide"} />
 
 function MainPanel() {
+
     const changedSlideIndex = searchChangedSlideIndex(actualProgState)
     return (
-        <div className="MainPanel">
-            <SlideMain numberOfSlide={changedSlideIndex} isSmallSlide={false}/>      
+        <div className={"MainPanel " + (globalActiveTool != 0 ? "MainPanel_createElement" : "")}>
+            <MainSlide numberOfSlide={changedSlideIndex} isSmallSlide={false}/>      
         </div>
     )
 }

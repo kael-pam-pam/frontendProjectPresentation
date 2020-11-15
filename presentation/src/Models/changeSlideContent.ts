@@ -36,6 +36,7 @@ import {
   getElemsWithChangedElem
 } from './commonFunctionsConst'
 import { textChangeRangeIsUnchanged } from 'typescript'
+import { actualProgState } from './dispatcher'
 
 export {
   setSlideBackground,
@@ -115,12 +116,12 @@ function createEmtyTextObj(): TextObj {
   return {
     id: createNewId(),
     position: {
-      x: 600,
-      y: 400
+      x: 10,
+      y: 10
     },
     height: 100,
     wigth: 300,
-    text: "введите текст", //  ' '      in vieu=>textObj.text || placeholder(enter text)
+    text: "",
     fontFamily: 'oblique',
     fontSize: '50',
     type: 'text'
@@ -145,11 +146,11 @@ function addTextObj(prog: Programm): Programm {
         ...prog.currentPresentation,
         slides: slidesWithChangedSlide
     },
-    selectedElements: [newTextObj.id]           
+    //selectedElements: [newTextObj.id]           
   }
 }
 
-function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' | 'fontSize' | 'fontFamily'): Programm { 
+function changeTextObj(prog: Programm, payload: {newParam: string, paramToChange: 'text' | 'fontSize' | 'fontFamily'}): Programm { 
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
@@ -157,7 +158,7 @@ function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' |
   
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
   if (isTextObj(changedElem)) {
-    changedElem = getNewTextElem(changedElem, newParam, paramToChange)
+    changedElem = getNewTextElem(changedElem, payload.newParam, payload.paramToChange)
   }
 
   const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
@@ -173,29 +174,15 @@ function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' |
   }  
 }
 
+
 function createShapeObj(type: 'rect' | 'triangle' | 'circle'): ShapeObj {
-  let fillColor = '#2ff211'
-  let position = {
-    x: 150,
-    y: 500
-  }
-  if (type == 'triangle') {
-    fillColor = '#999c1c'
-    position = {
-      x: 500,
-      y: 200
-    }
-  }
-  if (type == 'circle') {
-    fillColor = '#9c331c'
-    position = {
-      x: 950,
-      y: 600
-    }
-  }
+  let fillColor = 'rgba(0, 0, 255, 0.2)'
   return {
     id: createNewId(),
-    position: position,
+    position: {
+      x: 10,
+      y: 10
+    },
     wigth: 200,
     height: 200,
     borderColor: 'fff',
@@ -208,8 +195,11 @@ function addShapeObj(prog: Programm, shapeType: 'rect' | 'triangle' | 'circle'):
   deepFreeze(prog)
   
   const changedSlideIndex = searchChangedSlideIndex(prog)
-  const newShapeObj = createShapeObj(shapeType)
 
+  let newShapeObj: ShapeObj
+  let outlinerectId: string = ''
+  newShapeObj = createShapeObj(shapeType)
+  
   const changedElems = getElemsWithNewElem(prog, newShapeObj, changedSlideIndex)
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElems, changedSlideIndex)
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex)
@@ -270,16 +260,17 @@ function resizeElement(prog: Programm, newWidth:number, newHeigth: number): Prog
   }
 }
 
-function changeElemPosition(prog: Programm, newX: number, newY: number): Programm {
+function changeElemPosition(prog: Programm, payload:{newX: number, newY: number, saveToArh: boolean}): Programm {
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
+
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
-
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
-  changedElem = getNewElemWithNewPosition(changedElem, newX, newY)
+  changedElem = getNewElemWithNewPosition(changedElem, payload.newX, payload.newY)
 
-  const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
+  let changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)  
+
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex) 
 

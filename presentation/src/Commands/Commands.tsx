@@ -3,7 +3,7 @@ import './Commands.css';
 
 export type MenuItem = {
   title: string,
-  onClick: () => void,
+  onClick: (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void,
 }
 
 type CommandsProps = {
@@ -12,13 +12,13 @@ type CommandsProps = {
 
 function Commands(props: CommandsProps) {
     const menuItems: Array<MenuItem> = props.menu;
-    const liseMenuItems = menuItems.map((item, index) =>
-      <span key={index} className="MenuItem" onClick={item.onClick}>{item.title}</span>
+    const listMenuItems = menuItems.map((item, index) =>
+      <span key={index} className="menu-item" onClick={item.onClick}>{item.title}</span>
     );
 
     return (
-        <div className="Commands">
-          {liseMenuItems}
+        <div className="commands">
+          {listMenuItems}
         </div>
     )
 }

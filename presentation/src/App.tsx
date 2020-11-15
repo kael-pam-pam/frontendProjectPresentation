@@ -1,51 +1,30 @@
-import React, { createRef, useEffect, useRef, useState } from 'react';
+import React from 'react';
 import './App.css';
 import { HeaderPanel } from './HeaderPanel/HeaderPanel';
+import { SlidesPanel } from './SlidesPanel/SlidesPanel';
 import { MainPanel } from './MainPanel/MainPanel';
-import { SlideMain } from './Slide/Slide';
-import { SlidesPanel } from './SlidesPanel/SlidesPanel'
-import { Program } from 'typescript';
-//import { ShapesMenu } from './Tools/Tools';
-import {
-  Programm,
-  Presentation,
-  ArchiveOfState,
-  Slide,
-  Point,
-  ElementObj,
-  SlideElements,
-  Picture,
-  PictureObj,
-  TextObj,
-  Color,
-  ShapeObj
-} from './Models/types'
-import { 
-  searchChangedSlideIndex
-} from './Models/commonFunctionsConst';
-import { dispatch, actualProgState} from './Models/dispatcher'
-import { render } from './index';
-
+import { Popup } from './Popup/Popup';
+import { PopupProvider } from './Popup/PopupContext';
 
 function App() {
-
-  
-  const appRef = React.useRef()
-
-  
   return (
-    <div ref={appRef.current} className="App">
+    <PopupProvider>
+    <div className="App">
       <div className="App-header">      
-        <HeaderPanel/>
+        <HeaderPanel />
       </div>
       <div className="App-body">
-        <SlidesPanel/>
-        <MainPanel/>
+        <SlidesPanel />
+        <MainPanel />
+      </div>
+      <div className="additional">
+        <Popup />
       </div>
       <div className="App-footer">
       </div>
     </div>
-  )
+    </PopupProvider>
+  );
 }
 
 export default App;
