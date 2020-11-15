@@ -29,7 +29,7 @@ function ToolElemWithToolBox(activeTool: number) {
 
   const mouseUpHandler = () => {
     setShapeMenu(false)
-    document.removeEventListener('click', mouseUpHandler)
+    document.removeEventListener('mouseup', mouseUpHandler)
   }
   
   return (
