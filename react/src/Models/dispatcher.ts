@@ -1,132 +1,81 @@
 import {
-    Programm,
-/*
-    Presentation,
-    ArchiveOfState,
-    Slide,
-    Point,
-    ElementObj,
-    Picture,
-    PictureObj,
-    TextObj,
-    Color,
-    ShapeObj,
-    ChangedParams
-*/  
+  Programm,
+  Presentation,
+  ArchiveOfState,
+  Slide,
+  Point,
+  ElementObj,
+  Picture,
+  PictureObj,
+  TextObj,
+  Color,
+  ShapeObj,
+  ChangedParams
 } from './types';
-import { goBackAchive, goForwardAchive, saveStateToArchive, } from './archive';
 
-import { render } from '../index';
-//import { /*isShapeObj, isTextObj, searchChangedSlideIndex, isSlide,*/ isProgramm, /*isSlideId, isPoint */} from './commonFunctionsConst';
+import {
+  setSlideBackground,
+  createPictureObj,
+  addPictureObj,
+  createEmtyTextObj,
+  addTextObj,
+  changeTextObj,
+  createShapeObj,
+  addShapeObj,
+  changeShapeObj,
+  resizeElement,
+  changeElemPosition,
+  setSelectedElement,
+  deleteSelectedElements
+} from './changeSlideContent'
 
-export {
-    actualProgState,
-    setGlobalActiveTool,
-    globalActiveTool,
-    dispatch,
-}
+import { render } from '../index'
+import { isShapeObj, isTextObj, searchChangedSlideIndex, isSlide, isProgramm, isSlideId, isPoint, isChangedObjPosType } from './commonFunctionsConst';
+import { createProgram } from './functions';
+import { addSlide, setSelectedSlides } from './slideMoveInProgramm';
+import { goBackAchive, goForwardAchive, saveStateToArchive } from './archive';
 
-let actualProgState: Programm = {
-      currentPresentation: {
-          title: "Пример",
-          slides: [
-            {
-                id: "1",
-                background: {
-                    hexColor: "red", 
-                    type: 'color',
-                },
-                elements: [
-                    {
-                        id: "43",
-                        position: {
-                            x: 10,
-                            y: 20,
-                        },
-                        height: 30,
-                        wigth: 100,
-                        text: "Текст",
-	                    fontFamily: "Arial",
-	                    fontSize: 14,
-                        type: 'text',
-                    },
-                    {
-                        id: "57",
-                        position: {
-                            x: 100,
-                            y: 207,
-                        },
-                        height: 50,
-                        wigth: 150,
-                        text: "Текст номер 2",
-	                    fontFamily: "Arial",
-	                    fontSize: 18,
-                        type: 'text',
-                    },
-                ],
-            },
-            {
-                id: "2",
-                background: {
-                    hexColor: "идгу", 
-                    type: 'color',
-                },
-                elements: [
-                    {
-                        id: "434",
-                        position: {
-                            x: 10,
-                            y: 20,
-                        },
-                        height: 30,
-                        wigth: 100,
-                        text: "Текст3",
-	                    fontFamily: "Arial",
-	                    fontSize: 14,
-                        type: 'text',
-                    },
-                    {
-                        id: "571",
-                        position: {
-                            x: 100,
-                            y: 207,
-                        },
-                        height: 50,
-                        wigth: 150,
-                        text: "Текст номер 23",
-	                    fontFamily: "Arial",
-	                    fontSize: 18,
-                        type: 'text',
-                    },
-                ],
-            },
-          ],
-      },
-      selectedSlides: [],
-      selectedElements: [],
-  }
+export let globalActiveTool: number = 0;
 
-//необходимо состояние activeTool компонента Tools, которое влияет на отображение.
-//т.к. к хуку я не знаю, как можно обратиться из компонента MainPanel, то вынес сюда.
-//Думаю, что в будущем нам с этим поможет Redux. Пока в Tools состояние оставил.
-let globalActiveTool: number = 0;
-
-function setGlobalActiveTool(state: number): void {
+export function setGlobalActiveTool(state: number): void {
     globalActiveTool = state;
 } 
 
-function dispatch<T>(func: { (prog: Programm, obj?: T): Programm }, obj?: T): void { 
-    /*
-    if (isProgramm(obj)) {
-      actualProgState  = obj
-    } else {
-    */
-    actualProgState =  func(actualProgState, obj);
+export let actualProgState: Programm
+
+export function dispatch<T>(func: { (prog: Programm, obj: T): Programm }, obj: T ): void { 
+  if (isProgramm(obj)) {
+    actualProgState = obj
+  } else {
+    console.log(func.name)
+    actualProgState = func(actualProgState, obj) 
     if (func != goForwardAchive && func != goBackAchive) {
-        saveStateToArchive();
+      if (!(isChangedObjPosType(obj) && obj.saveToArh == false)) {
+        saveStateToArchive()
+        console.log('savedToArh')
+      }   
     }
-    /*
-    }
-    */  
-    render()
-  }
+  }  
+  render()
+}
+
+export function dispatchTwoParams<T>(func: { (prog: Programm, firstObj: T, secondObj: T): Programm }, firstObj: T, secondObj: T): void { 
+  actualProgState =  func(actualProgState, firstObj, secondObj);
+  console.log('56')
+  render()
+}
+
+export function loadProgramm(newProg: Programm): Programm {
+  return newProg
+}
+
+
+
+
+
+
+
+
+
+
+

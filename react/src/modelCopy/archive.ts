@@ -5,7 +5,7 @@ import {
 import { actualProgState } from './dispatcher';
 
 export {
-    //actualArchiveOfState,
+    actualArchiveOfState,
     goBackAchive,
     goForwardAchive,
     saveStateToArchive,
@@ -57,10 +57,11 @@ function saveStateToArchive(): void {
             past: [...actualArchiveOfState.past],
             future: [],
         }
-                
+        console.log('будущее неопределено');        
     } 
     actualArchiveOfState = {
-        past: [...actualArchiveOfState.past, {...actualProgState}],
+        past: [...actualArchiveOfState.past, actualProgState],
         future: [...actualArchiveOfState.future],
-    }   
+    }
+    console.log("Сохранено в архиве"); 
 }

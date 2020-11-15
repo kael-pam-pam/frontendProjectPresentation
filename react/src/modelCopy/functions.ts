@@ -1,8 +1,11 @@
 import {
     Programm,
+/*
     Presentation,
     ArchiveOfState,
+*/
     Slide,
+/*
     Point,
     ElementObj,
     Picture,
@@ -10,15 +13,18 @@ import {
     TextObj,
     Color,
     ShapeObj,
+*/
 } from './types';
 
 import {createDefaultSlide,} from './slideMoveInProgramm'
 
 export {
     createProgram,
+/*
     changePresentationTitle,
     saveProject,
     loadProject,
+*/
 }
 
 function createProgram(): Programm {
@@ -32,23 +38,3 @@ function createProgram(): Programm {
         selectedElements: []
     }
 }
-
-function changePresentationTitle(prog: Programm, newTitle: string): Programm {
-    return {
-        ...prog,
-        currentPresentation: {
-            ...prog.currentPresentation,
-            title: newTitle
-        }
-    }
-}
-
-
-function saveProject(prog: Programm): string {
-    return JSON.stringify(prog);
-}
-
-function loadProject(prog: Programm, savedProject: string): Programm {
-    return JSON.parse(savedProject);  // реализовать через blocker export pdf
-}
-

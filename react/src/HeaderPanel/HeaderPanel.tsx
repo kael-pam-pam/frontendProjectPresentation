@@ -5,14 +5,20 @@ import { Tools } from '../Tools/Tools';
 
 import { actualProgState } from '../Models/dispatcher'
 
-import { useSetPopup } from '../Popup/PopupContext';
+import { useSetPopup, useSetIsVisiblePopup } from '../Popup/PopupContext';
 import { PropsPopup } from '../Popup/Popup'
+
+import { addSlide } from '../Models/slideMoveInProgramm';
+import { dispatch } from '../Models/dispatcher';
+
 
 
 
 
 function HeaderPanel() {
     const setPopup = useSetPopup();
+    const setIsVisible = useSetIsVisiblePopup();
+
     const defSubMenu: PropsPopup = {
       items: [
         {
@@ -24,17 +30,16 @@ function HeaderPanel() {
         x: 0,
         y: 0,
       },
-      visible: true,
       width: 150,
     };
 
     const menu: Array<MenuItem> = [
-      {title: "Файл", onClick: (e) => 
+      {title: "Файл", onClick: (e) => {
         setPopup({...defSubMenu, 
           items: [
             {
                 caption: 'Добавить слайд',
-                action: () => {console.log('Добавить слайд')}
+                action: () => dispatch(addSlide, {})
             },
             {
                 caption: 'Сохранить',
@@ -49,7 +54,7 @@ function HeaderPanel() {
             x: e.currentTarget.offsetLeft,
             y: e.currentTarget.offsetTop + e.currentTarget.offsetHeight,
           },
-        })
+        }); setIsVisible(true)}
       }, 
       {title: "Правка", onClick: (e) => console.log(e.currentTarget.offsetLeft, e.currentTarget.offsetTop, e.currentTarget.offsetHeight)}, 
       {title: "Вид", onClick: () => console.log('Вид')}, 
@@ -58,7 +63,7 @@ function HeaderPanel() {
       {title: "Слайд", onClick: () => console.log('Слайд')}, 
       {title: "Объект", onClick: () => console.log('Объект')}, 
       {title: "Инструменты", onClick: () => console.log('Инструменты')}, 
-      {title: "Дополнения", onClick: (e) => 
+      {title: "Дополнения", onClick: (e) => {
         setPopup({...defSubMenu, 
           items: [
             {
@@ -74,9 +79,9 @@ function HeaderPanel() {
             x: e.currentTarget.offsetLeft,
             y: e.currentTarget.offsetTop + e.currentTarget.offsetHeight,
           },
-        })
+        }); setIsVisible(true)}
       }, 
-      {title: "Справка", onClick: (e) => 
+      {title: "Справка", onClick: (e) => {
         setPopup({...defSubMenu, 
           items: [
               {
@@ -96,7 +101,7 @@ function HeaderPanel() {
             x: e.currentTarget.offsetLeft,
             y: e.currentTarget.offsetTop + e.currentTarget.offsetHeight,
           },
-        })
+        }); setIsVisible(true)}
       }
     ];
 

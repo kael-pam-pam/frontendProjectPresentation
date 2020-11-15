@@ -6,22 +6,17 @@ import * as serviceWorker from './serviceWorker';
 import { createProgram } from './Models/functions';
 import { dispatch } from './Models/dispatcher';
 
-export {
-  render,
-}
+dispatch(createProgram, ({}))
 
-function render(){
+export function render(){
   ReactDOM.render(
     <React.StrictMode>
       <App />
     </React.StrictMode>,
     document.getElementById('root')
-  );
+  )
 }
 
-
-dispatch(createProgram);
-render();
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

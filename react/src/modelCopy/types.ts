@@ -1,24 +1,9 @@
 
-/*export {
-    Programm,
-    Presentation,
-    ArchiveOfState,
-    Slide,
-    Point,
-    ElementObj,
-    Picture,
-    PictureObj,
-    TextObj,
-    Color,
-    ShapeObj
-}*/
-
 export type Programm = {
     currentPresentation: Presentation,
     selectedSlides: Array<string>,         
-    selectedElements: Array<string>
+    selectedElements: Array<string>,
 }
-
 
 export type Presentation = {
     title: string,
@@ -60,7 +45,7 @@ export type PictureObj = ElementObj & Picture;
 export type TextObj = ElementObj & {
     text: string,
 	fontFamily: string,
-	fontSize: string,
+	fontSize: number,       //?! был string
 	type: 'text',
 }
 
@@ -70,24 +55,31 @@ export type Color = {
 }
 
 export type ShapeObj = ElementObj & {
-    type: 'triangle' | 'rect' | 'circle' | 'outlineRect',
-    borderColor: string, //borderColor  string
-    fillColor: string
+    type: 'triangle' | 'rect' | 'circle' | 'empty',
+    borderColor: string,
+    fillColor: string,
 }
 
-export type ChangedObjPosType = {
-    newX: number,
-    newY: number,
-    saveToArh: boolean
+export type SlideId = string    //?! зачем
+
+export type ChangedParams = Programm | ShapeObj | TextObj | PictureObj | SlideId | null     //?! зачем
+
+
+/*
+ export type {
+    Programm,
+    //Presentation,
+    ArchiveOfState,
+    //SlideElements,
+    Slide,
+    //Point,
+    //ElementObj,
+    //Picture,
+    //PictureObj,
+    //TextObj,
+    //Color,
+    //ShapeObj,
+    //SlideId,
+    //ChangedParams,
 }
-
-export type SlideId = string
-
-export type ChangedParams = Programm | ShapeObj | TextObj | PictureObj | SlideId | null
-
-
-
-//type Dispatch <Actions> = dispatch((prog:Programm, props:Actions): void, props:Actions): void) 
-
-
-
+*/

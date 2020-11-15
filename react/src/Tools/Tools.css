@@ -80,3 +80,27 @@
     width: 1px;
     margin: 5px 0;
 }
+
+.ToolShapeObj_shape {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    position: absolute;
+    list-style: none;
+    top: 20px;
+    width: 130px;
+    z-index: 1;
+    background: white;
+    border: 1px solid #dadce0;
+}
+
+.ToolShapeObj_shape_elem {
+    display: block;
+    text-indent: 20px;
+    width: 130px;
+    height: 20px;
+}
+
+.ToolShapeObj_shape_elem:hover {
+    background-color: rgb(112, 111, 111) ;
+}
