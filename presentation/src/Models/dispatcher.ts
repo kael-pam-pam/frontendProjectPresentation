@@ -49,11 +49,9 @@ export function dispatch<T>(func: { (prog: Programm, obj: T): Programm }, obj: T
   } else {
     console.log(func.name)
     actualProgState = func(actualProgState, obj) 
-    if (func != goForwardAchive && func != goBackAchive) {
-      if (!(isChangedObjPosType(obj) && obj.saveToArh == false)) {
+    if (func !== goForwardAchive && func !== goBackAchive) {
         saveStateToArchive()
         console.log('savedToArh')
-      }   
     }
   }  
   render()

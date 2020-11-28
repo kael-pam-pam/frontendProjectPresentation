@@ -37,6 +37,8 @@ import {
 } from './commonFunctionsConst'
 import { textChangeRangeIsUnchanged } from 'typescript'
 import { actualProgState } from './dispatcher'
+import { resolve } from 'dns'
+import { rejects } from 'assert'
 
 export {
   setSlideBackground,
@@ -72,14 +74,14 @@ function setSlideBackground(prog: Programm, newBackground: Picture | Color): Pro
   }
 }
 
-function createPictureObj(url: string): PictureObj { 
+function createPictureObj(url: string, height: number, wigth: number): PictureObj {
   return {
-      id: createNewId(),
-      position: defaultPoint,
-      height: 100,
-      wigth: 100,
-      url, // w/h take from url 
-      type: 'picture'
+    id: createNewId(),
+    position: defaultPoint,
+    height: height,
+    wigth: wigth,
+    url, 
+    type: 'picture'
   }
 }
 
@@ -91,12 +93,12 @@ function getSlideWithChangedElems(prog: Programm, changedElems: Array<PictureObj
   }
 }
 
-function addPictureObj(prog: Programm, url: string): Programm {
+function addPictureObj(prog: Programm, payload: {url: string, width: number, height: number}): Programm {
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
 
-  const newPictureObj = createPictureObj(url)
+  const newPictureObj = createPictureObj(payload.url, payload.width, payload.height)
   const changedElems = getElemsWithNewElem(prog, newPictureObj, changedSlideIndex)
 
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElems, changedSlideIndex)
@@ -108,7 +110,7 @@ function addPictureObj(prog: Programm, url: string): Programm {
         ...prog.currentPresentation,
         slides: slidesWithChangedSlide
     },
-    selectedElements: [newPictureObj.id]
+    //selectedElements: [newPictureObj.id]
   }           
 }
 
@@ -238,14 +240,14 @@ function changeShapeObj(prog: Programm, newParam: string, paramToChange: 'border
   }  
 }
 
-function resizeElement(prog: Programm, newWidth:number, newHeigth: number): Programm {  // add points for resize
+function resizeElement(prog: Programm, payload:{newWidth:number, newHeigth: number}): Programm {  // add points for resize
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
 
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
-  changedElem = getNewResizedElem(changedElem, newWidth, newHeigth)
+  changedElem = getNewResizedElem(changedElem, payload.newWidth, payload.newHeigth)
 
   const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
@@ -260,7 +262,7 @@ function resizeElement(prog: Programm, newWidth:number, newHeigth: number): Prog
   }
 }
 
-function changeElemPosition(prog: Programm, payload:{newX: number, newY: number, saveToArh: boolean}): Programm {
+function changeElemPosition(prog: Programm, payload:{newX: number, newY: number}): Programm {
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)

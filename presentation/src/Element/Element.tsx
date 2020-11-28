@@ -1,26 +1,11 @@
-import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
-import React, { useContext, useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { render } from '../index';
-import { saveStateToArchive } from '../Models/archive';
-import { addShapeObj, changeElemPosition, changeTextObj, createShapeObj, deleteSelectedElements, setSelectedElement} from '../Models/changeSlideContent';
-import { checkSelectedElem, getChangedElem, getCurrElemPosition, isPictureObj, isShapeObj, isTextObj, searchChangedElemIndex, searchChangedSlideIndex } from '../Models/commonFunctionsConst';
-import { actualProgState, dispatch, dispatchTwoParams } from '../Models/dispatcher';
-import {
-  Programm,
-  Presentation,
-  ArchiveOfState,
-  Slide,
-  Point,
-  ElementObj,
-  SlideElements,
-  Picture,
-  PictureObj,
-  TextObj,
-  Color,
-  ShapeObj
-} from '../Models/types'
-
+import React, { useState, useEffect, useRef} from 'react'
+import { changeElemPosition,resizeElement, setSelectedElement} from '../Models/changeSlideContent'
+import { checkSelectedElem, getCurrElemPosition, isPictureObj, isShapeObj, isTextObj} from '../Models/commonFunctionsConst'
+import { actualProgState, dispatch} from '../Models/dispatcher'
+import { PictureObj, TextObj, ShapeObj} from '../Models/types'
 import './Element.css'
+import { useDragAndDrop } from '../CustomHooks/dragAndDrop'
+import { useCheckSizeSetNewSize, useReSizeElem } from '../CustomHooks/commonHooks'
 
 
 export function SmallSlideElement(props: PictureObj | TextObj | ShapeObj) {
@@ -118,7 +103,7 @@ export function SmallSlideElement(props: PictureObj | TextObj | ShapeObj) {
     } 
   }
 
-  return (svgElem)
+  return (<polygon/>)
 }
 
 
@@ -130,137 +115,87 @@ interface BigSlideElementProps {
 
 export function BigSlideElement(props: BigSlideElementProps) {
 
-  let width = props.shape.wigth
-  let height = props.shape.height
-  let posX = props.shape.position.x  
-  let posY = props.shape.position.y
-  let id = props.shape.id
-  let svgElem: any
-
-  //add hook getSvgSize
-
   const mainSvgProps = props.svgProps.current?.getBoundingClientRect()
-  const leftSvgBorder = Number(mainSvgProps?.x)
-  const rightSvgBorder =  Number(mainSvgProps?.x) + Number(mainSvgProps?.width)
-  const topSvgBorder = Number(mainSvgProps?.y)
-  const bottomSvgBorder = Number(mainSvgProps?.y) + Number(mainSvgProps?.height)
-  const [updateShapeCoordinates, setUpdateShapeCoordinates] = useState(false)
+  let elemWidth = props.shape.wigth
+  let elemHeight = props.shape.height
+  let id = props.shape.id
+  let posX = 0  
+  let posY = 0
+
+  let newSize = {
+    width: elemWidth,
+    height: elemHeight,
+    mainSvgProps
+  }
+  if (useCheckSizeSetNewSize(newSize)){
+    elemWidth = newSize.width
+    elemHeight = newSize.height
+  }
+
   
+  const elemRef = useRef<any | null>(null)
+  const[pos, setPos] = useState({x: props.shape.position.x, y: props.shape.position.y})
+    
+  posX = pos.x
+  posY = pos.y
+
+  useDragAndDrop({elemRef, setPos, mainSvgProps, elemWidth: elemWidth, elemHeight: elemHeight})
+
+
+  const firstPointRef = useRef<SVGCircleElement | null>(null)
+  const secondPointRef = useRef<SVGCircleElement | null>(null)
+  const thirdPointRef = useRef<SVGCircleElement | null>(null)
+  const fourthPointRef = useRef<SVGCircleElement | null>(null)
+
+  const[elemSize, setSize] = useState({width: elemWidth, height: elemHeight})
+
+  elemWidth = elemSize.width
+  elemHeight = elemSize.height
+
+  useReSizeElem({firstPointRef, secondPointRef, thirdPointRef, fourthPointRef, pos, setSize, setPos})
+
+
+
+
   
-  let resetSelectElemsRef = useRef(false)
-
-  let deltaCoordRef = useRef({
-    x: 0,
-    y: 0
-  })
-
-
-  function checkSvgBorder(newX: number, newY: number ): boolean {
-    let inSvgBorder: boolean = false
-    if (leftSvgBorder + newX >= leftSvgBorder && leftSvgBorder + newX + width <= rightSvgBorder
-          && topSvgBorder + newY >= topSvgBorder && topSvgBorder + newY + height <= bottomSvgBorder) {
-    inSvgBorder = true
-    } 
-    return inSvgBorder 
-  }
-
-  if (updateShapeCoordinates){
-    onmousemove = (event) => {
-    const currElemPos = getCurrElemPosition(actualProgState)
-      deltaCoordRef.current = ({ 
-        x: event.clientX - currElemPos.x, 
-        y: event.clientY - currElemPos.y
-      })
-      setUpdateShapeCoordinates(false)   
-    }  
-  }
-
-  function setDeltaCoordSelectElem(event: React.MouseEvent | MouseEvent, id: string): void {
-    setUpdateShapeCoordinates(true) 
-    if (!checkSelectedElem(actualProgState, id)) {
-      deltaCoordRef.current = { 
-        x: event.clientX - posX, 
-        y: event.clientY - posY
-      }
-      dispatch(setSelectedElement, ([id]))
-      document.addEventListener('mouseup', letListenMouseDown)
-    }
-    else {
-      resetSelectElemsRef.current = false
-      document.addEventListener('mousemove', moveShape)
-      document.addEventListener('mouseup', stopShapeMove)
-    }
-  }
-
-  useEffect(() => console.log('render'))
-
-  onmousedown = () => {
-    if (resetSelectElemsRef.current){
-      console.log('reset Outline')
-      dispatch(setSelectedElement, ([]))
-      resetSelectElemsRef.current = false
-    }  
-  }  
-
-  const letListenMouseDown = () => {
-    resetSelectElemsRef.current = true
-    document.removeEventListener('mouseup', letListenMouseDown)
-  }
-
-  const stopShapeMove = (event: any) => {
-    let newX = event.clientX - deltaCoordRef.current.x
-    let newY = event.clientY - deltaCoordRef.current.y
-    let saveToArh = true
-    if(checkSvgBorder(newX, newY)) {  
-      dispatch(changeElemPosition, {newX, newY, saveToArh})
-    } 
-    document.removeEventListener('mousemove', moveShape)
-    document.removeEventListener('mouseup', stopShapeMove)
-    resetSelectElemsRef.current = true
-  }
-
-  const moveShape = (event: any) => { 
-    let newX = event.clientX - deltaCoordRef.current.x
-    let newY = event.clientY - deltaCoordRef.current.y
-    let saveToArh = false
-    if (checkSvgBorder(newX, newY)) {  
-      dispatch(changeElemPosition, {newX, newY, saveToArh})
-    }            
-  }
-
-  let outLineRect = <rect />
+  let svgElem: JSX.Element = <rect/>
+  let outLineRect: JSX.Element = <rect />
   if (checkSelectedElem(actualProgState, id)) {
-    if (isPictureObj(props.shape)) {     
-      let img = new Image();
-      img.onload = () => {
-      console.log(img.width + 'x' + img.height)
-      }
-    }
-    outLineRect = 
-    <rect
-      id={id}
-      x={posX}
-      y={posY}  
-      width={width}
-      height={height}
-      stroke='black'
-      strokeWidth='1'
-      strokeDasharray='10, 7'  
-      fill='none'
-    /> 
+    outLineRect =
+    <> 
+      <rect
+        id={id}
+        x={posX}
+        y={posY}  
+        width={elemWidth  + 'px'}
+        height={elemHeight + 'px'}
+        stroke='black'
+        strokeWidth='1'
+        strokeDasharray='10, 7'  
+        fill='none'
+      />
+
+      <circle key={1} id={'1'} ref={firstPointRef} cx={posX} cy={posY} r={5} fill='black' stroke='black'/>
+
+      <circle key={2} id={'2'} ref={secondPointRef} cx={posX + elemWidth} cy={posY} r={5} fill='black' stroke='black'/>
+
+      <circle key={3} id={'3'} ref={thirdPointRef} cx={posX} cy={posY + elemHeight} r={5} fill='black' stroke='black'/>
+
+      <circle key={4} id={'4'} ref={fourthPointRef} cx={posX + elemWidth} cy={posY + elemHeight} r={5} fill='black' stroke='black'/>
+    </>
   }
 
   if (props.shape.type == 'triangle') {
     const leftPoint= {
       x: posX,
-      y: Number(posY) + Number(height)
+      y: Number(posY) + Number(elemHeight)
     }  
     const rightPoint = {
-      x: Number(posX) + Number(width),
-      y: Number(posY) + Number(height)
+      x: Number(posX) + Number(elemWidth),
+      y: Number(posY) + Number(elemHeight)
     } 
     const pickPoint = {
-      x: Number(posX) + width/2,
+      x: Number(posX) + elemWidth/2,
       y: posY
     }
 
@@ -268,7 +203,8 @@ export function BigSlideElement(props: BigSlideElementProps) {
     <>   
       {outLineRect}  
       <polygon      
-        onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)}
+        ref={elemRef}
+        //onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)}
         id={id}      
         points= {
           leftPoint.x + ' ' + leftPoint.y + ', ' +
@@ -284,18 +220,11 @@ export function BigSlideElement(props: BigSlideElementProps) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   useEffect(() => {
     if(isTextObj(props.shape)) {
+      dispatch(setSelectedElement, ([String(elemRef.current?.id)]))
       inputRef.current?.focus()
-      setDeltaCoordSelectElem(new MouseEvent('mousedown'), id)
     }  
   }, [])
-
-  /*function changeText(event: React.ChangeEvent<HTMLInputElement>) {
-    const newParam = event.target.value
-    const paramToChange = 'text'
-    dispatch(changeTextObj, {newParam, paramToChange})
-    setActualText(event.target.value)
-  }*/ 
-
+ 
   const [actualText, setActualText] = useState(isTextObj(props.shape) ? props.shape.text : '')
  
   if (isTextObj(props.shape)) {
@@ -303,21 +232,22 @@ export function BigSlideElement(props: BigSlideElementProps) {
       <>
         {outLineRect}
         <foreignObject
-          onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)}          
-          id={id + '.txt'}
+          ref={elemRef}          
+          id={id}
           x={posX}
           y={posY}
-          width={width}
-          height={height}
+          width={elemWidth}
+          height={elemHeight}
         >
           <input
             ref={inputRef}
             type="text"
             value={actualText}
+            onMouseDown={() => inputRef.current?.focus()}
             onChange={(event) => setActualText(event.target.value)}
             style={{
-              width: width, 
-              height: height, 
+              width: elemWidth, 
+              height: elemHeight, 
               outline: 'unset', 
               border: 'unset',
               fontSize: props.shape.fontSize + 'px',
@@ -332,16 +262,16 @@ export function BigSlideElement(props: BigSlideElementProps) {
     svgElem =
       <>
         {outLineRect} 
-        <image 
-          onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)}
+        <image
+          ref={elemRef} 
+          id={id}
           x={posX}
           y={posY}
-          width={width} 
-          height={height}
+          width={elemWidth + 'px'} 
+          height={elemHeight + 'px'}
           href={props.shape.url}        
         />
       </>  
-      
   }
 
   if (isShapeObj(props.shape)) {
@@ -350,12 +280,12 @@ export function BigSlideElement(props: BigSlideElementProps) {
           <>
             {outLineRect} 
             <rect
-              onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)}
+              ref={elemRef}
               id={id}
               x={posX}
               y={posY}  
-              width={width}
-              height={height}
+              width={elemWidth}
+              height={elemHeight}
               stroke={props.shape.borderColor} 
               fill='rgba(0, 0, 255, 0.2)'
             />
@@ -367,16 +297,18 @@ export function BigSlideElement(props: BigSlideElementProps) {
         <>
           {outLineRect} 
           <circle
-            onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)} 
+            ref={elemRef}
+            //onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)} 
             id={id}
-            cx={posX + width/2} 
-            cy={posY + height/2} 
-            r={width/2} 
+            cx={posX + elemWidth/2} 
+            cy={posY + elemHeight/2} 
+            r={elemWidth/2} 
             fill={props.shape.fillColor} 
             stroke={props.shape.borderColor} 
           /> 
         </>             
     }
   }
+  //svgElem.ref={elemRef}
   return (svgElem)
 }

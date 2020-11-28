@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Popup.css';
-import { usePopup, useSetPopup } from './PopupContext'
+import { usePopup, useSetPopup, IsVisiblePopup, useSetIsVisiblePopup } from './PopupContext'
 
 export type PopupItem  = {
     caption: string,
@@ -15,13 +15,14 @@ export type Pos = {
 export type PropsPopup = {
     items: Array<PopupItem>,
     pos: Pos,
-    visible: boolean,
     width: number,
 }
 
 function Popup() {
     const props = usePopup();
     const setProps = useSetPopup();
+    const isVisible = IsVisiblePopup();
+    const setIsVisible = useSetIsVisiblePopup();
 
     const style = {
         top: props.pos.y,
@@ -29,14 +30,14 @@ function Popup() {
         width: props.width
     }
 
-    const className = "popup "+(props.visible ? "" : "popup_hide ")
+    const className = "popup "+(isVisible ? "" : "popup_hide ")
     
     const listMenuItems = props.items.map((item, index) =>
         <li key={index} className="popup__menu__item" onClick = {item.action}>{item.caption}</li>
     );
 
     return (
-        <div className = {className} style = {style} onClick={() => setProps({...props, visible: !props.visible})}>
+        <div className = {className} style = {style} onClick={() => {setProps({...props}); setIsVisible(false)}}>
             <ul className="popup__menu">
                 {listMenuItems}
             </ul>
