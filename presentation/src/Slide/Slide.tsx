@@ -5,6 +5,7 @@ import './Slide.css';
 import { Slide } from '../Models/types'
 import { createNewId, isColor, isPictureObj } from '../Models/commonFunctionsConst';
 import { setSelectedSlides } from '../Models/slideMoveInProgramm';
+import { setSelectedElement } from '../Models/changeSlideContent';
 
 type SlideProps = {
     numberOfSlide: number
@@ -50,8 +51,9 @@ export function MainSlide(props: SlideProps) {
     
     const slideElements = [currSlide.elements]
     
-    function actionOnClcick() {
+    function actionOnMouseDown(event: React.MouseEvent | MouseEvent) {
       if(props.isSmallSlide) {
+        event.preventDefault()
         dispatch(setSelectedSlides, ([currSlide.id])) // [...actualProgState.selectedSlides, currSlide.id])
       }
     } 
@@ -66,7 +68,7 @@ export function MainSlide(props: SlideProps) {
   
     return (    
       <div id={currSlide.id} className={divClassName} 
-        onClick={() => actionOnClcick()}
+        onMouseDown={(event) => actionOnMouseDown(event)}
         style={propsStyles}
       >
         <svg ref={svgRef} id={createId()} className={svgClassName} xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" >

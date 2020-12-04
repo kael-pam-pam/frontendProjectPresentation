@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef} from 'react'
 import { changeElemPosition,resizeElement, setSelectedElement} from '../Models/changeSlideContent'
-import { checkSelectedElem, getCurrElemPosition, isPictureObj, isShapeObj, isTextObj} from '../Models/commonFunctionsConst'
+import { checkSelectedElem, getCurrElemPosition, getCurrElemSize, isPictureObj, isShapeObj, isTextObj} from '../Models/commonFunctionsConst'
 import { actualProgState, dispatch} from '../Models/dispatcher'
 import { PictureObj, TextObj, ShapeObj} from '../Models/types'
 import './Element.css'
 import { useDragAndDrop } from '../CustomHooks/dragAndDrop'
-import { useCheckSizeSetNewSize, useReSizeElem } from '../CustomHooks/commonHooks'
+import { useNormalizeImgSize, useReSizeElem, useUpdateElemAfterSlideChanged } from '../CustomHooks/commonHooks'
 
 
 export function SmallSlideElement(props: PictureObj | TextObj | ShapeObj) {
@@ -112,51 +112,51 @@ interface BigSlideElementProps {
   svgProps: React.MutableRefObject<SVGSVGElement | null>
 }
 
-
 export function BigSlideElement(props: BigSlideElementProps) {
 
   const mainSvgProps = props.svgProps.current?.getBoundingClientRect()
-  let elemWidth = props.shape.wigth
-  let elemHeight = props.shape.height
   let id = props.shape.id
-  let posX = 0  
-  let posY = 0
 
-  let newSize = {
-    width: elemWidth,
-    height: elemHeight,
-    mainSvgProps
-  }
-  if (useCheckSizeSetNewSize(newSize)){
-    elemWidth = newSize.width
-    elemHeight = newSize.height
-  }
-
-  
   const elemRef = useRef<any | null>(null)
   const[pos, setPos] = useState({x: props.shape.position.x, y: props.shape.position.y})
-    
-  posX = pos.x
-  posY = pos.y
+  useDragAndDrop({elemRef, setPos, mainSvgProps})
 
-  useDragAndDrop({elemRef, setPos, mainSvgProps, elemWidth: elemWidth, elemHeight: elemHeight})
-
-
+  
   const firstPointRef = useRef<SVGCircleElement | null>(null)
   const secondPointRef = useRef<SVGCircleElement | null>(null)
   const thirdPointRef = useRef<SVGCircleElement | null>(null)
   const fourthPointRef = useRef<SVGCircleElement | null>(null)
 
-  const[elemSize, setSize] = useState({width: elemWidth, height: elemHeight})
+  
+  const[elemSize, setSize] = useState({width: props.shape.wigth, height: props.shape.height})
 
-  elemWidth = elemSize.width
-  elemHeight = elemSize.height
+  useReSizeElem ({
+    firstPointRef, 
+    secondPointRef, 
+    thirdPointRef, 
+    fourthPointRef, 
+    setSize, 
+    setPos,
+    mainSvgProps
+  })
 
-  useReSizeElem({firstPointRef, secondPointRef, thirdPointRef, fourthPointRef, pos, setSize, setPos})
+  useNormalizeImgSize({
+    imgWidth: elemSize.width,
+    imgHeight: elemSize.height, 
+    svgWidth: Number(mainSvgProps?.width), 
+    svgHeight: Number(mainSvgProps?.height),
+    setSize
+  })
 
 
-
-
+  useUpdateElemAfterSlideChanged({
+    setPos, 
+    setSize, 
+    elemPosX: props.shape.position.x, 
+    elemPosY: props.shape.position.y,
+    elemWidth: props.shape.wigth,
+    elemHeight: props.shape.height
+  })  
   
   let svgElem: JSX.Element = <rect/>
   let outLineRect: JSX.Element = <rect />
@@ -165,38 +165,38 @@ export function BigSlideElement(props: BigSlideElementProps) {
     <> 
       <rect
         id={id}
-        x={posX}
-        y={posY}  
-        width={elemWidth  + 'px'}
-        height={elemHeight + 'px'}
+        x={pos.x}
+        y={pos.y}  
+        width={elemSize.width + 'px'}
+        height={elemSize.height + 'px'}
         stroke='black'
         strokeWidth='1'
         strokeDasharray='10, 7'  
         fill='none'
       />
 
-      <circle key={1} id={'1'} ref={firstPointRef} cx={posX} cy={posY} r={5} fill='black' stroke='black'/>
+      <circle key={1} id={'1'} ref={firstPointRef} cx={pos.x} cy={pos.y} r={5} fill='black' stroke='black'/>
 
-      <circle key={2} id={'2'} ref={secondPointRef} cx={posX + elemWidth} cy={posY} r={5} fill='black' stroke='black'/>
+      <circle key={2} id={'2'} ref={secondPointRef} cx={pos.x + elemSize.width} cy={pos.y} r={5} fill='black' stroke='black'/>
 
-      <circle key={3} id={'3'} ref={thirdPointRef} cx={posX} cy={posY + elemHeight} r={5} fill='black' stroke='black'/>
+      <circle key={3} id={'3'} ref={thirdPointRef} cx={pos.x} cy={pos.y + elemSize.height} r={5} fill='black' stroke='black'/>
 
-      <circle key={4} id={'4'} ref={fourthPointRef} cx={posX + elemWidth} cy={posY + elemHeight} r={5} fill='black' stroke='black'/>
+      <circle key={4} id={'4'} ref={fourthPointRef} cx={pos.x + elemSize.width} cy={pos.y + elemSize.height} r={5} fill='black' stroke='black'/>
     </>
   }
 
   if (props.shape.type == 'triangle') {
     const leftPoint= {
-      x: posX,
-      y: Number(posY) + Number(elemHeight)
+      x: pos.x,
+      y: Number(pos.y) + Number(elemSize.height)
     }  
     const rightPoint = {
-      x: Number(posX) + Number(elemWidth),
-      y: Number(posY) + Number(elemHeight)
+      x: Number(pos.x) + Number(elemSize.width),
+      y: Number(pos.y) + Number(elemSize.height)
     } 
     const pickPoint = {
-      x: Number(posX) + elemWidth/2,
-      y: posY
+      x: Number(pos.x) + elemSize.width / 2,
+      y: pos.y
     }
 
     svgElem =
@@ -223,7 +223,7 @@ export function BigSlideElement(props: BigSlideElementProps) {
       dispatch(setSelectedElement, ([String(elemRef.current?.id)]))
       inputRef.current?.focus()
     }  
-  }, [])
+  }, [props.shape])
  
   const [actualText, setActualText] = useState(isTextObj(props.shape) ? props.shape.text : '')
  
@@ -234,75 +234,77 @@ export function BigSlideElement(props: BigSlideElementProps) {
         <foreignObject
           ref={elemRef}          
           id={id}
-          x={posX}
-          y={posY}
-          width={elemWidth}
-          height={elemHeight}
+          x={pos.x}
+          y={pos.y}
+          width={elemSize.width}
+          height={elemSize.height}
         >
           <input
             ref={inputRef}
             type="text"
             value={actualText}
-            onMouseDown={() => inputRef.current?.focus()}
+            //onMouseDown={() => inputRef.current?.focus()}
             onChange={(event) => setActualText(event.target.value)}
             style={{
-              width: elemWidth, 
-              height: elemHeight, 
+              width: elemSize.width, 
+              height: elemSize.height, 
               outline: 'unset', 
               border: 'unset',
               fontSize: props.shape.fontSize + 'px',
               fontFamily: props.shape.fontFamily,
-              background: 'unset'
+              background: 'rgba(0, 0, 255, 0.2)'
           }}/>
         </foreignObject>
       </>  
   }
 
   if (isPictureObj(props.shape)) {
+    const src = props.shape.imgB64
+  
     svgElem =
       <>
-        {outLineRect} 
         <image
           ref={elemRef} 
           id={id}
-          x={posX}
-          y={posY}
-          width={elemWidth + 'px'} 
-          height={elemHeight + 'px'}
-          href={props.shape.url}        
+          x={pos.x}
+          y={pos.y}
+          width={elemSize.width} 
+          height={elemSize.height}
+          href={src}        
         />
+        {outLineRect} 
       </>  
   }
 
   if (isShapeObj(props.shape)) {
     if (props.shape.type == 'rect') { 
-        svgElem = 
-          <>
-            {outLineRect} 
-            <rect
-              ref={elemRef}
-              id={id}
-              x={posX}
-              y={posY}  
-              width={elemWidth}
-              height={elemHeight}
-              stroke={props.shape.borderColor} 
-              fill='rgba(0, 0, 255, 0.2)'
-            />
-          </>  
+      svgElem = 
+        <>
+          {outLineRect} 
+          <rect
+            ref={elemRef}
+            id={id}
+            x={pos.x}
+            y={pos.y}  
+            width={elemSize.width}
+            height={elemSize.height}
+            stroke={props.shape.borderColor} 
+            fill='rgba(0, 0, 255, 0.2)'
+          />
+        </>  
     }  
 
-    if (props.shape.type == 'circle') {
+    if (props.shape.type === 'circle') {
       svgElem =
         <>
           {outLineRect} 
-          <circle
-            ref={elemRef}
-            //onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)} 
+          <ellipse
+            ref={elemRef} 
             id={id}
-            cx={posX + elemWidth/2} 
-            cy={posY + elemHeight/2} 
-            r={elemWidth/2} 
+            cx={pos.x + elemSize.width / 2} 
+            cy={pos.y + elemSize.height / 2} 
+            rx={elemSize.width / 2}
+            ry={elemSize.height / 2} 
             fill={props.shape.fillColor} 
             stroke={props.shape.borderColor} 
           /> 

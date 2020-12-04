@@ -1,18 +1,3 @@
-
-/*export {
-    Programm,
-    Presentation,
-    ArchiveOfState,
-    Slide,
-    Point,
-    ElementObj,
-    Picture,
-    PictureObj,
-    TextObj,
-    Color,
-    ShapeObj
-}*/
-
 export type Programm = {
     currentPresentation: Presentation,
     selectedSlides: Array<string>,         
@@ -52,6 +37,7 @@ export type ElementObj = {
 
 export type Picture = {
     url: string,
+    imgB64: string,
     type: 'picture',
 }
 

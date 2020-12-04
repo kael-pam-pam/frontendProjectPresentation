@@ -74,14 +74,15 @@ function setSlideBackground(prog: Programm, newBackground: Picture | Color): Pro
   }
 }
 
-function createPictureObj(url: string, height: number, wigth: number): PictureObj {
+function createPictureObj(url: string, width: number, height: number, imgB64: string): PictureObj {
   return {
     id: createNewId(),
     position: defaultPoint,
     height: height,
-    wigth: wigth,
+    wigth: width,
     url, 
-    type: 'picture'
+    type: 'picture',
+    imgB64
   }
 }
 
@@ -93,12 +94,12 @@ function getSlideWithChangedElems(prog: Programm, changedElems: Array<PictureObj
   }
 }
 
-function addPictureObj(prog: Programm, payload: {url: string, width: number, height: number}): Programm {
+function addPictureObj(prog: Programm, payload: {url: string, width: number, height: number, imgB64: string}): Programm {
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
 
-  const newPictureObj = createPictureObj(payload.url, payload.width, payload.height)
+  const newPictureObj = createPictureObj(payload.url, payload.width, payload.height, payload.imgB64)
   const changedElems = getElemsWithNewElem(prog, newPictureObj, changedSlideIndex)
 
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElems, changedSlideIndex)

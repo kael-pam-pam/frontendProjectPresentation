@@ -45,7 +45,8 @@ export {
   getSlideWithNewBackground,
   getSlidesWithChangedSlide,
   getElemsWithChangedElem,
-  getCurrElemPosition
+  getCurrElemPosition,
+  getCurrElemSize
 }
 
 const defaultPoint: Point = {
@@ -98,6 +99,22 @@ function getCurrElemPosition(prog: Programm): Point {
   return {
     x: elemX,
     y: elemY
+  }
+}
+
+function getCurrElemSize(prog: Programm): {width: number, height: number} {
+  let width: number = 0
+  let height: number = 0
+  const changedSlideIndex = searchChangedSlideIndex(prog)
+  const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
+  let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
+  if (changedElem != undefined) {
+    width = changedElem.wigth
+    height = changedElem.height
+  } 
+  return {
+    width: width,
+    height: height
   }
 }
 

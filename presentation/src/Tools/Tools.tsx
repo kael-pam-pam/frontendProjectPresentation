@@ -46,6 +46,15 @@ function ToolElemWithToolBox(props: ToolElemWithToolBoxProps) {
   ) 
 }
 
+function getBase64 (file: any, callback: any) {
+
+  const reader = new FileReader();
+
+  reader.addEventListener('load', () => callback(reader.result));
+
+  reader.readAsDataURL(file);
+}
+
 function loadPicFromComp() {
   let input = document.createElement("input")
   input.type = "file"
@@ -59,7 +68,9 @@ function loadPicFromComp() {
         const src = URL.createObjectURL(input.files?.item(0))
         const img = new Image()
         img.onload = function() {
-          dispatch(addPictureObj, ({url:src, width: img.height, height: img.width}))
+          getBase64(input.files?.item(0), function(base64Data: any){
+            dispatch(addPictureObj, ({url:src, width: img.width, height: img.height, imgB64: base64Data}))
+          })
         }
         img.src = src
     }

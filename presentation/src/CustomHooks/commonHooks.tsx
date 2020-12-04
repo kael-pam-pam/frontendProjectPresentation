@@ -1,40 +1,69 @@
-import React, {useEffect} from 'react'
-import {Point} from '../Models/types'
+import React, {useEffect, useRef} from 'react'
+import { changeElemPosition, resizeElement } from '../Models/changeSlideContent'
+import { getCurrElemPosition, getCurrElemSize, isPictureObj, searchChangedElemIndex, searchChangedSlideIndex } from '../Models/commonFunctionsConst'
+import { actualProgState, dispatch } from '../Models/dispatcher'
+import {PictureObj, Point, ShapeObj, TextObj} from '../Models/types'
 
-interface checkSizeProps {
-  width: number, 
-  height: number, 
-  mainSvgProps:  DOMRect | undefined
+
+interface UpdateElemProps {
+  setPos: React.Dispatch<React.SetStateAction<Point>>
+  setSize: React.Dispatch<React.SetStateAction<{ width: number; height: number; }>>
+  elemPosX: number,
+  elemPosY: number, 
+  elemWidth: number,
+  elemHeight: number
 }
 
-export function useCheckSizeSetNewSize(props: checkSizeProps): boolean {
-  let sizeIsChanged = false 
-  const mainSvgWidth = Number(props.mainSvgProps?.width)
-  const mainSvgHeight = Number(props.mainSvgProps?.height)
-  let resizeNum = 20
-  if (props.width > 1800 || props.height >= 1000) {
-    resizeNum = 30
-  }
-  if (props.width > 2400 || props.height > 1500) {
-    resizeNum = 40
-  }
-  if (props.width > 3000 || props.height > 2000) {
-    resizeNum = 60
-  }
-  if (props.width > 4000 || props.height > 2500) {
-    resizeNum = 75
-  }
+export function useUpdateElemAfterSlideChanged(props: UpdateElemProps) {
+  useEffect(() => {
+    props.setPos({
+      x: props.elemPosX,
+      y: props.elemPosY
+    }) 
+    props.setSize({
+      width: props.elemWidth,
+      height: props.elemHeight
+    })
+  }, [actualProgState.selectedSlides])
+} 
 
-  console.log(mainSvgHeight, "",  mainSvgWidth)
-  if (props.height >= mainSvgHeight || props.width >= mainSvgWidth)
-  { 
-    props.height = props.height - (props.height / 100 * resizeNum)
-    props.width = props.width - (props.width / 100 * resizeNum)
-    sizeIsChanged = true  
-  }
-  return sizeIsChanged
+interface NormalizeImgProps {
+  imgWidth: number,
+  imgHeight: number, 
+  svgWidth: number, 
+  svgHeight: number,
+  setSize: React.Dispatch<React.SetStateAction<{ width: number; height: number; }>>
 }
 
+export function useNormalizeImgSize(props: NormalizeImgProps){
+  let changeSize = useRef(true)
+  //useEffect(() => {    
+    if (props.imgWidth >= props.svgWidth || props.imgHeight >= props.svgHeight && changeSize.current) {
+      console.log('set')
+
+      let newImgSize = {
+        width: props.imgWidth,
+        height: props.imgHeight
+      }
+      let imgIndex = 0
+
+      if (props.imgWidth >= props.imgHeight) {
+        imgIndex = props.imgWidth / props.imgHeight
+      } else {
+        imgIndex = props.imgHeight / props.imgWidth
+      }
+
+      if (props.imgWidth >= props.svgWidth) {
+        newImgSize.width = props.svgWidth - 100
+        newImgSize.height = newImgSize.width / imgIndex
+      } else {
+        newImgSize.height = props.svgHeight - 100
+        newImgSize.width = newImgSize.height / imgIndex
+      }
+      props.setSize(newImgSize)
+      changeSize.current = false
+    } 
+}
 
 
 interface resizeProps {
@@ -42,26 +71,148 @@ interface resizeProps {
   secondPointRef: React.MutableRefObject<SVGCircleElement | null>
   thirdPointRef: React.MutableRefObject<SVGCircleElement | null>
   fourthPointRef: React.MutableRefObject<SVGCircleElement | null>
-  pos: Point
   setSize: React.Dispatch<React.SetStateAction<{ width: number; height: number; }>>
   setPos: React.Dispatch<React.SetStateAction<Point>>
+  mainSvgProps: DOMRect | undefined
 }
 
 export function useReSizeElem(props: resizeProps) {
-  useEffect(() => {
-    props.firstPointRef.current?.addEventListener('mousedown', (event) => mouseDownHandler(event , props.firstPointRef.current?.id))
-    props.secondPointRef.current?.addEventListener('mousedown', (event) => mouseDownHandler(event , props.secondPointRef.current?.id))
-    props.firstPointRef.current?.addEventListener('mousedown', (event) => mouseDownHandler(event , props.thirdPointRef.current?.id))
-    props.secondPointRef.current?.addEventListener('mousedown', (event) => mouseDownHandler(event , props.fourthPointRef.current?.id))
-  }, )
+  const mainSvgProps = props.mainSvgProps 
+  const leftSvgBorder = Number(mainSvgProps?.x)
+  const topSvgBorder = Number(mainSvgProps?.y)
 
-  const mouseDownHandler = (event: React.MouseEvent | MouseEvent, key: string | undefined) => {
+  let newCursPos = {
+    x: 0,
+    y: 0
+  }
+
+  let newElemSize = {
+    width: 0,
+    height: 0
+  }
+
+  let newElemPos = {
+    x: 0,
+    y: 0
+  }
+
+  const prevSizeRef = useRef({
+    width: 0,
+    height: 0
+  })
+
+  let point = 0
+
+  useEffect(() => {
+      props.firstPointRef.current?.addEventListener('mousedown', mouseDownLeftTopHandler)
+      props.secondPointRef.current?.addEventListener('mousedown', mouseDownRightTopHandler)
+      props.thirdPointRef.current?.addEventListener('mousedown', mouseDownLeftBottomHandler)
+      props.fourthPointRef.current?.addEventListener('mousedown', mouseDownRightBottomHandler)
+  }, [props.firstPointRef.current])
+
+  const addListnersPreventMouseDown = (event: React.MouseEvent | MouseEvent) => {
+    document.addEventListener('mousemove', mouseMoveResizeHandler)
+    document.addEventListener('mouseup', mouseUpResizeHandler)
     event.preventDefault()
-    if (key === '1') {
-      console.log(1)
+  }
+
+  const mouseDownLeftTopHandler = (event: React.MouseEvent | MouseEvent) => {
+    point = 1
+    addListnersPreventMouseDown(event)
+  }
+
+  const mouseDownRightTopHandler = (event: React.MouseEvent | MouseEvent) => {
+    point = 2
+    addListnersPreventMouseDown(event)
+  }
+
+  const mouseDownLeftBottomHandler = (event: React.MouseEvent | MouseEvent) => {
+    point = 3
+    addListnersPreventMouseDown(event)
+  }
+
+  const mouseDownRightBottomHandler = (event: React.MouseEvent | MouseEvent) => {
+    point = 4
+    addListnersPreventMouseDown (event)
+  }
+
+
+  const mouseMoveResizeHandler = (event: React.MouseEvent | MouseEvent) => {
+    newCursPos = {
+      x: event.pageX - leftSvgBorder,
+      y: event.pageY - topSvgBorder
     }
-    if (key === '2') {
-      console.log(2)
+
+    if(point === 1) {
+      newElemPos = newCursPos
+    
+      newElemSize = {
+        width: getCurrElemSize(actualProgState).width + getCurrElemPosition(actualProgState).x - newCursPos.x,
+        height: getCurrElemSize(actualProgState).height + getCurrElemPosition(actualProgState).y - newCursPos.y
+      }
     }
+
+    if(point === 2) {
+      newElemPos = {
+        x: getCurrElemPosition(actualProgState).x,
+        y: newCursPos.y
+      }
+  
+      newElemSize = {
+        width: newCursPos.x - getCurrElemPosition(actualProgState).x,
+        height: getCurrElemSize(actualProgState).height + (getCurrElemPosition(actualProgState).y - newCursPos.y)
+      }
+    }
+
+    if(point === 3) {
+      newElemPos = {
+      x: newCursPos.x,
+      y: getCurrElemPosition(actualProgState).y
+      }
+
+      newElemSize = {
+        width: getCurrElemSize(actualProgState).width + getCurrElemPosition(actualProgState).x - newCursPos.x,
+        height: newCursPos.y - getCurrElemPosition(actualProgState).y
+      }
+    }
+
+    if(point === 4) {
+      newElemPos = {
+      x: getCurrElemPosition(actualProgState).x,
+      y: getCurrElemPosition(actualProgState).y
+      }
+
+      newElemSize = {
+        width: newCursPos.x - getCurrElemPosition(actualProgState).x,
+        height: newCursPos.y - getCurrElemPosition(actualProgState).y
+      }
+    }
+
+    if (newElemSize.width > 10 && newElemSize.height > 10) {
+      props.setSize(newElemSize)
+      props.setPos(newElemPos)
+    }
+  }
+
+  const mouseUpResizeHandler = () => {
+    if (prevSizeRef.current.width !== newElemSize.width && prevSizeRef.current.height !== newElemSize.height) {
+      dispatch(changeElemPosition, {newX: newElemPos.x, newY: newElemPos.y})
+      dispatch(resizeElement, {newWidth: newElemSize.width, newHeigth: newElemSize.height})  
+    }
+    prevSizeRef.current = newElemSize
+    document.removeEventListener('mousemove', mouseMoveResizeHandler)
+    if (point === 1) {
+      document.removeEventListener('mousedown', mouseDownLeftTopHandler)
+    }
+    if (point === 2) {
+      document.removeEventListener('mousedown', mouseDownRightTopHandler)
+    }
+    if (point === 3) {
+      document.removeEventListener('mousedown', mouseDownLeftBottomHandler)
+    }
+    if (point === 4) {
+      document.removeEventListener('mousedown', mouseDownRightBottomHandler)
+    }
+    document.removeEventListener('mouseup', mouseUpResizeHandler) 
   }
 }

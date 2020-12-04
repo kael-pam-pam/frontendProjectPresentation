@@ -98,7 +98,8 @@ function setSelectedSlides(prog: Programm, selectedSlides: Array<string>): Progr
   //console.log(prog.selectedSlides.length)
   return {
       ...prog,
-      selectedSlides: selectedSlides
+      selectedSlides: selectedSlides,
+      selectedElements: []
   }
 }
 

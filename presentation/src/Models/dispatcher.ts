@@ -34,6 +34,7 @@ import { isShapeObj, isTextObj, searchChangedSlideIndex, isSlide, isProgramm, is
 import { createProgram } from './functions';
 import { addSlide, setSelectedSlides } from './slideMoveInProgramm';
 import { goBackAchive, goForwardAchive, saveStateToArchive } from './archive';
+import { useState } from 'react';
 
 export let globalActiveTool: number = 0;
 
@@ -42,6 +43,8 @@ export function setGlobalActiveTool(state: number): void {
 } 
 
 export let actualProgState: Programm
+
+
 
 export function dispatch<T>(func: { (prog: Programm, obj: T): Programm }, obj: T ): void { 
   if (isProgramm(obj)) {
@@ -54,14 +57,11 @@ export function dispatch<T>(func: { (prog: Programm, obj: T): Programm }, obj: T
         console.log('savedToArh')
     }
   }  
-  render()
+  
+  render() 
 }
 
-export function dispatchTwoParams<T>(func: { (prog: Programm, firstObj: T, secondObj: T): Programm }, firstObj: T, secondObj: T): void { 
-  actualProgState =  func(actualProgState, firstObj, secondObj);
-  console.log('56')
-  render()
-}
+
 
 export function loadProgramm(newProg: Programm): Programm {
   return newProg
