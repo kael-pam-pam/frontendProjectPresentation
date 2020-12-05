@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react'
 import { render } from '../index'
 import { changeElemPosition, setSelectedElement } from '../Models/changeSlideContent'
-import { checkSelectedElem, getCurrElemPosition } from '../Models/commonFunctionsConst'
+import { checkSelectedElem, getCurrElemPosition, isTextObj } from '../Models/commonFunctionsConst'
 import { actualProgState, dispatch } from '../Models/dispatcher'
 import {Point} from '../Models/types'
 

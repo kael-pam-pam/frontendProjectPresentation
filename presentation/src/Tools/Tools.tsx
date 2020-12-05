@@ -50,7 +50,7 @@ function getBase64 (file: any, callback: any) {
 
   const reader = new FileReader();
 
-  reader.addEventListener('load', () => callback(reader.result));
+  reader.addEventListener('load', () => callback(reader.result))
 
   reader.readAsDataURL(file);
 }
@@ -68,7 +68,7 @@ function loadPicFromComp() {
         const src = URL.createObjectURL(input.files?.item(0))
         const img = new Image()
         img.onload = function() {
-          getBase64(input.files?.item(0), function(base64Data: any){
+          getBase64(input.files?.item(0), function(base64Data: string){
             dispatch(addPictureObj, ({url:src, width: img.width, height: img.height, imgB64: base64Data}))
           })
         }

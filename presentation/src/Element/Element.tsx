@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef} from 'react'
-import { changeElemPosition,resizeElement, setSelectedElement} from '../Models/changeSlideContent'
+import { changeElemPosition,changeTextObj,resizeElement, setSelectedElement} from '../Models/changeSlideContent'
 import { checkSelectedElem, getCurrElemPosition, getCurrElemSize, isPictureObj, isShapeObj, isTextObj} from '../Models/commonFunctionsConst'
 import { actualProgState, dispatch} from '../Models/dispatcher'
 import { PictureObj, TextObj, ShapeObj} from '../Models/types'
@@ -137,7 +137,8 @@ export function BigSlideElement(props: BigSlideElementProps) {
     fourthPointRef, 
     setSize, 
     setPos,
-    mainSvgProps
+    mainSvgProps,
+    elemRef
   })
 
   useNormalizeImgSize({
@@ -220,12 +221,13 @@ export function BigSlideElement(props: BigSlideElementProps) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   useEffect(() => {
     if(isTextObj(props.shape)) {
-      dispatch(setSelectedElement, ([String(elemRef.current?.id)]))
-      inputRef.current?.focus()
+      if (!checkSelectedElem(actualProgState, id)) {
+        dispatch(setSelectedElement, ([String(elemRef.current?.id)]))
+        inputRef.current?.focus()
+      }
     }  
-  }, [props.shape])
+  }, [id])
  
-  const [actualText, setActualText] = useState(isTextObj(props.shape) ? props.shape.text : '')
  
   if (isTextObj(props.shape)) {
     svgElem =
@@ -242,9 +244,8 @@ export function BigSlideElement(props: BigSlideElementProps) {
           <input
             ref={inputRef}
             type="text"
-            value={actualText}
-            //onMouseDown={() => inputRef.current?.focus()}
-            onChange={(event) => setActualText(event.target.value)}
+            onMouseDown={() => inputRef.current?.focus()}
+            onChange={(event) => dispatch(changeTextObj, {newParam: event.target.value, paramToChange: 'text'})}
             style={{
               width: elemSize.width, 
               height: elemSize.height, 
@@ -260,7 +261,7 @@ export function BigSlideElement(props: BigSlideElementProps) {
 
   if (isPictureObj(props.shape)) {
     const src = props.shape.imgB64
-  
+    
     svgElem =
       <>
         <image

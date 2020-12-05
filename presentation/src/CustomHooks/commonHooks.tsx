@@ -36,11 +36,8 @@ interface NormalizeImgProps {
 }
 
 export function useNormalizeImgSize(props: NormalizeImgProps){
-  let changeSize = useRef(true)
-  //useEffect(() => {    
-    if (props.imgWidth >= props.svgWidth || props.imgHeight >= props.svgHeight && changeSize.current) {
-      console.log('set')
-
+  useEffect(() => {    
+    if (props.imgWidth >= props.svgWidth || props.imgHeight >= props.svgHeight) {
       let newImgSize = {
         width: props.imgWidth,
         height: props.imgHeight
@@ -61,8 +58,8 @@ export function useNormalizeImgSize(props: NormalizeImgProps){
         newImgSize.width = newImgSize.height / imgIndex
       }
       props.setSize(newImgSize)
-      changeSize.current = false
-    } 
+    }
+  }) 
 }
 
 
@@ -74,6 +71,7 @@ interface resizeProps {
   setSize: React.Dispatch<React.SetStateAction<{ width: number; height: number; }>>
   setPos: React.Dispatch<React.SetStateAction<Point>>
   mainSvgProps: DOMRect | undefined
+  elemRef: React.MutableRefObject<SVGElement | null>
 }
 
 export function useReSizeElem(props: resizeProps) {
@@ -187,6 +185,8 @@ export function useReSizeElem(props: resizeProps) {
         height: newCursPos.y - getCurrElemPosition(actualProgState).y
       }
     }
+    let index = Number((640 / 480).toFixed(2))
+    let newIndex = Number((newElemSize.height / newElemSize.width).toFixed(2))
 
     if (newElemSize.width > 10 && newElemSize.height > 10) {
       props.setSize(newElemSize)
