@@ -4,8 +4,9 @@ import { checkSelectedElem, getCurrElemPosition, getCurrElemSize, isPictureObj, 
 import { actualProgState, dispatch} from '../Models/dispatcher'
 import { PictureObj, TextObj, ShapeObj} from '../Models/types'
 import './Element.css'
-import { useDragAndDrop } from '../CustomHooks/dragAndDrop'
-import { useNormalizeImgSize, useReSizeElem, useUpdateElemAfterSlideChanged } from '../CustomHooks/commonHooks'
+import { useDragAndDrop, useReSizeElem } from '../CustomHooks/ResizeDragAndDrop'
+import { useMouseDownDocumentListner, useNormalizeElemSize} from '../CustomHooks/commonHooks'
+import { ImgTextObject, OutlineRect, ShapeObject } from './SvgElems'
 
 
 export function SmallSlideElement(props: PictureObj | TextObj | ShapeObj) {
@@ -113,205 +114,78 @@ interface BigSlideElementProps {
 }
 
 export function BigSlideElement(props: BigSlideElementProps) {
+  const id = props.shape.id
 
   const mainSvgProps = props.svgProps.current?.getBoundingClientRect()
-  let id = props.shape.id
+  const svgWidth = Number(mainSvgProps?.width)
+  const svgHeight = Number(mainSvgProps?.height)
 
-  const elemRef = useRef<any | null>(null)
-  const[pos, setPos] = useState({x: props.shape.position.x, y: props.shape.position.y})
-  useDragAndDrop({elemRef, setPos, mainSvgProps})
+  const elemPosX = props.shape.position.x
+  const elemPosY = props.shape.position.y
+  const elemWidth = props.shape.wigth
+  const elemHeight = props.shape.height
 
-  
+  const elemRef = useRef<(SVGPolygonElement & SVGRectElement & SVGImageElement & SVGEllipseElement) | null>(null)
   const firstPointRef = useRef<SVGCircleElement | null>(null)
   const secondPointRef = useRef<SVGCircleElement | null>(null)
   const thirdPointRef = useRef<SVGCircleElement | null>(null)
   const fourthPointRef = useRef<SVGCircleElement | null>(null)
 
-  
-  const[elemSize, setSize] = useState({width: props.shape.wigth, height: props.shape.height})
 
-  useReSizeElem ({
-    firstPointRef, 
-    secondPointRef, 
-    thirdPointRef, 
-    fourthPointRef, 
-    setSize, 
-    setPos,
-    mainSvgProps,
-    elemRef
-  })
+  const[pos, setPos] = useState({x: elemPosX, y: elemPosY})
+  const[elemSize, setSize] = useState({width: elemWidth, height: elemHeight})
 
-  useNormalizeImgSize({
-    imgWidth: elemSize.width,
-    imgHeight: elemSize.height, 
-    svgWidth: Number(mainSvgProps?.width), 
-    svgHeight: Number(mainSvgProps?.height),
-    setSize
-  })
+  useNormalizeElemSize({setSize, elemWidth, elemHeight, svgWidth, svgHeight})
 
+  useMouseDownDocumentListner(elemRef)
 
-  useUpdateElemAfterSlideChanged({
-    setPos, 
-    setSize, 
-    elemPosX: props.shape.position.x, 
-    elemPosY: props.shape.position.y,
-    elemWidth: props.shape.wigth,
-    elemHeight: props.shape.height
-  })  
+  useDragAndDrop({setPos, elemRef, mainSvgProps})
+
+  useReSizeElem ({setPos, setSize, firstPointRef, secondPointRef, thirdPointRef, fourthPointRef, mainSvgProps})  
+
   
   let svgElem: JSX.Element = <rect/>
   let outLineRect: JSX.Element = <rect />
+
   if (checkSelectedElem(actualProgState, id)) {
-    outLineRect =
-    <> 
-      <rect
-        id={id}
-        x={pos.x}
-        y={pos.y}  
-        width={elemSize.width + 'px'}
-        height={elemSize.height + 'px'}
-        stroke='black'
-        strokeWidth='1'
-        strokeDasharray='10, 7'  
-        fill='none'
-      />
-
-      <circle key={1} id={'1'} ref={firstPointRef} cx={pos.x} cy={pos.y} r={5} fill='black' stroke='black'/>
-
-      <circle key={2} id={'2'} ref={secondPointRef} cx={pos.x + elemSize.width} cy={pos.y} r={5} fill='black' stroke='black'/>
-
-      <circle key={3} id={'3'} ref={thirdPointRef} cx={pos.x} cy={pos.y + elemSize.height} r={5} fill='black' stroke='black'/>
-
-      <circle key={4} id={'4'} ref={fourthPointRef} cx={pos.x + elemSize.width} cy={pos.y + elemSize.height} r={5} fill='black' stroke='black'/>
-    </>
+    outLineRect = <OutlineRect 
+      firstPointRef={firstPointRef}
+      secondPointRef={secondPointRef}
+      thirdPointRef={thirdPointRef}
+      fourthPointRef={fourthPointRef}
+      id={id}
+      posX={pos.x}
+      posY={pos.y}
+      width={elemSize.width}
+      height={elemSize.height}
+    />
   }
 
-  if (props.shape.type == 'triangle') {
-    const leftPoint= {
-      x: pos.x,
-      y: Number(pos.y) + Number(elemSize.height)
-    }  
-    const rightPoint = {
-      x: Number(pos.x) + Number(elemSize.width),
-      y: Number(pos.y) + Number(elemSize.height)
-    } 
-    const pickPoint = {
-      x: Number(pos.x) + elemSize.width / 2,
-      y: pos.y
-    }
-
-    svgElem =
-    <>   
-      {outLineRect}  
-      <polygon      
-        ref={elemRef}
-        //onMouseDown = {(event) => setDeltaCoordSelectElem(event, id)}
-        id={id}      
-        points= {
-          leftPoint.x + ' ' + leftPoint.y + ', ' +
-          rightPoint.x + ' ' + rightPoint.y + ', ' +
-          pickPoint.x + ' ' + pickPoint.y
-        }
-        fill={props.shape.fillColor} 
-        stroke={props.shape.borderColor} 
-      />
-    </>           
+  if (props.shape.type === 'rect' || props.shape.type === 'triangle'  || props.shape.type === 'circle') {
+    svgElem = <ShapeObject 
+      shape={props.shape}
+      elemRef={elemRef}
+      posX={pos.x}
+      posY={pos.y}
+      width={elemSize.width}
+      height={elemSize.height}
+      outlineRect={outLineRect}
+    />
   }
 
-  const inputRef = useRef<HTMLInputElement | null>(null)
-  useEffect(() => {
-    if(isTextObj(props.shape)) {
-      if (!checkSelectedElem(actualProgState, id)) {
-        dispatch(setSelectedElement, ([String(elemRef.current?.id)]))
-        inputRef.current?.focus()
-      }
-    }  
-  }, [id])
- 
- 
-  if (isTextObj(props.shape)) {
-    svgElem =
-      <>
-        {outLineRect}
-        <foreignObject
-          ref={elemRef}          
-          id={id}
-          x={pos.x}
-          y={pos.y}
-          width={elemSize.width}
-          height={elemSize.height}
-        >
-          <input
-            ref={inputRef}
-            type="text"
-            onMouseDown={() => inputRef.current?.focus()}
-            onChange={(event) => dispatch(changeTextObj, {newParam: event.target.value, paramToChange: 'text'})}
-            style={{
-              width: elemSize.width, 
-              height: elemSize.height, 
-              outline: 'unset', 
-              border: 'unset',
-              fontSize: props.shape.fontSize + 'px',
-              fontFamily: props.shape.fontFamily,
-              background: 'rgba(0, 0, 255, 0.2)'
-          }}/>
-        </foreignObject>
-      </>  
+  if (props.shape.type === 'picture' || props.shape.type === 'text' ){
+    svgElem = <ImgTextObject
+      shape={props.shape}
+      elemRef={elemRef}
+      posX={pos.x}
+      posY={pos.y}
+      width={elemSize.width}
+      height={elemSize.height}
+      outlineRect={outLineRect}
+    />
   }
-
-  if (isPictureObj(props.shape)) {
-    const src = props.shape.imgB64
-    
-    svgElem =
-      <>
-        <image
-          ref={elemRef} 
-          id={id}
-          x={pos.x}
-          y={pos.y}
-          width={elemSize.width} 
-          height={elemSize.height}
-          href={src}        
-        />
-        {outLineRect} 
-      </>  
-  }
-
-  if (isShapeObj(props.shape)) {
-    if (props.shape.type == 'rect') { 
-      svgElem = 
-        <>
-          {outLineRect} 
-          <rect
-            ref={elemRef}
-            id={id}
-            x={pos.x}
-            y={pos.y}  
-            width={elemSize.width}
-            height={elemSize.height}
-            stroke={props.shape.borderColor} 
-            fill='rgba(0, 0, 255, 0.2)'
-          />
-        </>  
-    }  
-
-    if (props.shape.type === 'circle') {
-      svgElem =
-        <>
-          {outLineRect} 
-          <ellipse
-            ref={elemRef} 
-            id={id}
-            cx={pos.x + elemSize.width / 2} 
-            cy={pos.y + elemSize.height / 2} 
-            rx={elemSize.width / 2}
-            ry={elemSize.height / 2} 
-            fill={props.shape.fillColor} 
-            stroke={props.shape.borderColor} 
-          /> 
-        </>             
-    }
-  }
-  //svgElem.ref={elemRef}
+  
   return (svgElem)
 }
+
+

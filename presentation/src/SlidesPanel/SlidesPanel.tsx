@@ -14,7 +14,7 @@ function SlidesPanel() {
         <div key={slides[i].id} className={"slide-frame "+(selectedSlides.includes(slides[i].id) ? "slide-frame_selected" : "")}> 
           <span className="slide-frame__number">{i + 1}</span>
           <div className={"slide " + (selectedSlides.includes(slides[i].id) ? "slide_selected" : "")}>
-            <MainSlide numberOfSlide={i} isSmallSlide={true}/>
+            <MainSlide key={slides[i].id} numberOfSlide={i} isSmallSlide={true}/>
           </div>
         </div>
       )

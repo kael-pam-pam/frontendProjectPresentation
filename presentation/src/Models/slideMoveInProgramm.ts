@@ -95,7 +95,6 @@ function moveSlide(prog: Programm, posBefore: number): Programm {
 }
 
 function setSelectedSlides(prog: Programm, selectedSlides: Array<string>): Programm {
-  //console.log(prog.selectedSlides.length)
   return {
       ...prog,
       selectedSlides: selectedSlides,

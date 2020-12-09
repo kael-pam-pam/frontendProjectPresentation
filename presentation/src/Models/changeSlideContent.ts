@@ -166,6 +166,7 @@ function changeTextObj(prog: Programm, payload: {newParam: string, paramToChange
 
   const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
+  
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex)
 
   return {
@@ -200,7 +201,6 @@ function addShapeObj(prog: Programm, shapeType: 'rect' | 'triangle' | 'circle'):
   const changedSlideIndex = searchChangedSlideIndex(prog)
 
   let newShapeObj: ShapeObj
-  let outlinerectId: string = ''
   newShapeObj = createShapeObj(shapeType)
   
   const changedElems = getElemsWithNewElem(prog, newShapeObj, changedSlideIndex)
@@ -281,7 +281,7 @@ function changeElemPosition(prog: Programm, payload:{newX: number, newY: number}
     ...prog,
     currentPresentation: {
       ...prog.currentPresentation,
-      slides: slidesWithChangedSlide
+      slides: slidesWithChangedSlide,
     }
   }
 }

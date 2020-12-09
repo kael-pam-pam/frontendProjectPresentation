@@ -44,8 +44,8 @@ export function MainSlide(props: SlideProps) {
     for(let i = 0; i < elemsLength; i++) {
       slideElems.push(
         props.isSmallSlide
-        ? <SmallSlideElement {...currSlide.elements[i]}/>
-        : <BigSlideElement shape={{...currSlide.elements[i]}} svgProps={svgRef}/> 
+        ? <SmallSlideElement key={elems[i].id} {...currSlide.elements[i]}/>
+        : <BigSlideElement key={elems[i].id} shape={{...currSlide.elements[i]}} svgProps={svgRef}/> 
       )
     }
     
@@ -53,7 +53,6 @@ export function MainSlide(props: SlideProps) {
     
     function actionOnMouseDown(event: React.MouseEvent | MouseEvent) {
       if(props.isSmallSlide) {
-        event.preventDefault()
         dispatch(setSelectedSlides, ([currSlide.id])) // [...actualProgState.selectedSlides, currSlide.id])
       }
     } 
@@ -71,22 +70,9 @@ export function MainSlide(props: SlideProps) {
         onMouseDown={(event) => actionOnMouseDown(event)}
         style={propsStyles}
       >
-        <svg ref={svgRef} id={createId()} className={svgClassName} xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" >
+        <svg ref={svgRef}  id={createId()} className={svgClassName} xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" >
           {slideElems}   
         </svg>
       </div>
     )
   }
-
-/*interface SlideProps {
-    slideIndex: number,
-}
-
-function MainSlide(props: SlideProps) {
-    const currSlide: Slide = actualProgState.currentPresentation.slides[props.slideIndex];
-    //?! а если пусто
-    return (
-        <div className="MainSlide">
-        </div>
-    )
-}*/
