@@ -1,7 +1,6 @@
 .App {
   display: flex;
   flex-direction: column;
-  background-color: darkgreen;
   height: 100vh;
 }
 
@@ -10,6 +9,7 @@
 }
 
 .App-body {
+  overflow: hidden;
   display: flex;
   flex-direction: row;
   align-items: stretch;

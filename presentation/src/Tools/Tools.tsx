@@ -1,28 +1,9 @@
-import { url } from 'inspector';
-import ReactDOM from 'react-dom';
-import App from '../App';
-import { isDebuggerStatement } from 'typescript';
-import React, { useEffect, useState } from 'react';
+import React, {useState} from 'react';
 import './Tools.css';
-import {
-  Programm,
-  Presentation,
-  ArchiveOfState,
-  Slide,
-  Point,
-  ElementObj,
-  SlideElements,
-  Picture,
-  PictureObj,
-  TextObj,
-  Color,
-  ShapeObj
-} from '../Models/types';
 import { addSlide } from '../Models/slideMoveInProgramm';
-import { render } from '@testing-library/react';
-import { KeyObject } from 'crypto';
-import { addShapeObj } from '../Models/changeSlideContent';
-import { saveProgram } from '../Models/SetGetPresentation';
+import { dispatch, setGlobalActiveTool } from '../Models/dispatcher';
+import { /*actualArchiveOfState,*/ goBackAchive, goForwardAchive} from '../Models/archive';
+import { addPictureObj, addShapeObj, addTextObj } from '../Models/changeSlideContent';
 
 
 export type Tool = {
@@ -31,91 +12,129 @@ export type Tool = {
   onClick: () => void,
 }
 
-function renderProgWithNewState(props: Programm) {
-  let newProg = addSlide(props)
-  ReactDOM.render(
-    <React.StrictMode>
-      <App {...newProg}/>
-    </React.StrictMode>,
-    document.getElementById('root')
-  )
-}
-
-function renderProgWithNewShape(shapeType: 'rect' | 'triangle' | 'circle', prog: Programm) {
-  let newProg = addShapeObj(prog, shapeType)
-  ReactDOM.render(
-    <React.StrictMode>
-      <App {...newProg}/>
-    </React.StrictMode>,
-    document.getElementById('root')
-  )
-}
-
-function ShapeCheckBox(props: Programm) {
+function ShapeToolBox() {
   return (
-    <div className="ToolShapeObj_shape">
-      <span className="ToolShapeObj_shape_elem " onClick={() => renderProgWithNewShape('rect', {...props})} >Квадрат</span>
-      <span className="ToolShapeObj_shape_elem " onClick={() => renderProgWithNewShape('triangle', {...props})} >Треугольник</span>
-      <span className="ToolShapeObj_shape_elem " onClick={() => renderProgWithNewShape('circle', {...props})} >Круг</span>
+    <div className="ToolShapeObj_shape"> 
+      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj, 'rect')} >Квадрат</span>
+      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj, 'triangle')} >Треугольник</span>
+      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj, 'circle')}>Круг</span>
     </div>
   )        
 }
 
-
-export function ShapesMenu(props: Programm) {
-  const [ShapeCheckBoxIsOpen, setShapeMenu] = useState(0);   // state
-
-  if (ShapeCheckBoxIsOpen === 1) {
-   return (
-    <div key={6} className="Tool ToolShapeObj" onClick={() => setShapeMenu(0)}>
-      <span className="Tooltip">Фигуры</span> 
-      <ShapeCheckBox {...props}/>
-    </div>
-  )} else {
-    return (
-      <div key={6} className="Tool ToolShapeObj" onClick={() => setShapeMenu(1)}>
-        <span className="Tooltip">Фигуры</span>
-      </div>
-    )
-  } 
+interface ToolElemWithToolBoxProps {
+  activeTool: number
+  setActiveTool: React.Dispatch<React.SetStateAction<number>>
 }
 
-function Tools(props: Programm) {   
+
+function ToolElemWithToolBox(props: ToolElemWithToolBoxProps) {
+
+  const [toolBoxIsOpen, setShapeMenu] = useState(false)
+
+  const mouseUpHandler = () => {
+    setShapeMenu(false)
+    document.removeEventListener('mouseup', mouseUpHandler)
+  }
+  
+  return (
+    <div key={6} className={" tool tool_shape-obj " + (props.activeTool == 3 ? "tool_active" : "")} 
+    onClick={() => {setShapeMenu(!toolBoxIsOpen); props.setActiveTool(3);  setGlobalActiveTool(3); document.addEventListener('mouseup', mouseUpHandler)}}>
+      <span className="tool__tooltip">Фигуры</span> 
+      {toolBoxIsOpen && <ShapeToolBox/>}
+    </div>
+  ) 
+}
+
+function getBase64 (file: any, callback: any) {
+
+  const reader = new FileReader();
+
+  reader.addEventListener('load', () => callback(reader.result))
+
+  reader.readAsDataURL(file);
+}
+
+function loadPicFromComp() {
+  let input = document.createElement("input")
+  input.type = "file"
+  input.id = "inputFile"
+  document.body.appendChild(input)
+  input.click()
+  input.onchange = () => {
+    if (input.files?.item(0)?.type && input.files?.item(0)?.type.indexOf('image') === -1) {
+      console.log('File is not an image.')
+    } else {
+        const src = URL.createObjectURL(input.files?.item(0))
+        const img = new Image()
+        img.onload = function() {
+          getBase64(input.files?.item(0), function(base64Data: string){
+            dispatch(addPictureObj, ({url:src, width: img.width, height: img.height, imgB64: base64Data}))
+          })
+        }
+        img.src = src
+    }
+  }
+}
+
+function PictureToolBox() {
+  return (
+      <div className="ToolShapeObj_shape"> 
+        <span className="ToolShapeObj_shape_elem " onClick={() => null} >по ссылке</span>
+        <span className="ToolShapeObj_shape_elem " onMouseDown={() => loadPicFromComp()} >с компьютера</span>
+      </div>
+  )        
+}
+
+interface PictureElemWithToolBoxProps {
+  activeTool: number
+  setActiveTool: React.Dispatch<React.SetStateAction<number>>
+}
+
+function PictureElemWithToolBox(props: PictureElemWithToolBoxProps) {
+  const [toolBoxIsOpen, setShapeMenu] = useState(false)
+  
+  const mouseUpHandler = () => {
+    setShapeMenu(false)
+    document.removeEventListener('mouseup', mouseUpHandler)
+  }
+
+  return (
+    <div key={5} className={" tool tool_pic-obj " + (props.activeTool == 2 ? "tool_active" : "")}
+      onClick={() => {setShapeMenu(!toolBoxIsOpen); props.setActiveTool(2);  setGlobalActiveTool(2); document.addEventListener('mouseup', mouseUpHandler)}}>
+      <span className="tool__tooltip">Вставить изображение</span> 
+      {toolBoxIsOpen && <PictureToolBox/>}
+    </div>
+  ) 
+}
+
+function Tools() {
+    const [activeTool, setActiveTool] = useState(0) 
 
     return (
-        <div className="Tools">
-          <div key={0} className="Tool ToolAddSlide" onClick={() => renderProgWithNewState(props)}><span className="Tooltip">Новый слайд</span></div>
-          <div key={1} className="Tool ToolBackHistory" onClick={() => console.log('Назад по истории')}><span className="Tooltip">Отменить</span></div>
-          <div key={2} className="Tool ToolFutureHistory" onClick={() => console.log('Вперед по истории')}><span className="Tooltip">Повторить</span></div>
-          <div key={3} className="Tool ToolCursor" onClick={() => console.log('Курсор')}><span className="Tooltip">Выбрать</span></div>
-          <div key={4} className="Tool ToolTextObj" onClick={() => console.log('Текст')}><span className="Tooltip">Текстовое поле</span></div>
-          <div key={5} className="Tool ToolPicObj" onClick={() => console.log('Картинка')}><span className="Tooltip">Вставить изображение</span></div>
-          <div key={6} className="Tool ToolShapeObj" onClick={() => console.log('Фигура')}><span className="Tooltip">Фигура</span></div>
-          <div key={7} className="Tool ToolSavePres" onClick={() => saveProgram(props, 'C:\Project')}><span className="Tooltip">Сохранить</span></div>
-        </div>
-    )
+        <div className="tools" onClick={() => console.log("ты в инструментах")}>
+          <div key={0} className="tool tool_add-slide" onClick={() => dispatch(addSlide, {})}>
+            <span className="tool__tooltip">Новый слайд</span>
+          </div>
+          <div key={1} className="tool tool_back-history" onClick={() => dispatch(goBackAchive, {})}>
+            <span className="tool__tooltip">Отменить</span>
+          </div>
+          <div key={2} className="tool tool_future-history" onClick={() => dispatch(goForwardAchive, {})}>
+            <span className="tool__tooltip">Повторить</span>
+          </div>
+          <div key={3} className={"tool tool_cursor "+(activeTool == 0 ? "tool_active" : "")} onClick={() => {setActiveTool(0); setGlobalActiveTool(0); console.log('Курсор')}}>
+            <span className="tool__tooltip">Выбрать</span>
+          </div>
+          <div key={4} className={"tool tool_text-obj "+(activeTool == 1 ? "tool_active" : "")} onClick={() => {dispatch(addTextObj, {}); setActiveTool(1); setGlobalActiveTool(1)}}>
+            <span className="tool__tooltip">Текстовое поле</span>
+          </div>
+          <PictureElemWithToolBox activeTool={activeTool} setActiveTool={setActiveTool}/>
+          <ToolElemWithToolBox activeTool={activeTool} setActiveTool={setActiveTool}/>
+          <div key={7} className="splitter"></div>
+        </div>    
+      )
 }
 
 export {
     Tools
 }
-
-
-
-/*
-  PahaToolsFunction
-  const tools: Array<Tool> = props.tools;
-
-  const listTools = tools.map((item, index) =>
-    <div key={index} className="Tool" onClick={item.onClick}></div>
-  );
-*/  
-  //background-image: url("./pic/cursor.png");
-  //backgroundImage: `url("../pic/cursor.png")`
-  //style={{backgroundImage: `url("/src/Tools/cursor.png")`, width: "204px", height: "204px"}}
-/*
-  const tools: Array<Tool> = [
-    {hint: "Новый слайд", pic: "addSlide.png", onClick: () => console.log('Новый слайд')}
-  ];
-            {listTools}
-*/

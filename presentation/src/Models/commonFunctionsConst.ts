@@ -1,8 +1,10 @@
+import { setSelectedSlides } from './slideMoveInProgramm'
 import {
   Programm,
   Presentation,
   ArchiveOfState,
   Slide,
+  SlideId,
   Point,
   ElementObj,
   Picture,
@@ -10,7 +12,8 @@ import {
   TextObj,
   Color,
   ShapeObj,
-  SlideElements
+  SlideElements,
+  ChangedObjPosType
 } from './types'
 
 
@@ -20,10 +23,16 @@ export {
   searchChangedSlideIndex,
   searchChangedElemIndex,
   deepFreeze,
+  isProgramm,
+  isSlideId,
   isTextObj,
   isShapeObj,
   isPictureObj,
   isColor,
+  isSlide,
+  isPoint,
+  isChangedObjPosType,
+  checkSelectedElem,
   getSlidesWithoutChangedSlide,
   getChangedSlideObj,
   getNewTextElem,
@@ -35,7 +44,9 @@ export {
   getNewElemWithNewPosition,
   getSlideWithNewBackground,
   getSlidesWithChangedSlide,
-  getElemsWithChangedElem
+  getElemsWithChangedElem,
+  getCurrElemPosition,
+  getCurrElemSize
 }
 
 const defaultPoint: Point = {
@@ -65,14 +76,60 @@ function searchChangedSlideIndex(prog: Programm): number {
 
 function searchChangedElemIndex(prog: Programm, changedSlideIndex: number): number {
   const elems = prog.currentPresentation.slides[changedSlideIndex].elements
-  const selectedElem = prog.selectedElements[prog.selectedElements.length - 1]
-  let changedElemIndex: number = 0
+  let selectedElem = prog.selectedElements[prog.selectedElements.length - 1]
+  let changedElemIndex: number = -1
   for (let i = 0; i < elems.length; i++) {     
     if (elems[i].id == selectedElem) {
         changedElemIndex = i
     }
   }
   return changedElemIndex
+}
+
+function getCurrElemPosition(prog: Programm): Point {
+  let elemX: number = 0
+  let elemY: number = 0
+  const changedSlideIndex = searchChangedSlideIndex(prog)
+  const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
+  let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
+  if (changedElem != undefined) {
+    elemX = changedElem.position.x
+    elemY = changedElem.position.y
+  } 
+  return {
+    x: elemX,
+    y: elemY
+  }
+}
+
+function getCurrElemSize(prog: Programm): {width: number, height: number} {
+  let width: number = 0
+  let height: number = 0
+  const changedSlideIndex = searchChangedSlideIndex(prog)
+  const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
+  let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
+  if (changedElem != undefined) {
+    width = changedElem.wigth
+    height = changedElem.height
+  } 
+  return {
+    width: width,
+    height: height
+  }
+}
+
+function checkSelectedElem(prog: Programm, currElemId: string): boolean {
+  let elemIsSelected: boolean = false
+  let selectedElemId: string = '-1'
+  const changedSlideIndex = searchChangedSlideIndex(prog)
+  const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
+  if(changedElemIndex != -1) {
+    selectedElemId = getChangedElem(prog, changedSlideIndex, changedElemIndex).id
+  }
+  if (currElemId == selectedElemId) {
+    elemIsSelected = true
+  }
+  return elemIsSelected
 }
 
 function deepFreeze (o: any) {
@@ -90,7 +147,17 @@ function deepFreeze (o: any) {
   return o;
 };
 
+function isProgramm(elem: any): elem is Programm {
+  return elem.currentPresentation !== undefined
+}
 
+function isSlideId(elem: any): elem is SlideId {
+  return typeof elem == "string"
+}
+
+function isSlide(elem: any): elem is Slide {
+  return elem.elements !== undefined
+}
 
 function isTextObj(elem: any): elem is TextObj {
   return elem.text !== undefined && elem.fontFamily !== undefined;
@@ -108,6 +175,14 @@ function isColor(elem: any): elem is Color {
   return elem.hexColor !== undefined
 }
 
+function isPoint(elem: any): elem is Point {
+  return elem.x !== undefined
+}
+
+function isChangedObjPosType(obj: any): obj is ChangedObjPosType {
+  return obj.newX !== undefined && obj.saveToArh !== undefined
+}
+
 
 function getChangedSlideObj(prog: Programm, changedSlideIndex: number): Slide {
   return {...prog.currentPresentation.slides[changedSlideIndex]}
@@ -116,6 +191,7 @@ function getChangedSlideObj(prog: Programm, changedSlideIndex: number): Slide {
 function getSlidesWithoutChangedSlide(prog: Programm, changedSlideIndex: number): Array<Slide> {
   return [...prog.currentPresentation.slides.filter((elem) => elem != prog.currentPresentation.slides[changedSlideIndex])]
 }
+
 
 function getNewTextElem(changedElem: TextObj, newParam: string, paramToChange: 'text' | 'fontSize' | 'fontFamily'): TextObj {
   let newElem = changedElem

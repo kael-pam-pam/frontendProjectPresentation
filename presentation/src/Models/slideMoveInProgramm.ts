@@ -30,7 +30,7 @@ function createDefaultSlide(): Slide {
   return {
       id: createNewId(),
       background: {
-          hexColor: '#e0c7c1',
+          hexColor: '#fff',
           type: 'color'
       },
       elements: [],
@@ -95,9 +95,11 @@ function moveSlide(prog: Programm, posBefore: number): Programm {
 }
 
 function setSelectedSlides(prog: Programm, selectedSlides: Array<string>): Programm {
+  //console.log(prog.selectedSlides.length)
   return {
       ...prog,
-      selectedSlides: selectedSlides
+      selectedSlides: selectedSlides,
+      selectedElements: []
   }
 }
 
@@ -119,7 +121,7 @@ function deleteSlide(prog: Programm): Programm {
     slides: slidesWithoutSelectedSlides
     },
     selectedSlides:
-    (slidesWithoutSelectedSlides.length == 0)
+    (slidesWithoutSelectedSlides.length == 1) // временно 1(для работы с 1 слайдом), поменять на 0
     ? []
     : (slidesWithoutSelectedSlides.length - 1 <= oldPos)
     ? [slidesWithoutSelectedSlides[oldPos].id]

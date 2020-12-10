@@ -1,28 +1,59 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './MainPanel.css';
-import {
-    Programm,
-    Presentation,
-    ArchiveOfState,
-    Slide,
-    Point,
-    ElementObj,
-    SlideElements,
-    Picture,
-    PictureObj,
-    TextObj,
-    Color,
-    ShapeObj
-} from '../Models/types'
-import { SlideMain } from '../Slide/Slide';
+import { MainSlide, } from '../Slide/Slide';
+
 import { searchChangedSlideIndex } from '../Models/commonFunctionsConst';
+import { actualProgState, globalActiveTool } from '../Models/dispatcher'
+import { useSetPopup, useSetIsVisiblePopup } from '../Popup/PopupContext';
+import { PropsPopup } from '../Popup/Popup'
 
 
-function MainPanel(props: Programm) {
-    const changedSlideIndex = searchChangedSlideIndex(props)
+function MainPanel() {
+
+    const changedSlideIndex = searchChangedSlideIndex(actualProgState)
+    const setPopup = useSetPopup();
+    const setIsVisible = useSetIsVisiblePopup(); 
+
     return (
-        <div className="MainPanel">
-            <SlideMain prog={props} numberOfSlide={changedSlideIndex} isSmallSlide={false}/>      
+        <div className={"MainPanel "+(globalActiveTool != 0 ? "MainPanel_createElement" : "")} onClick={() => ''} 
+            onContextMenu={(e) => {
+                const defSubMenu: PropsPopup = {
+                    items: [
+                      {
+                          caption: '<Пусто>',
+                          action: () => {}
+                      },
+                    ],
+                    pos: {
+                      x: 0,
+                      y: 0,
+                    },
+                    width: 150,
+                };
+                e.preventDefault();
+                setPopup({...defSubMenu, 
+                    items: [
+                      {
+                          caption: 'Добавить слайд',
+                          action: () => {console.log('Добавить слайд')}
+                      },
+                      {
+                          caption: 'Сохранить',
+                          action: () => {console.log('Сохранить')}
+                      },
+                      {
+                        caption: 'Экспорт в PDF',
+                        action: () => {console.log('Экспорт в PDF')}
+                    },
+                    ],
+                    pos: {
+                      x: e.clientX,
+                      y: e.clientY,
+                    },
+                  }); setIsVisible(true)
+                
+            }}>
+            <MainSlide numberOfSlide={changedSlideIndex} isSmallSlide={false}/>      
         </div>
     )
 }

@@ -36,6 +36,9 @@ import {
   getElemsWithChangedElem
 } from './commonFunctionsConst'
 import { textChangeRangeIsUnchanged } from 'typescript'
+import { actualProgState } from './dispatcher'
+import { resolve } from 'dns'
+import { rejects } from 'assert'
 
 export {
   setSlideBackground,
@@ -71,14 +74,15 @@ function setSlideBackground(prog: Programm, newBackground: Picture | Color): Pro
   }
 }
 
-function createPictureObj(url: string): PictureObj { 
+function createPictureObj(url: string, width: number, height: number, imgB64: string): PictureObj {
   return {
-      id: createNewId(),
-      position: defaultPoint,
-      height: 100,
-      wigth: 100,
-      url, // w/h take from url 
-      type: 'picture'
+    id: createNewId(),
+    position: defaultPoint,
+    height: height,
+    wigth: width,
+    url, 
+    type: 'picture',
+    imgB64
   }
 }
 
@@ -90,12 +94,12 @@ function getSlideWithChangedElems(prog: Programm, changedElems: Array<PictureObj
   }
 }
 
-function addPictureObj(prog: Programm, url: string): Programm {
+function addPictureObj(prog: Programm, payload: {url: string, width: number, height: number, imgB64: string}): Programm {
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
 
-  const newPictureObj = createPictureObj(url)
+  const newPictureObj = createPictureObj(payload.url, payload.width, payload.height, payload.imgB64)
   const changedElems = getElemsWithNewElem(prog, newPictureObj, changedSlideIndex)
 
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElems, changedSlideIndex)
@@ -107,7 +111,7 @@ function addPictureObj(prog: Programm, url: string): Programm {
         ...prog.currentPresentation,
         slides: slidesWithChangedSlide
     },
-    selectedElements: [newPictureObj.id]
+    //selectedElements: [newPictureObj.id]
   }           
 }
 
@@ -115,12 +119,12 @@ function createEmtyTextObj(): TextObj {
   return {
     id: createNewId(),
     position: {
-      x: 600,
-      y: 400
+      x: 10,
+      y: 10
     },
     height: 100,
     wigth: 300,
-    text: "введите текст", //  ' '      in vieu=>textObj.text || placeholder(enter text)
+    text: "",
     fontFamily: 'oblique',
     fontSize: '50',
     type: 'text'
@@ -145,11 +149,11 @@ function addTextObj(prog: Programm): Programm {
         ...prog.currentPresentation,
         slides: slidesWithChangedSlide
     },
-    selectedElements: [newTextObj.id]           
+    //selectedElements: [newTextObj.id]           
   }
 }
 
-function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' | 'fontSize' | 'fontFamily'): Programm { 
+function changeTextObj(prog: Programm, payload: {newParam: string, paramToChange: 'text' | 'fontSize' | 'fontFamily'}): Programm { 
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
@@ -157,7 +161,7 @@ function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' |
   
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
   if (isTextObj(changedElem)) {
-    changedElem = getNewTextElem(changedElem, newParam, paramToChange)
+    changedElem = getNewTextElem(changedElem, payload.newParam, payload.paramToChange)
   }
 
   const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
@@ -173,31 +177,17 @@ function changeTextObj(prog: Programm, newParam: string, paramToChange: 'text' |
   }  
 }
 
+
 function createShapeObj(type: 'rect' | 'triangle' | 'circle'): ShapeObj {
-  let fillColor = '#2ff211'
-  let position = {
-    x: 250,
-    y: 500
-  }
-  if (type == 'triangle') {
-    fillColor = '#999c1c'
-    position = {
-      x: 500,
-      y: 500
-    }
-  }
-  if (type == 'circle') {
-    fillColor = '#9c331c'
-    position = {
-      x: 750,
-      y: 550
-    }
-  }
+  let fillColor = 'rgba(0, 0, 255, 0.2)'
   return {
     id: createNewId(),
-    position: position,
-    wigth: 100,
-    height: 100,
+    position: {
+      x: 10,
+      y: 10
+    },
+    wigth: 200,
+    height: 200,
     borderColor: 'fff',
     fillColor: fillColor,
     type
@@ -208,8 +198,11 @@ function addShapeObj(prog: Programm, shapeType: 'rect' | 'triangle' | 'circle'):
   deepFreeze(prog)
   
   const changedSlideIndex = searchChangedSlideIndex(prog)
-  const newShapeObj = createShapeObj(shapeType)
 
+  let newShapeObj: ShapeObj
+  let outlinerectId: string = ''
+  newShapeObj = createShapeObj(shapeType)
+  
   const changedElems = getElemsWithNewElem(prog, newShapeObj, changedSlideIndex)
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElems, changedSlideIndex)
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex)
@@ -220,7 +213,7 @@ function addShapeObj(prog: Programm, shapeType: 'rect' | 'triangle' | 'circle'):
           ...prog.currentPresentation,
           slides: slidesWithChangedSlide
       },
-      selectedElements: [newShapeObj.id]    
+      selectedElements: []    
   }
 }
 
@@ -248,14 +241,14 @@ function changeShapeObj(prog: Programm, newParam: string, paramToChange: 'border
   }  
 }
 
-function resizeElement(prog: Programm, newWidth:number, newHeigth: number): Programm {  // add points for resize
+function resizeElement(prog: Programm, payload:{newWidth:number, newHeigth: number}): Programm {  // add points for resize
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
 
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
-  changedElem = getNewResizedElem(changedElem, newWidth, newHeigth)
+  changedElem = getNewResizedElem(changedElem, payload.newWidth, payload.newHeigth)
 
   const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
@@ -270,16 +263,17 @@ function resizeElement(prog: Programm, newWidth:number, newHeigth: number): Prog
   }
 }
 
-function changeElemPosition(prog: Programm, newX: number, newY: number): Programm {
+function changeElemPosition(prog: Programm, payload:{newX: number, newY: number}): Programm {
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
+
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
-
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
-  changedElem = getNewElemWithNewPosition(changedElem, newX, newY)
+  changedElem = getNewElemWithNewPosition(changedElem, payload.newX, payload.newY)
 
-  const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
+  let changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)  
+
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prog, slideWithChangedElems, changedSlideIndex) 
 

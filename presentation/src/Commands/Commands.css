@@ -1,19 +1,19 @@
-.Commands {
+.commands {
     margin-bottom: 5px;
     padding-left: 10px;
 }
 
-.MenuItem {
+.menu-item {
     padding: 4px 6px;
     font: 14px sans-serif;
 }
 
-.MenuItem::selection
+.menu-item::selection
 {
     background: transparent;
 }
 
-.MenuItem:hover
+.menu-item:hover
 {
     background-color: #dadce0;
     width: 16px;

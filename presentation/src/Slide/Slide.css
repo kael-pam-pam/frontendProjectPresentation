@@ -1,8 +1,40 @@
-.SlideCss {
-  display: block;
-  position: relative;
-  margin: 10px auto;
-  background-color: black;
-  border-radius: 4px;
-  border: 2px solid #dadce0;
+.MainSlide {
+    height: calc(800px);
+    width: calc(800px * 19/11);
+    
+    background-color: white;
+    box-shadow: 0 1px 3px 1px rgba(60,64,67,.15);
+    border: 1px solid #d1d1d1;
 }
+
+.mainSlideDiv {
+    display: block;
+    position: relative;
+    margin: 10px auto;
+    background-color: black;
+    border-radius: 4px;
+    border: 2px solid #dadce0;
+    width: 1400px;
+    height: 850px
+  }
+  
+  .mainSlideDiv_small {
+    display: block;
+    position: relative;
+    margin: 10px auto;
+    background-color: black;
+    border-radius: 4px;
+    border: 2px solid #dadce0;
+    width: 140px;
+    height: 85px;
+  } 
+  
+  .mainSlideSvg {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .smallMainSlideSvg {
+    width: 180px;
+    height: 85px;
+  }

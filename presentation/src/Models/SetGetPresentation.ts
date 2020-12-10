@@ -9,54 +9,86 @@ import {
     PictureObj,
     TextObj,
     Color,
-    ShapeObj,
+    ShapeObj
 } from './types';
+
 import { jsPDF } from "jspdf";  //npm install jspdf --save      or      yarn add jspdf
 
-import html2canvas from 'html2canvas';
+import { dispatch,  loadProgramm } from '../Models/dispatcher';
 
 export {
-    createLoadedProgram,
-    saveProgram
+    //createLoadedProgram,
+    saveProgramAsPDF,
+    savePresentationAsJSON,
+    getProgram
 }
 const exportWidth = 1400;
-const exportHeight = 580;
+const exportHeight = 850;
 
-
-
-function getProgram (fileName:string):Presentation {
-
-    let Pres:Presentation = require('../importFiles/testPresent2.json');
-    /*let request = new XMLHttpRequest();
-    let Pres:Presentation;
-    request.open('GET', fileName);
-
-    request.onloadend = function() {
-
-        Pres = JSON.parse(request.responseText);
+function savePresentationAsJSON(prog:Programm): Programm {
+    const progName = prog.currentPresentation.title + '.json';
+    let progFile = new Blob([JSON.stringify(prog)], {type: 'json'});
+    if (window.navigator.msSaveOrOpenBlob)
+        window.navigator.msSaveOrOpenBlob(progFile, progName);
+    else {
+        let a = document.createElement("a"),
+            url = URL.createObjectURL(progFile);
+        a.href = url;
+        a.download = progName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 0);
     }
-    request.send();*/
-    return Pres;
+    return prog;
 }
 
-function createLoadedProgram(Path:string): Programm {
-    const loadedPres = getProgram(Path); 
-    return {
-        currentPresentation: loadedPres,
-        selectedSlides: [loadedPres.slides[0].id],
-        selectedElements: []
-    }
+function getProgram() {
+    let input = document.createElement("input");
+    input.type = "file";
+    input.id = "inputFile";
+    document.body.appendChild(input);
+
+    input.onchange = function () {
+        let files = input.files as FileList;
+        let f:File = files[0] as File;
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            let target: any = e.target;
+            let data:Programm = JSON.parse(target.result) as Programm;
+            dispatch(LoadPr, data);
+            function LoadPr():Programm {
+                return data
+            }
+        };
+        reader.onerror = function (e) {
+            alert("Error loading"); // Ошибка загрузки
+        }
+        reader.readAsText(f);
+    };
+
+    input.click();
+
+    setTimeout(function () {
+        document.body.removeChild(input);
+    }, 0);
 }
 
-function saveProgram(prog:Programm, Path:string){
+function saveDocPDF(prog:Programm, Path:string, doc:jsPDF){
+    doc.save(Path + "/" + prog.currentPresentation.title + ".pdf");
+}
+
+function saveProgramAsPDF(prog:Programm, Path:string):Programm{
     let doc = new jsPDF({
         orientation: "landscape",
         unit: "px",
         format: /*"a4"*/ [exportWidth, exportHeight],
       });
       doc = setPDF(prog, doc);
-
-      doc.save(Path + "/" + prog.currentPresentation.title + ".pdf");
+      setTimeout(saveDocPDF, 1000, prog, Path, doc);
+      return prog;
 }
 
 function setPDF(prog:Programm, doc:jsPDF){
@@ -70,20 +102,13 @@ function setPDF(prog:Programm, doc:jsPDF){
 }
 
 function setPagePDF(progSlide:Slide, doc:jsPDF){
-    //let canvas = plot.getCanvas();
     if (progSlide.background.type == "picture"){
-        //let src = canvas.toDataURL(prog.currentPresentation.slides[0].background.url);
-        let src = progSlide.background.url;
-        // add method for canvas with color
-        if (progSlide.background.url.substr(-4,4).toUpperCase( ) == "JPEG")
-            doc.addImage(src, 'JPEG', 0, 0, exportWidth, exportHeight);
-        if (progSlide.background.url.substr(-3,3).toUpperCase( ) == "PNG")
-            doc.addImage(src, 'PNG', 0, 0, exportWidth, exportHeight);
+        let imgData2 = progSlide.background.imgB64;//CanEl.toDataURL('image/png');
+            doc.addImage(imgData2, 'PNG', +0, +0, +exportWidth, +exportHeight);
     }
     if (progSlide.background.type == "color"){
-        // to think
         doc.setFillColor(progSlide.background.hexColor);
-        doc.rect(0, 0, exportWidth, exportHeight, "F")
+        doc.rect(0, 0, exportWidth, exportHeight, "F");
     }
     for (var i = 0; i < progSlide.elements.length; i++){
         doc = setElementToPagePDF(progSlide.elements[i], doc);
@@ -93,104 +118,34 @@ function setPagePDF(progSlide:Slide, doc:jsPDF){
 
 function setElementToPagePDF(progSlide:(PictureObj|ShapeObj|TextObj), doc:jsPDF){
     if (progSlide.type == "picture"){
-        let src = progSlide.url;
-        //if ((progSlide.url.substr(-4,4).toUpperCase( ) == "JPG") || (progSlide.url.substr(-4,4).toUpperCase( ) == "jpg") )
-        //    doc.addImage(src, 'JPEG', progSlide.position.x, progSlide.position.y, progSlide.wigth, progSlide.height);
-       // if (progSlide.url.substr(-3,3).toUpperCase( ) == "PNG")
-        //    doc.addImage(src, 'PNG', progSlide.position.x, progSlide.position.y, progSlide.wigth, progSlide.height);
-        //if (progSlide.url.substr(-3,3).toUpperCase( ) == "JPG")
-        //    doc.addImage(src, 'JPG', progSlide.position.x, progSlide.position.y, progSlide.wigth, progSlide.height);
+        let imgData2 = progSlide.imgB64;//CanEl.toDataURL('image/png');
+            doc.addImage(imgData2, 'PNG', +progSlide.position.x, +progSlide.position.y, +progSlide.wigth, +progSlide.height);
     }
     else if (progSlide.type == "text"){
-        /*doc.setFont(progSlide.fontFamily);
-        doc.setFontSize(+progSlide.fontSize);
-        doc.text(progSlide.text, progSlide.position.x, progSlide.position.y);*/
-
-        // document.getElementById(progSlide.id);
-        //doc.addImage(document.getElementById(progSlide.id), 'JPEG', progSlide.position.x, progSlide.position.y, progSlide.wigth, progSlide.height, 'alias', 'MEDIUM', 0);
-        //html2canvas(document.querySelector('#' + progSlide.id)).then(function(canvas){
-        //const img = document.querySelector('#'+progSlide.id) as HTMLCanvasElement;
-
-        
-        window.scrollTo(0,0);   
-        /*const img = document.getElementById(progSlide.id+'.txt') as HTMLCanvasElement;
-        html2canvas(img, {
-            allowTaint: true,
-            useCORS: true,
-            logging: false}).then(function(canvas){   
-            var imgData = canvas.toDataURL('image/png');
-            doc.addImage(imgData, 'PNG', progSlide.position.x, progSlide.position.y, progSlide.wigth, progSlide.height);
-          });*/
-        /*const img = document.getElementById('root') as HTMLImageElement;// HTMLCanvasElement;
-        html2canvas(img).then(function(canvas){   
-              //var imgData = canvas.toDataURL('image/png');
-              doc.addImage(canvas, 'PNG', 0, 0, 1400, 850);
-              console.log(canvas);
-            });*/
-        
-        //const img = document.getElementById(progSlide.id+'.txt').getElementsByClassName('MainPanel') as HTMLCanvasElement;
-        const img = document.getElementById(progSlide.id+'.txt') as HTMLCanvasElement;
-        //const img = document.getElementById('3') as HTMLCanvasElement;
-        html2canvas(img).then(async function(canvas){   
-            var imgData = canvas.toDataURL('image/png');
-            doc.addImage(atob(imgData), 'PNG',  progSlide.position.x, progSlide.position.y, progSlide.wigth, progSlide.height);
-            console.log(atob(imgData));
-        });
-        
-        /*var canvas = document.createElement('canvas');
-        canvas.id     = "CursorLayer";
-        canvas.width  = 1224;
-        canvas.height = 768;
-        canvas.style.zIndex   = '8';
-        canvas.style.position = "absolute";
-        canvas.style.border   = "1px solid";
-
-        let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-        ctx.fillStyle = "blue";
-        ctx.beginPath();
-        ctx.arc(75, 75, 50, 0, Math.PI*2, true); 
-        ctx.fill();
-        ctx.moveTo(110, 75);
-        ctx.arc(75, 75, 35, 0, Math.PI, false); 
-        ctx.closePath() 
-        ctx.stroke();
-
-        window.onload = function() {
-            const img = document.getElementById('CursorLayer') as HTMLCanvasElement;
-            html2canvas(img).then(async function(canvas){   
-            var imgData = canvas.toDataURL('image/png');
-            doc.addImage(imgData, 'PNG',  progSlide.position.x, progSlide.position.y, progSlide.wigth, progSlide.height);
-            console.log(imgData);
-        });
-        }*/
-        
-        /*let img = new Image;
-        let data: string;
-        img.src = "https://nastol.net/wallpaper/big/2/8377058-kote-fon-kotyara-koshak-vzglyad-koshki.jpg";
-            var canvas = document.createElement('canvas');
-            document.body.appendChild(canvas);
-            canvas.width = img.width;
-            canvas.height = img.height;
-    
-            var ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-            ctx.drawImage(img, 0, 0);
-            // Grab the image as a jpeg encoded in base64, but only the data
-            data = canvas.toDataURL('image/jpeg').slice('data:image/jpeg;base64,'.length);
-            // Convert the data to binary form
-            data = atob(data)
-            document.body.removeChild(canvas);
-        
-        
-
-        doc.addImage(data, 'JPEG', 10, 10, 50, 50);*/
+        let CanEl:HTMLCanvasElement = document.createElement('canvas');
+        CanEl.id = 'picID';
+        let ctx = CanEl.getContext("2d");
+        CanEl.width = progSlide.text.length * parseInt(progSlide.fontSize) * 0.6;//progSlide.wigth;
+        CanEl.height = parseInt(progSlide.fontSize)*0.9;//progSlide.height;
+        if (ctx != null) {
+            /*ctx.fillStyle = "#00F";
+            ctx.strokeStyle = "#F00";
+            ctx.font = "italic 30pt Arial";*/
+            ctx.font = progSlide.fontSize + "px " + progSlide.fontFamily;
+            ctx.fillText(progSlide.text, 0, parseInt(progSlide.fontSize)*0.75/*progSlide.position.x, progSlide.position.y*/);
+            //ctx.font = 'bold 30px sans-serif';
+            //ctx.strokeText("Stroke text", 0, 50);
+        }
+        //document.body.prepend(CanEl); 
+        let imgData2 = CanEl.toDataURL('image/png');
+        doc.addImage(imgData2, 'PNG', +progSlide.position.x, +progSlide.position.y - CanEl.height, +CanEl.width, +CanEl.height);
     }
     else
     {
         if (progSlide.type ==  "circle"){
             doc.setFillColor(progSlide.fillColor);
             doc.setDrawColor(progSlide.borderColor);
-            //doc.circle(+progSlide.position.x, +progSlide.position.y, +progSlide.wigth, "DF");
-            doc.ellipse(+progSlide.position.x, +progSlide.position.y, +progSlide.wigth, +progSlide.height, "DF");
+            doc.ellipse(+progSlide.position.x, +progSlide.position.y, +progSlide.wigth/2, +progSlide.height/2, "DF");
         }
         else if (progSlide.type ==  "triangle"){
             doc.setFillColor(progSlide.fillColor);
@@ -207,6 +162,3 @@ function setElementToPagePDF(progSlide:(PictureObj|ShapeObj|TextObj), doc:jsPDF)
     }
     return doc;
 }
-
-// npm install --save html2canvas        or         yarn add html2canvas
-// npm install canvas

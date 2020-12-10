@@ -40,7 +40,7 @@
               "y": "200"
             },  
             "height": 100,
-            "wigth": 100,
+            "wigth": 300,
             "borderColor": "green",
             "fillColor": "blue",
             "type": "circle"
@@ -69,17 +69,6 @@
             "fontFamily": "Arial",
             "fontSize": 50,
             "type": "text"
-          },
-          {
-            "id": "21",
-            "position": {
-              "x": "800",
-              "y": "500"
-            },
-            "height": 300,
-            "wigth": 300,
-            "url": "https://ds04.infourok.ru/uploads/ex/0fde/00074f55-222ab8e3/hello_html_m27e10a8b.png",
-            "type": "picture"
           }
         ]
       },
@@ -108,7 +97,7 @@
               "x": "950",
               "y": "200"
             },  
-            "height": 150,
+            "height": 100,
             "wigth": 150,
             "borderColor": "green",
             "fillColor": "#42783a",
@@ -138,6 +127,17 @@
             "fontFamily": "Arial",
             "fontSize": 50,
             "type": "text"
+          },
+          {
+            "id": "212",
+            "position": {
+              "x": "800",
+              "y": "350"
+            },
+            "height": 400,
+            "wigth": 500,
+            "url": "https://liveberlin.ru/wp-content/uploads/2019/04/grass-flower-pxhere.com-cover.jpg",
+            "type": "picture"
           }
         ]
       }

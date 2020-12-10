@@ -40,7 +40,7 @@
               "y": "200"
             },  
             "height": 100,
-            "wigth": 100,
+            "wigth": 300,
             "borderColor": "green",
             "fillColor": "blue",
             "type": "circle"
@@ -69,25 +69,14 @@
             "fontFamily": "Arial",
             "fontSize": 50,
             "type": "text"
-          },
-          {
-            "id": "21",
-            "position": {
-              "x": "800",
-              "y": "500"
-            },
-            "height": 300,
-            "wigth": 300,
-            "url": "https://ds04.infourok.ru/uploads/ex/0fde/00074f55-222ab8e3/hello_html_m27e10a8b.png",
-            "type": "picture"
           }
         ]
       },
       {
         "id": "231",
         "background": {
-            "hexColor": "#783a6d",
-            "type": "picture"
+            "hexColor": "#483a6d",
+            "type": "color"
         },
         "elements": [
           {
@@ -108,7 +97,7 @@
               "x": "950",
               "y": "200"
             },  
-            "height": 150,
+            "height": 100,
             "wigth": 150,
             "borderColor": "green",
             "fillColor": "#42783a",
@@ -138,6 +127,95 @@
             "fontFamily": "Arial",
             "fontSize": 50,
             "type": "text"
+          },
+          {
+            "id": "2262",
+            "position": {
+              "x": "50",
+              "y": "130"
+            },
+            "height": 100,
+            "wigth": 200,
+            "text": "Морковка ван лав2",
+            "fontFamily": "Arial",
+            "fontSize": 10,
+            "type": "text"
+          },
+          {
+            "id": "2263",
+            "position": {
+              "x": "50",
+              "y": "160"
+            },
+            "height": 100,
+            "wigth": 200,
+            "text": "Морковка ван лав3",
+            "fontFamily": "Arial",
+            "fontSize": 20,
+            "type": "text"
+          },
+          {
+            "id": "2264",
+            "position": {
+              "x": "50",
+              "y": "200"
+            },
+            "height": 100,
+            "wigth": 200,
+            "text": "Морковка ван лав4",
+            "fontFamily": "Arial",
+            "fontSize": 30,
+            "type": "text"
+          },
+          {
+            "id": "2265",
+            "position": {
+              "x": "50",
+              "y": "260"
+            },
+            "height": 100,
+            "wigth": 200,
+            "text": "Морковка ван лав5",
+            "fontFamily": "Arial",
+            "fontSize": 40,
+            "type": "text"
+          },
+          {
+            "id": "2266",
+            "position": {
+              "x": "50",
+              "y": "360"
+            },
+            "height": 100,
+            "wigth": 200,
+            "text": "Морковка ван лав6",
+            "fontFamily": "Arial",
+            "fontSize": 80,
+            "type": "text"
+          },
+          {
+            "id": "2267",
+            "position": {
+              "x": "50",
+              "y": "450"
+            },
+            "height": 100,
+            "wigth": 200,
+            "text": "Морковка ван лав7",
+            "fontFamily": "Arial",
+            "fontSize": 120,
+            "type": "text"
+          },
+          {
+            "id": "212",
+            "position": {
+              "x": "800",
+              "y": "350"
+            },
+            "height": 400,
+            "wigth": 500,
+            "url": "https://liveberlin.ru/wp-content/uploads/2019/04/grass-flower-pxhere.com-cover.jpg",
+            "type": "picture"
           }
         ]
       }

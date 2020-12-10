@@ -1,42 +1,31 @@
 import React from 'react';
 import './SlidesPanel.css';
-import {
-    Programm,
-    Presentation,
-    ArchiveOfState,
-    Slide,
-    Point,
-    ElementObj,
-    SlideElements,
-    Picture,
-    PictureObj,
-    TextObj,
-    Color,
-    ShapeObj
-} from '../Models/types'
-import { SlideMain } from '../Slide/Slide';
+import { Slide } from '../Models/types'
+import { MainSlide } from '../Slide/Slide';
+import { actualProgState } from '../Models/dispatcher'
 
-
-function SlidesPanel(props: Programm) {
-    const slides = props.currentPresentation.slides
+function SlidesPanel() {
+    const slides: Array<Slide> = actualProgState.currentPresentation.slides
+    const selectedSlides: Array<string> = actualProgState.selectedSlides;
     let listSlides: any = []
     const slidesLength = Object.keys(slides).length
     for(let i = 0; i < slidesLength; i++) {
       listSlides.push(
-        <div className="SmallSlide"> 
-          <span className="SlideNum">{i + 1}</span>
-          <SlideMain prog={props} numberOfSlide={i} isSmallSlide={true}/>
+        <div key={slides[i].id} className={"slide-frame "+(selectedSlides.includes(slides[i].id) ? "slide-frame_selected" : "")}> 
+          <span className="slide-frame__number">{i + 1}</span>
+          <div className={"slide " + (selectedSlides.includes(slides[i].id) ? "slide_selected" : "")}>
+            <MainSlide numberOfSlide={i} isSmallSlide={true}/>
+          </div>
         </div>
       )
-    } 
-    
+    }    
     return (
-        <div className="SlidesPanel">
-          {listSlides}
+        <div className="slides-panel">
+            {listSlides}
         </div>
-    )
+    )  
 }
 
 export {
-    SlidesPanel,
+  SlidesPanel,
 }
