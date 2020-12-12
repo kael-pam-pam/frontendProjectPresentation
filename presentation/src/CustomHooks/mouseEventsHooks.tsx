@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from 'react'
 import { changeElemPosition, setSelectedElement, resizeElement } from '../Models/changeSlideContent'
-import { checkSelectedElem, getCurrElemPosition, getCurrElemSize, searchChangedSlideIndexById } from '../Models/commonFunctionsConst'
+import { checkSecondSlideIsBeyond, checkSelectedElem, getCurrElemPosition, getCurrElemSize, searchChangedSlideIndexById } from '../Models/commonFunctionsConst'
 import { actualProgState, dispatch } from '../Models/dispatcher'
 import { moveSlide, setSelectedSlides } from '../Models/slideMoveInProgramm'
 import {Point, Slide} from '../Models/types'
@@ -271,4 +271,57 @@ export function useDragAndDropSlides(props: dragAndDropSlidesProps) {
       }
   } 
 } 
+
+
+
+interface lighInsertPlaceProps {
+  currSlide: Slide
+  svgRef: React.MutableRefObject<SVGSVGElement | null>
+  divRef: React.MutableRefObject<HTMLDivElement | null>
+  slidesPanelRef: React.MutableRefObject<HTMLDivElement | null> | null
+  isSmallSlide: boolean
+} 
+
+export function useLighSlideInsertPlace(props: lighInsertPlaceProps) {
+
+  useEffect(() => {
+    if (props.isSmallSlide && actualProgState.selectedSlides[0] !== props.currSlide.id) {
+      props.slidesPanelRef?.current?.addEventListener('mousedown', mouseDownNotSelectSlide)
+      return () => props.slidesPanelRef?.current?.removeEventListener('mousedown', mouseDownNotSelectSlide)
+    }
+  })
+
+  const mouseDownNotSelectSlide = (event: React.MouseEvent | MouseEvent) => {
+    if (event.defaultPrevented) {
+      props.svgRef.current?.addEventListener('mouseenter', mouseEnterNotSelectSlide)
+      props.divRef.current?.addEventListener('mouseleave', mouseLeaveNotSelectSlide)
+      document.addEventListener('mouseup', mouseUpNotSelectSlide)
+      event.preventDefault()
+    }  
+  }
+
+  const mouseEnterNotSelectSlide = (event: MouseEvent) => {
+    if (props.isSmallSlide && actualProgState.selectedSlides[0] !== props.currSlide.id){
+      const selectedSlideId = actualProgState.selectedSlides[0]
+      const otherSlideId = props.currSlide.id
+      if (checkSecondSlideIsBeyond(actualProgState, selectedSlideId, otherSlideId)) {
+        props.divRef.current?.classList.add('slide-frame_selected__bottom')
+      } else {
+        props.divRef.current?.classList.add('slide-frame_selected__top')
+      }
+    }
+  }
+
+  const mouseLeaveNotSelectSlide = () => {
+    props.divRef.current?.classList.remove('slide-frame_selected__top')
+    props.divRef.current?.classList.remove('slide-frame_selected__bottom')
+  }
+
+  const mouseUpNotSelectSlide = (event: React.MouseEvent | MouseEvent) => {
+    props.divRef.current?.classList.remove('slide-frame_selected__top')
+    props.divRef.current?.classList.remove('slide-frame_selected__bottom')
+    props.svgRef.current?.removeEventListener('mouseenter', mouseEnterNotSelectSlide)
+    document.removeEventListener('mouseup', mouseUpNotSelectSlide)
+  }
+}
 

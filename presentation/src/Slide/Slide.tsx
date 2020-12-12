@@ -2,12 +2,8 @@ import React, {useRef} from 'react';
 import { actualProgState } from '../Models/dispatcher'
 import './Slide.css';
 import { Slide} from '../Models/types'
-import { 
-  useGetSlideBackground, 
-  useGetSlideSvgElems,
-  useGetDivSvgClassNames, 
-  useLighSlideInsertPlace } from '../CustomHooks/commonHooks';
-import { useDragAndDropSlides } from '../CustomHooks/mouseEventsHooks';
+import { useGetSlideBackground, useGetSlideSvgElems, useGetDivSvgClassNames, } from '../CustomHooks/commonHooks';
+import { useDragAndDropSlides, useLighSlideInsertPlace  } from '../CustomHooks/mouseEventsHooks';
 
 type SlideProps = {
     numberOfSlide: number
