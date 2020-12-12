@@ -20,6 +20,9 @@ import {
 export {
   defaultPoint,
   createNewId,
+  createSlideId,
+  checkSecondSlideIsBeyond,
+  searchChangedSlideIndexById,
   searchChangedSlideIndex,
   searchChangedElemIndex,
   deepFreeze,
@@ -61,6 +64,38 @@ function createNewId(): string {
   const newId = String((new Date()).getTime() % 10 ** 8 + randomNum)
   return newId
 }
+
+function createSlideId(isSmallSlide: boolean): string {
+  let id: string = createNewId()
+  if (isSmallSlide) {
+    id += '.small'
+  }
+  //console.log(id)
+  return id
+}
+
+function checkSecondSlideIsBeyond(prog: Programm, firstSlideId: string, secondSlideId: string): boolean {
+  let secondSlideIsBeyond = false;
+  const firstSlideIndex = searchChangedSlideIndexById(prog, firstSlideId)
+  const secondSlideIndex = searchChangedSlideIndexById(prog, secondSlideId)
+  if (secondSlideIndex > firstSlideIndex) {
+    secondSlideIsBeyond = true
+  }
+  return secondSlideIsBeyond
+}
+
+function searchChangedSlideIndexById(prog: Programm, id: string): number {
+  const slides = prog.currentPresentation.slides
+  const searchSlideId = id
+  let changedSlideIndex: number = 0
+  for (let i = 0; i < slides.length; i++) {     
+      if (slides[i].id == searchSlideId) {
+          changedSlideIndex = i
+      }
+  }
+  return changedSlideIndex
+}
+
 
 function searchChangedSlideIndex(prog: Programm): number {
   const slides = prog.currentPresentation.slides
@@ -276,8 +311,8 @@ function getSlidesWithChangedSlide(prog: Programm, changedSlide: Slide, changedS
   let slidesWithChangedSlide: Array<Slide> = [] 
   for(let i = 0; i < prog.currentPresentation.slides.length; i++) {
     i == changedSlideIndex
-    ? slidesWithChangedSlide[i] = changedSlide
-    : slidesWithChangedSlide[i] = prog.currentPresentation.slides[i]
+      ? slidesWithChangedSlide[i] = changedSlide
+      : slidesWithChangedSlide[i] = prog.currentPresentation.slides[i]
   }
   return slidesWithChangedSlide
 }
@@ -293,3 +328,4 @@ function getElemsWithChangedElem(prog: Programm, changedSlideIndex: number, chan
 
   return changedElemsArr
 } 
+

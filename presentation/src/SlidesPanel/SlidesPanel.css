@@ -20,13 +20,43 @@
 
 .slide-frame {
     display: flex;
-    margin: 2px 0 0 0;
+    margin: 10px 0 0 0;
     padding: 5px 2px 5px 5px;
     border-radius: 0 6px 6px 0;
 }
 
 .slide-frame_selected {
     background-color: rgb(254, 239, 195);
+}
+
+.slide-frame_selected__top {
+    background-color: rgb(254, 239, 195);
+    position: relative;
+}
+
+.slide-frame_selected__bottom {
+    background-color: rgb(254, 239, 195);
+    position: relative;
+}
+
+.slide-frame_selected__top::before {
+    position: absolute;
+    top: -10px;
+    left: -26px;
+    width: 178px;
+    border: 1px rgb(242, 153, 0) solid;
+    border-radius: 5px;
+    content: "";
+}
+
+.slide-frame_selected__bottom::after {
+    position: absolute;
+    bottom: -10px;
+    left: -26px;
+    width: 178px;
+    border: 1px rgb(242, 153, 0) solid;
+    border-radius: 5px;
+    content: "";
 }
 
 .slide_selected {

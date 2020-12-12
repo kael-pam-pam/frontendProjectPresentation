@@ -53,7 +53,7 @@ function MainPanel() {
                   }); setIsVisible(true)
                 
             }}>
-            <MainSlide numberOfSlide={changedSlideIndex} isSmallSlide={false}/>      
+            <MainSlide numberOfSlide={changedSlideIndex} isSmallSlide={false} slidesPanelRef={null}/>      
         </div>
     )
 }

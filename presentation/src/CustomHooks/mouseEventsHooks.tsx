@@ -1,8 +1,9 @@
 import React, {useEffect, useRef} from 'react'
 import { changeElemPosition, setSelectedElement, resizeElement } from '../Models/changeSlideContent'
-import { checkSelectedElem, getCurrElemPosition, getCurrElemSize } from '../Models/commonFunctionsConst'
+import { checkSelectedElem, getCurrElemPosition, getCurrElemSize, searchChangedSlideIndexById } from '../Models/commonFunctionsConst'
 import { actualProgState, dispatch } from '../Models/dispatcher'
-import {Point} from '../Models/types'
+import { moveSlide, setSelectedSlides } from '../Models/slideMoveInProgramm'
+import {Point, Slide} from '../Models/types'
 
 interface dragAndDropProps {
   setPos: React.Dispatch<React.SetStateAction<Point>>
@@ -10,7 +11,7 @@ interface dragAndDropProps {
   mainSvgProps: DOMRect | undefined
 } 
 
-export function useDragAndDrop(props: dragAndDropProps) {
+export function useDragAndDropElements(props: dragAndDropProps) {
   const mainSvgProps = props.mainSvgProps 
   const leftSvgBorder = Number(mainSvgProps?.x)
   const topSvgBorder = Number(mainSvgProps?.y)
@@ -229,4 +230,45 @@ export function useReSizeElem(props: resizeProps) {
   }
 }
 
+
+interface dragAndDropSlidesProps {
+  currSlide: Slide
+  svgRef: React.MutableRefObject<SVGSVGElement | null>
+  isSmallSlide: boolean
+} 
+
+export function useDragAndDropSlides(props: dragAndDropSlidesProps) {
+
+  useEffect(() => {
+    if(props.isSmallSlide) {
+      props.svgRef.current?.addEventListener('mousedown', mouseDownSelectSlide)
+      return () => props.svgRef.current?.removeEventListener('mousedown', mouseDownSelectSlide)
+    }
+  })
+
+  const mouseDownSelectSlide = (event: React.MouseEvent | MouseEvent) => {
+    if (!event.defaultPrevented) {
+      dispatch(setSelectedElement, [])
+      if (!actualProgState.selectedSlides.includes(props.currSlide.id)) {
+        dispatch(setSelectedSlides, ([props.currSlide.id])) // [...actualProgState.selectedSlides, currSlide.id])
+      }
+      event.preventDefault()
+    }  
+  }
+
+  useEffect(() => {
+    if (props.isSmallSlide && actualProgState.selectedSlides[0] !== props.currSlide.id) {
+      props.svgRef.current?.addEventListener('mouseup', mouseUpSelectSlide)
+      return () => props.svgRef.current?.removeEventListener('mouseup', mouseUpSelectSlide)
+    }
+  })
+
+  const mouseUpSelectSlide = (event: React.MouseEvent | MouseEvent) => {
+      if (actualProgState.selectedElements.length === 0) {
+        const secondSlideId: string = props.currSlide.id 
+        const index = searchChangedSlideIndexById(actualProgState, secondSlideId)
+        dispatch(moveSlide, index)
+      }
+  } 
+} 
 

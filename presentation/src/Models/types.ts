@@ -20,7 +20,7 @@ export type SlideElements = Array<PictureObj | ShapeObj | TextObj>
 export type Slide = {
     id: string,
     background: Picture | Color,
-    elements: SlideElements
+    elements: SlideElements,
 }
 
 export type Point = {

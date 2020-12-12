@@ -13,7 +13,7 @@ import {
 } from './types'
 
 import {
-  createNewId
+  createNewId, getSlidesWithChangedSlide, searchChangedSlideIndexById
 } from './commonFunctionsConst'
 
 export {
@@ -23,7 +23,7 @@ export {
   supportSortingSelectedSlides,
   moveSlide,
   setSelectedSlides,
-  deleteSlide
+  deleteSlide,
 }
 
 function createDefaultSlide(): Slide {  
@@ -33,7 +33,7 @@ function createDefaultSlide(): Slide {
           hexColor: '#fff',
           type: 'color'
       },
-      elements: [],
+      elements: []
   }
 }
 
@@ -128,3 +128,4 @@ function deleteSlide(prog: Programm): Programm {
   } 
 }
 
+//id тоже копируется, получается 2 слайда с одинаковым id. Нужна копия всего слайда без айдишника

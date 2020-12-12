@@ -158,14 +158,15 @@ export function ImgTextObject(props: ImgTextObjectProps) {
         onMouseDown={() => inputRef.current?.focus()}
         onChange={(event) => dispatch(changeTextObj, {newParam: event.target.value, paramToChange: 'text'})}
         style={{
-        width: props.width, 
-        height: props.height, 
-        outline: 'unset', 
-        border: 'unset',
-        fontSize: props.shape.fontSize + 'px',
-        fontFamily: props.shape.fontFamily,
-        background: 'rgba(0, 0, 255, 0.2)'
-      }}/>
+          width: props.width, 
+          height: props.height, 
+          outline: 'unset', 
+          border: 'unset',
+          fontSize: props.shape.fontSize + 'px',
+          fontFamily: props.shape.fontFamily,
+          background: 'rgba(0, 0, 255, 0.2)'
+        }}
+      />
   }
 
   if (props.shape.type === 'picture') {

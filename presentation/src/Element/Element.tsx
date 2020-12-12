@@ -1,110 +1,49 @@
-import React, { useState, useEffect, useRef} from 'react'
-import { changeElemPosition,changeTextObj,resizeElement, setSelectedElement} from '../Models/changeSlideContent'
-import { checkSelectedElem, getCurrElemPosition, getCurrElemSize, isPictureObj, isShapeObj, isTextObj} from '../Models/commonFunctionsConst'
-import { actualProgState, dispatch} from '../Models/dispatcher'
+import React, { useState, useRef} from 'react'
+import { checkSelectedElem } from '../Models/commonFunctionsConst'
+import { actualProgState } from '../Models/dispatcher'
 import { PictureObj, TextObj, ShapeObj} from '../Models/types'
 import './Element.css'
-import { useDragAndDrop, useReSizeElem } from '../CustomHooks/ResizeDragAndDrop'
+import { useDragAndDropElements, useReSizeElem } from '../CustomHooks/mouseEventsHooks'
 import { useMouseDownDocumentListner, useNormalizeElemSize} from '../CustomHooks/commonHooks'
 import { ImgTextObject, OutlineRect, ShapeObject } from './SvgElems'
 
 
-export function SmallSlideElement(props: PictureObj | TextObj | ShapeObj) {
-  const elemId = props.id
-  let width = props.wigth / 10
-  let height = props.height / 10
-  let posX = props.position.x  / 10
-  let posY = props.position.y  / 10
-  let id = props.id
-  let svgElem: any
+export function SmallSlideElement(shape: PictureObj | TextObj | ShapeObj) {
+  let width = shape.wigth / 10
+  let height = shape.height / 10
+  let posX = shape.position.x  / 10
+  let posY = shape.position.y  / 10
 
-  if (isTextObj(props)) {
-    svgElem =
-      <text 
-        id={id + '.txt'}
-        x={posX}
-        y={posY}
-        width={width}
-        height={height}
-        fontFamily={props.fontFamily}
-        fontSize={Number(props.fontSize) / 10}
-      >
-        {props.text}
-      </text>
+  const elemRef = useRef<(SVGPolygonElement & SVGRectElement & SVGImageElement & SVGEllipseElement) | null>(null)
+
+  let svgElem: JSX.Element = <rect/>
+  let outLineRect: JSX.Element = <rect />
+
+  if (shape.type === 'rect' || shape.type === 'triangle'  || shape.type === 'circle') {
+    svgElem = <ShapeObject 
+      shape={shape}
+      elemRef={elemRef}
+      posX={posX}
+      posY={posY}
+      width={width}
+      height={height}
+      outlineRect={outLineRect}
+    />
   }
 
-  if (isPictureObj(props)) {
-    svgElem =
-      <image 
-        x={posX}
-        y={posY}
-        width={width} 
-        height={height}
-        href={props.url} 
-      />
+  if (shape.type === 'picture' || shape.type === 'text' ){
+    svgElem = <ImgTextObject
+      shape={shape}
+      elemRef={elemRef}
+      posX={posX}
+      posY={posY}
+      width={width}
+      height={height}
+      outlineRect={outLineRect}
+    />
   }
 
-  if (isShapeObj(props)) {
-    if (props.type == 'outlineRect') {
-      svgElem = 
-        <rect
-        />
-    }
-
-    if (props.type == 'rect') {
-      svgElem = 
-        <rect
-          id={id}
-          x={posX}
-          y={posY}  
-          width={width}
-          height={height}
-          stroke={props.borderColor} 
-          fill={props.fillColor}
-        />
-    }  
-
-    if (props.type == 'circle') {
-      svgElem = 
-        <circle 
-          id={id}
-          cx={posX + width/2} 
-          cy={posY + height/2} 
-          r={width/2} 
-          fill={props.fillColor} 
-          stroke={props.borderColor} 
-        />          
-    }
-
-    if (props.type == 'triangle') {
-      const leftPoint= {
-        x: posX,
-        y: Number(posY) + Number(height)
-      }  
-      const rightPoint = {
-        x: Number(posX) + Number(width),
-        y: Number(posY) + Number(height)
-      } 
-      const pickPoint = {
-        x: Number(posX) + width/2,
-        y: posY
-      }
-
-      svgElem = 
-        <polygon 
-          id={id}      
-          points= {
-            leftPoint.x + ' ' + leftPoint.y + ', ' +
-            rightPoint.x + ' ' + rightPoint.y + ', ' +
-            pickPoint.x + ' ' + pickPoint.y
-          }
-          fill={props.fillColor} 
-          stroke={props.borderColor} 
-        />         
-    } 
-  }
-
-  return (<polygon/>)
+  return (svgElem)
 }
 
 
@@ -139,7 +78,7 @@ export function BigSlideElement(props: BigSlideElementProps) {
 
   useMouseDownDocumentListner(elemRef)
 
-  useDragAndDrop({setPos, elemRef, mainSvgProps})
+  useDragAndDropElements({setPos, elemRef, mainSvgProps})
 
   useReSizeElem ({setPos, setSize, firstPointRef, secondPointRef, thirdPointRef, fourthPointRef, mainSvgProps})  
 
