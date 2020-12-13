@@ -1,6 +1,6 @@
 export type Programm = {
     currentPresentation: Presentation,
-    selectedSlides: Array<string>,         
+    selectedSlides: Array<string>,       
     selectedElements: Array<string>
 }
 
@@ -45,6 +45,7 @@ export type PictureObj = ElementObj & Picture;
 
 export type TextObj = ElementObj & {
     text: string,
+    fillColor: string,
 	fontFamily: string,
 	fontSize: string,
 	type: 'text',

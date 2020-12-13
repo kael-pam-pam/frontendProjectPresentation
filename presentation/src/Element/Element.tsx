@@ -40,6 +40,7 @@ export function SmallSlideElement(shape: PictureObj | TextObj | ShapeObj) {
       width={width}
       height={height}
       outlineRect={outLineRect}
+      isSmallElem={true}
     />
   }
 
@@ -121,6 +122,7 @@ export function BigSlideElement(props: BigSlideElementProps) {
       width={elemSize.width}
       height={elemSize.height}
       outlineRect={outLineRect}
+      isSmallElem={false}
     />
   }
   

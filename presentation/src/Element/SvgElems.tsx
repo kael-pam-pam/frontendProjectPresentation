@@ -71,8 +71,7 @@ export function ShapeObject(props: ShapeObjProps) {
     }
 
     svgElem =
-    <>   
-      {props.outlineRect}  
+    <>    
       <polygon      
         ref={props.elemRef}
         id={props.shape.id}      
@@ -84,13 +83,13 @@ export function ShapeObject(props: ShapeObjProps) {
         fill={props.shape.fillColor} 
         stroke={props.shape.borderColor} 
       />
+      {props.outlineRect} 
     </>  
   }
 
   if (props.shape.type === 'rect') {
     svgElem = 
       <>
-        {props.outlineRect} 
         <rect
           ref={props.elemRef}
           id={props.shape.id}
@@ -99,15 +98,15 @@ export function ShapeObject(props: ShapeObjProps) {
           width={props.width}
           height={props.height}
           stroke={props.shape.borderColor} 
-          fill='rgba(0, 0, 255, 0.2)'
+          fill={props.shape.fillColor} 
         />
+        {props.outlineRect} 
       </>
   }  
 
   if (props.shape.type === 'circle') {
     svgElem =
       <>
-        {props.outlineRect} 
         <ellipse
           ref={props.elemRef} 
           id={props.shape.id}
@@ -117,7 +116,8 @@ export function ShapeObject(props: ShapeObjProps) {
           ry={props.height / 2} 
           fill={props.shape.fillColor} 
           stroke={props.shape.borderColor} 
-        /> 
+        />
+        {props.outlineRect}  
       </>             
   }
 
@@ -133,6 +133,7 @@ interface ImgTextObjectProps {
   width: number
   height: number
   outlineRect: JSX.Element
+  isSmallElem: boolean
 }
 
 
@@ -140,31 +141,40 @@ export function ImgTextObject(props: ImgTextObjectProps) {
   let svgElem: JSX.Element = <rect/>
   let htmlElem: any
 
+
+
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   useEffect(() => {
-    if(props.shape.type === 'text') {
-      if (!checkSelectedElem(actualProgState, props.shape.id)) {
-        dispatch(setSelectedElement, ([String(props.shape.id)]))
+  if(props.shape.type === 'text' && checkSelectedElem(actualProgState, props.shape.id)) {
         inputRef.current?.focus()
-      }
-    }  
-  }, [props.shape.id])
+      }  
+  })
 
   if (props.shape.type === 'text') {
+    let fontSize = props.shape.fontSize
+    let isReadOnly = false
+    if (props.isSmallElem) {
+      fontSize = String(Number(fontSize) / 10)
+      isReadOnly = true
+    }
+
     htmlElem = 
       <textarea
+        readOnly={isReadOnly}
         ref={inputRef}
-        //type="text"
+        value={props.shape.text}
         onMouseDown={() => inputRef.current?.focus()}
         onChange={(event) => dispatch(changeTextObj, {newParam: event.target.value, paramToChange: 'text'})}
         style={{
           width: props.width, 
           height: props.height, 
+          fontSize: fontSize + 'px',
+          fontFamily: props.shape.fontFamily,
+          background: props.shape.fillColor,
           outline: 'unset', 
           border: 'unset',
-          fontSize: props.shape.fontSize + 'px',
-          fontFamily: props.shape.fontFamily,
-          background: 'rgba(0, 0, 255, 0.2)'
+          resize: 'none',
+          overflow: 'hidden'
         }}
       />
   }

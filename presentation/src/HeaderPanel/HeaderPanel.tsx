@@ -10,6 +10,7 @@ import { PropsPopup } from '../Popup/Popup'
 
 import { addSlide } from '../Models/slideMoveInProgramm';
 import { dispatch } from '../Models/dispatcher';
+import { getProgram, savePresentationAsJSON, saveProgramAsPDF } from '../Models/SetGetPresentation';
 
 
 
@@ -42,12 +43,16 @@ function HeaderPanel() {
                 action: () => dispatch(addSlide, {})
             },
             {
+              caption: 'Открыть',
+              action: () => {getProgram()}
+            },
+            {
                 caption: 'Сохранить',
-                action: () => {console.log('Сохранить')}
+                action: () => {dispatch(savePresentationAsJSON, ({}))}
             },
             {
               caption: 'Экспорт в PDF',
-              action: () => {console.log('Экспорт в PDF')}
+              action: () => {dispatch(saveProgramAsPDF, '')}
           },
           ],
           pos: {

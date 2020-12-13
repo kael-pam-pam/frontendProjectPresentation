@@ -1,19 +1,10 @@
 import {
   Programm,
-  Presentation,
-  ArchiveOfState,
   Slide,
-  Point,
-  ElementObj,
-  Picture,
-  PictureObj,
-  TextObj,
-  Color,
-  ShapeObj
 } from './types'
 
 import {
-  createNewId, getSlidesWithChangedSlide, searchChangedSlideIndexById
+  createNewId
 } from './commonFunctionsConst'
 
 export {

@@ -33,7 +33,6 @@ interface NormalizeImgProps {
 export function useNormalizeElemSize(props: NormalizeImgProps) { 
   useEffect(() => {
     if (props.elemWidth >= props.svgWidth || props.elemHeight >= props.svgHeight) {
-      console.log(props.elemWidth)
       let newImgSize = {
         width: props.elemWidth,
         height: props.elemHeight
@@ -46,13 +45,19 @@ export function useNormalizeElemSize(props: NormalizeImgProps) {
         imgIndex = props.elemHeight / props.elemWidth
       }
 
-      if (props.elemWidth >= props.svgWidth) { //большая сторона по меньшей стороне слайда
+      if (props.elemWidth >= props.svgWidth && props.elemHeight >= props.svgHeight) { 
         newImgSize.width = props.svgWidth - 100
-        newImgSize.height = newImgSize.width / imgIndex
+        newImgSize.height = props.svgWidth - 100
+      }
+
+      if (props.elemWidth >= props.svgWidth && props.elemHeight <= props.svgHeight) { 
+        newImgSize.width = props.svgWidth - 100
+        newImgSize.height = props.elemHeight / imgIndex
       } 
-      if (props.elemHeight >= props.svgHeight) {
+
+      if (props.elemHeight >= props.svgHeight && props.elemWidth <= props.svgWidth) {
         newImgSize.height = props.svgHeight - 100
-        newImgSize.width = newImgSize.height / imgIndex
+        newImgSize.width = props.elemWidth / imgIndex
       }
       dispatch(resizeElement, {newWidth: newImgSize.width, newHeigth: newImgSize.height})
       props.setSize(newImgSize)

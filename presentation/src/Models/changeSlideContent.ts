@@ -111,7 +111,7 @@ function addPictureObj(prog: Programm, payload: {url: string, width: number, hei
         ...prog.currentPresentation,
         slides: slidesWithChangedSlide
     },
-    //selectedElements: [newPictureObj.id]
+    selectedElements: [newPictureObj.id]
   }           
 }
 
@@ -125,6 +125,7 @@ function createEmtyTextObj(): TextObj {
     height: 100,
     wigth: 300,
     text: "",
+    fillColor: '#e6e6e6',
     fontFamily: 'oblique',
     fontSize: '50',
     type: 'text'
@@ -149,7 +150,7 @@ function addTextObj(prog: Programm): Programm {
         ...prog.currentPresentation,
         slides: slidesWithChangedSlide
     },
-    //selectedElements: [newTextObj.id]           
+    selectedElements: [newTextObj.id]           
   }
 }
 
@@ -180,7 +181,7 @@ function changeTextObj(prog: Programm, payload: {newParam: string, paramToChange
 
 
 function createShapeObj(type: 'rect' | 'triangle' | 'circle'): ShapeObj {
-  let fillColor = 'rgba(0, 0, 255, 0.2)'
+  let fillColor = '#ccccd9'
   return {
     id: createNewId(),
     position: {
@@ -189,7 +190,7 @@ function createShapeObj(type: 'rect' | 'triangle' | 'circle'): ShapeObj {
     },
     wigth: 200,
     height: 200,
-    borderColor: 'fff',
+    borderColor: '#cccccc',
     fillColor: fillColor,
     type
   }
