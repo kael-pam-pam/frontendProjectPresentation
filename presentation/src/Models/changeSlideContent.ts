@@ -18,6 +18,7 @@ import {
   createNewId,
   searchChangedSlideIndex,
   searchChangedElemIndex,
+  searchChangedElemIndexById,
   deepFreeze,
   isTextObj,
   isShapeObj,
@@ -33,7 +34,7 @@ import {
   getNewElemWithNewPosition,
   getSlideWithNewBackground,
   getSlidesWithChangedSlide,
-  getElemsWithChangedElem
+  getElemsWithChangedElem,
 } from './commonFunctionsConst'
 import { textChangeRangeIsUnchanged } from 'typescript'
 import { actualProgState } from './dispatcher'
@@ -41,6 +42,7 @@ import { resolve } from 'dns'
 import { rejects } from 'assert'
 
 export {
+  setCanDeleteSlide,
   setSlideBackground,
   createPictureObj,
   addPictureObj,
@@ -53,7 +55,16 @@ export {
   resizeElement,
   changeElemPosition,
   setSelectedElement,
+  removeOneElemFromSelectedElems,
   deleteSelectedElements
+}
+
+function setCanDeleteSlide(prog: Programm, canDeleteSlide: boolean): Programm {
+
+  return {
+    ...prog,
+   canDeleteSlides: canDeleteSlide
+}
 }
 
 function setSlideBackground(prog: Programm, newBackground: Picture | Color): Programm {
@@ -242,14 +253,14 @@ function changeShapeObj(prog: Programm, newParam: string, paramToChange: 'border
   }  
 }
 
-function resizeElement(prog: Programm, payload:{newWidth:number, newHeigth: number}): Programm {  // add points for resize
+function resizeElement(prog: Programm, payload: {newWidth: number, newHeigth: number, newPosX: number, newPosY: number}): Programm { 
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
 
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
-  changedElem = getNewResizedElem(changedElem, payload.newWidth, payload.newHeigth)
+  changedElem = getNewResizedElem(changedElem, payload.newWidth, payload.newHeigth, payload.newPosX, payload.newPosY)
 
   const changedElemsArr = getElemsWithChangedElem(prog, changedSlideIndex, changedElemIndex, changedElem)
   const slideWithChangedElems = getSlideWithChangedElems(prog, changedElemsArr, changedSlideIndex)
@@ -264,12 +275,12 @@ function resizeElement(prog: Programm, payload:{newWidth:number, newHeigth: numb
   }
 }
 
-function changeElemPosition(prog: Programm, payload:{newX: number, newY: number}): Programm {
+function changeElemPosition(prog: Programm, payload: {newX: number, newY: number, id: string}): Programm {
   deepFreeze(prog)
 
   const changedSlideIndex = searchChangedSlideIndex(prog)
 
-  const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
+  const changedElemIndex = searchChangedElemIndexById(prog, changedSlideIndex, payload.id)
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
   changedElem = getNewElemWithNewPosition(changedElem, payload.newX, payload.newY)
 
@@ -286,6 +297,23 @@ function changeElemPosition(prog: Programm, payload:{newX: number, newY: number}
     }
   }
 }
+
+
+function removeOneElemFromSelectedElems(prog: Programm, id: string): Programm {
+  const selectedElems: Array<string> = [...prog.selectedElements]
+  let newElems: Array<string> = []
+  for(let i = 0; i < selectedElems.length; i++) {
+    if (selectedElems[i] !== id) {
+      newElems.push(selectedElems[i])
+    }
+  }
+
+  return {
+      ...prog,
+      selectedElements: newElems
+  }
+}
+
 
 function setSelectedElement(prog: Programm, selectedElems: Array<string>): Programm {
   return {

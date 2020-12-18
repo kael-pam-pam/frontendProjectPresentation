@@ -2,18 +2,17 @@ import React, { useCallback } from 'react';
 import './HeaderPanel.css';
 import { Commands, MenuItem } from '../Commands/Commands';
 import { Tools } from '../Tools/Tools';
-
-import { actualProgState } from '../Models/dispatcher'
-
+import { actualProgState } from '../../Models/dispatcher'
 import { useSetPopup, useSetIsVisiblePopup } from '../Popup/PopupContext';
 import { PropsPopup } from '../Popup/Popup'
-
-import { addSlide } from '../Models/slideMoveInProgramm';
-import { dispatch } from '../Models/dispatcher';
-import { getProgram, savePresentationAsJSON, saveProgramAsPDF } from '../Models/SetGetPresentation';
-
+import { addSlide } from '../../Models/slideMoveInProgramm';
+import { dispatch } from '../../Models/dispatcher';
+import { getProgram, savePresentationAsJSON, saveProgramAsPDF } from '../../Models/SetGetPresentation';
 
 
+export {
+  HeaderPanel
+}
 
 
 function HeaderPanel() {
@@ -110,8 +109,6 @@ function HeaderPanel() {
       }
     ];
 
-    
-
     return (
       <div className="header-panel">
         <span className="title">{actualProgState.currentPresentation.title}</span>
@@ -119,8 +116,4 @@ function HeaderPanel() {
         <Tools />
       </div>
     )
-}
-
-export {
-    HeaderPanel,
 }

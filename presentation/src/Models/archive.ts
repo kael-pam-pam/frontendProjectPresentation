@@ -5,7 +5,6 @@ import {
 import { actualProgState } from './dispatcher';
 
 export {
-    //actualArchiveOfState,
     goBackAchive,
     goForwardAchive,
     saveStateToArchive,

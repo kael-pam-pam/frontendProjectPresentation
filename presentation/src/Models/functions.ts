@@ -1,18 +1,10 @@
 import {
     Programm,
-    Presentation,
-    ArchiveOfState,
-    Slide,
-    Point,
-    ElementObj,
-    Picture,
-    PictureObj,
-    TextObj,
-    Color,
-    ShapeObj,
+    Slide
 } from './types';
 
 import {createDefaultSlide,} from './slideMoveInProgramm'
+import { createNewId } from './commonFunctionsConst';
 
 export {
     createProgram,
@@ -29,7 +21,9 @@ function createProgram(): Programm {
             slides: [currSlide]
         },
         selectedSlides: [currSlide.id],
-        selectedElements: []
+        selectedElements: [],
+        canDeleteSlides: false,
+        elemsMoveCount: 0
     }
 }
 

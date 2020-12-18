@@ -3,10 +3,12 @@ import './Commands.css';
 import { useSetIsVisiblePopup } from '../Popup/PopupContext';
 
 
+export { Commands }
 export type MenuItem = {
   title: string,
   onClick: (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void,
 }
+
 
 type CommandsProps = {
   menu: Array<MenuItem>
@@ -33,8 +35,4 @@ function Commands(props: CommandsProps) {
           {listMenuItems}
         </div>
     )
-}
-
-export {
-    Commands,
 }

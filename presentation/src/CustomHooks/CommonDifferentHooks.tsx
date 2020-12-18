@@ -1,25 +1,19 @@
 import React, {useEffect} from 'react'
-import { BigSlideElement, SmallSlideElement } from '../Element/Element'
-import { resizeElement, setSelectedElement } from '../Models/changeSlideContent'
-import { checkSecondSlideIsBeyond, isColor, isPictureObj, } from '../Models/commonFunctionsConst'
+import { BigSlideElement, SmallSlideElement } from '../View/Element/Element'
+import { resizeElement} from '../Models/changeSlideContent'
+import { isColor, isPictureObj, } from '../Models/commonFunctionsConst'
 import { actualProgState, dispatch } from '../Models/dispatcher'
 import { Color, Picture, SlideElements, Slide } from '../Models/types'
-import { MainSlide } from '../Slide/Slide'
+import { MainSlide } from '../View/Slide/Slide'
 
 
-export function useMouseDownDocumentListner(elemRef: React.MutableRefObject<SVGElement | null>) {  
-  useEffect(() => {
-    document.addEventListener('mousedown', mouseDownResetHandler)
-    return () => document.removeEventListener('mousedown', mouseDownResetHandler)
-  })
-  
-  const mouseDownResetHandler = (event: React.MouseEvent | MouseEvent) => {
-    if (!event.defaultPrevented) {
-      dispatch(setSelectedElement, ([]))
-    }
-  }
+export {
+  useNormalizeElemSize,
+  useGetSlideSvgElems,
+  useGetSlideBackground,
+  useGetListSlides,
+  useGetDivSvgClassNames
 }
-
 
 
 interface NormalizeImgProps {
@@ -30,44 +24,41 @@ interface NormalizeImgProps {
   svgHeight: number,
 }
 
-export function useNormalizeElemSize(props: NormalizeImgProps) { 
+function useNormalizeElemSize(props: NormalizeImgProps) { 
   useEffect(() => {
     if (props.elemWidth >= props.svgWidth || props.elemHeight >= props.svgHeight) {
       let newImgSize = {
         width: props.elemWidth,
         height: props.elemHeight
       } 
-      let imgIndex = 0
-
-      if (props.elemWidth >= props.elemHeight) {
-        imgIndex = props.elemWidth / props.elemHeight
-      } else {
-        imgIndex = props.elemHeight / props.elemWidth
+      if (props.elemWidth > props.elemHeight) {
+        newImgSize = {
+          width: 900,
+          height: 700
+        }
       }
-
-      if (props.elemWidth >= props.svgWidth && props.elemHeight >= props.svgHeight) { 
-        newImgSize.width = props.svgWidth - 100
-        newImgSize.height = props.svgWidth - 100
+      if (props.elemWidth < props.elemHeight) {
+        newImgSize = {
+          width: 700,
+          height: 900
+        }
       }
-
-      if (props.elemWidth >= props.svgWidth && props.elemHeight <= props.svgHeight) { 
-        newImgSize.width = props.svgWidth - 100
-        newImgSize.height = props.elemHeight / imgIndex
-      } 
-
-      if (props.elemHeight >= props.svgHeight && props.elemWidth <= props.svgWidth) {
-        newImgSize.height = props.svgHeight - 100
-        newImgSize.width = props.elemWidth / imgIndex
+      if (props.elemWidth == props.elemHeight) {
+        newImgSize = {
+          width: 800,
+          height: 800
+        }
       }
-      dispatch(resizeElement, {newWidth: newImgSize.width, newHeigth: newImgSize.height})
+     
+      dispatch(resizeElement, {newWidth: newImgSize.width, newHeigth: newImgSize.height, newPosX: 10, newPosY: 10})
       props.setSize(newImgSize)
     } 
-  })
+  }, [])
 }
 
 
 
-export function useGetDivSvgClassNames(isSmallSlide: boolean): {divClassName: string, svgClassName: string} {
+function useGetDivSvgClassNames(isSmallSlide: boolean): {divClassName: string, svgClassName: string} {
   let classNames = {
     divClassName: 'mainSlideDiv',
     svgClassName: 'mainSlideSvg'
@@ -82,7 +73,7 @@ export function useGetDivSvgClassNames(isSmallSlide: boolean): {divClassName: st
 
 
 
-export function useGetSlideBackground(modelSlideBackground: Picture | Color): string {
+function useGetSlideBackground(modelSlideBackground: Picture | Color): string {
   
   let svgSlideBackground: string = ''
   
@@ -104,7 +95,7 @@ interface getSlideElemsPayload {
   svgRef: React.MutableRefObject<SVGSVGElement | null>
 } 
 
-export function useGetSlideSvgElems(payload: getSlideElemsPayload): Array<JSX.Element> {
+function useGetSlideSvgElems(payload: getSlideElemsPayload): Array<JSX.Element> {
 
   let svgSlideElems: Array<JSX.Element> = []
   const modelSlideElems = {...payload.modelSlideElems}
@@ -128,7 +119,7 @@ interface getListSlidesProps {
   slidesPanelRef: React.MutableRefObject<HTMLDivElement | null> | null
 }
 
-export function useGetListSlides(props: getListSlidesProps): Array<JSX.Element> {
+function useGetListSlides(props: getListSlidesProps): Array<JSX.Element> {
   let slidesList: Array<JSX.Element> = []
   const slidesLength = Object.keys(props.slides).length
 
@@ -141,7 +132,7 @@ export function useGetListSlides(props: getListSlidesProps): Array<JSX.Element> 
     slidesList.push(
       <div key={props.slides[i].id} className={getDivClassname(i)}> 
         <span className="slide-frame__number">{i + 1}</span>
-        <div className={"slide " + (props.selectedSlides.includes(props.slides[i].id) ? "slide_selected" : "")}>
+        <div className={"slide " + (props.selectedSlides.includes(props.slides[i].id) && actualProgState.canDeleteSlides ? "slide_selected" : "")}>
           <MainSlide key={props.slides[i].id} numberOfSlide={i} isSmallSlide={true} slidesPanelRef={props.slidesPanelRef}/>
         </div>
       </div>

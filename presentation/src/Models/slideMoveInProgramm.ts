@@ -15,6 +15,7 @@ export {
   moveSlide,
   setSelectedSlides,
   deleteSlide,
+  removeOneElemFromSelectedSlides
 }
 
 function createDefaultSlide(): Slide {  
@@ -72,8 +73,8 @@ function moveSlide(prog: Programm, posBefore: number): Programm {
       ...prog.currentPresentation,
       slides: 
         (posBefore == 0) 
-        ? [...sortedSelectedSlides, ...slidesWithoutSelectedSlides]
-        : (prog.currentPresentation.slides.length == posBefore)
+          ? [...sortedSelectedSlides, ...slidesWithoutSelectedSlides]
+          : (prog.currentPresentation.slides.length == posBefore)
         //TODO: не так как в оригинале!
           ? [...slidesWithoutSelectedSlides, ...sortedSelectedSlides]
           : [
@@ -97,12 +98,12 @@ function deleteSlide(prog: Programm): Programm {
   let oldPos: number = prog.currentPresentation.slides.length - 1;
 
   for (let i = 0; i < prog.currentPresentation.slides.length; i++) {
-    if ((prog.selectedSlides.includes(prog.currentPresentation.slides[i].id)) && (oldPos > i)) {
-    oldPos = i;
+    if ((prog.selectedSlides.includes(prog.currentPresentation.slides[i].id)) && (oldPos >= i)) {
+      oldPos = i;
     }
   }
 
-  const slidesWithoutSelectedSlides = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides)
+  const slidesWithoutSelectedSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides)
 
   return {
     ...prog,
@@ -111,12 +112,31 @@ function deleteSlide(prog: Programm): Programm {
     slides: slidesWithoutSelectedSlides
     },
     selectedSlides:
-    (slidesWithoutSelectedSlides.length == 1) // временно 1(для работы с 1 слайдом), поменять на 0
-    ? []
-    : (slidesWithoutSelectedSlides.length - 1 <= oldPos)
-    ? [slidesWithoutSelectedSlides[oldPos].id]
-    : [slidesWithoutSelectedSlides[slidesWithoutSelectedSlides.length - 1].id]
+      (slidesWithoutSelectedSlides.length === 0) // временно 1(для работы с 1 слайдом), поменять на 0
+      ? []
+      : (slidesWithoutSelectedSlides.length - 1 < oldPos)
+      ? [slidesWithoutSelectedSlides[oldPos - 1].id]
+      : (slidesWithoutSelectedSlides.length - 1 == oldPos)
+      ? [slidesWithoutSelectedSlides[oldPos].id]
+      : [slidesWithoutSelectedSlides[slidesWithoutSelectedSlides.length - 1].id]
   } 
 }
+
+
+function removeOneElemFromSelectedSlides(prog: Programm, id: string): Programm {
+  const selectedSlides: Array<string> = [...prog.selectedSlides]
+  let newSlides: Array<string> = []
+  for(let i = 0; i < selectedSlides.length; i++) {
+    if (selectedSlides[i] !== id) {
+      newSlides.push(selectedSlides[i])
+    }
+  }
+
+  return {
+      ...prog,
+      selectedSlides: newSlides
+  }
+}
+
 
 //id тоже копируется, получается 2 слайда с одинаковым id. Нужна копия всего слайда без айдишника

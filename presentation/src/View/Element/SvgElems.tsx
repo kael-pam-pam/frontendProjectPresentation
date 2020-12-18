@@ -1,9 +1,17 @@
 import React, { useEffect, useRef} from 'react'
-import { changeTextObj, setSelectedElement} from '../Models/changeSlideContent'
-import { checkSelectedElem } from '../Models/commonFunctionsConst'
-import { actualProgState, dispatch} from '../Models/dispatcher'
-import { PictureObj, TextObj, ShapeObj} from '../Models/types'
+import { changeTextObj, setSelectedElement} from '../../Models/changeSlideContent'
+import { checkSelectedElem } from '../../Models/commonFunctionsConst'
+import { actualProgState, dispatch} from '../../Models/dispatcher'
+import { PictureObj, TextObj, ShapeObj} from '../../Models/types'
 import './Element.css'
+
+
+export {
+  OutlineRect,
+  ShapeObject,
+  ImgTextObject
+}
+
 
 interface OutlineRectProps {
   firstPointRef: React.MutableRefObject<SVGCircleElement | null>
@@ -17,7 +25,7 @@ interface OutlineRectProps {
   height: number
 }
 
-export function OutlineRect(props: OutlineRectProps) {
+function OutlineRect(props: OutlineRectProps) {
   let outLineRect: JSX.Element = <rect />
   outLineRect =
     <> 
@@ -54,7 +62,7 @@ interface ShapeObjProps {
   outlineRect: JSX.Element
 }
 
-export function ShapeObject(props: ShapeObjProps) {
+function ShapeObject(props: ShapeObjProps) {
   let svgElem: JSX.Element = <rect/>
   if (props.shape.type === 'triangle') {
     const leftPoint= {
@@ -137,7 +145,7 @@ interface ImgTextObjectProps {
 }
 
 
-export function ImgTextObject(props: ImgTextObjectProps) {
+function ImgTextObject(props: ImgTextObjectProps) {
   let svgElem: JSX.Element = <rect/>
   let htmlElem: any
 

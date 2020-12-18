@@ -18,6 +18,11 @@ export type PropsPopup = {
     width: number,
 }
 
+export {
+    Popup
+}
+
+
 function Popup() {
     const props = usePopup();
     const setProps = useSetPopup();
@@ -43,8 +48,4 @@ function Popup() {
             </ul>
         </div>
     )
-}
-
-export {
-    Popup,
 }

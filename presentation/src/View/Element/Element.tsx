@@ -1,14 +1,20 @@
-import React, { useState, useRef} from 'react'
-import { checkSelectedElem } from '../Models/commonFunctionsConst'
-import { actualProgState } from '../Models/dispatcher'
-import { PictureObj, TextObj, ShapeObj} from '../Models/types'
+import React, { useState, useRef, useEffect} from 'react'
+import { checkSelectedElem } from '../../Models/commonFunctionsConst'
+import { actualProgState } from '../../Models/dispatcher'
+import { PictureObj, TextObj, ShapeObj} from '../../Models/types'
 import './Element.css'
-import { useDragAndDropElements, useReSizeElem } from '../CustomHooks/mouseEventsHooks'
-import { useMouseDownDocumentListner, useNormalizeElemSize} from '../CustomHooks/commonHooks'
+import { useDragAndDropElement, useReSizeElement} from '../../CustomHooks/ElemMouseEvents'
+import { useMouseDownDocumentListner} from '../../CustomHooks/CommonMouseKeyboardEvents'
 import { ImgTextObject, OutlineRect, ShapeObject } from './SvgElems'
+import { useNormalizeElemSize } from '../../CustomHooks/CommonDifferentHooks'
+
+export {
+  SmallSlideElement,
+  BigSlideElement
+}
 
 
-export function SmallSlideElement(shape: PictureObj | TextObj | ShapeObj) {
+function SmallSlideElement(shape: PictureObj | TextObj | ShapeObj) {
   let width = shape.wigth / 10
   let height = shape.height / 10
   let posX = shape.position.x  / 10
@@ -53,7 +59,7 @@ interface BigSlideElementProps {
   svgProps: React.MutableRefObject<SVGSVGElement | null>
 }
 
-export function BigSlideElement(props: BigSlideElementProps) {
+function BigSlideElement(props: BigSlideElementProps) {
   const id = props.shape.id
 
   const mainSvgProps = props.svgProps.current?.getBoundingClientRect()
@@ -71,18 +77,21 @@ export function BigSlideElement(props: BigSlideElementProps) {
   const thirdPointRef = useRef<SVGCircleElement | null>(null)
   const fourthPointRef = useRef<SVGCircleElement | null>(null)
 
-
   const[pos, setPos] = useState({x: elemPosX, y: elemPosY})
+
   const[elemSize, setSize] = useState({width: elemWidth, height: elemHeight})
+
 
   useNormalizeElemSize({setSize, elemWidth, elemHeight, svgWidth, svgHeight})
 
-  useMouseDownDocumentListner(elemRef)
+  useDragAndDropElement({id: props.shape.id, pos, setPos, elemRef, mainSvgProps})
 
-  useDragAndDropElements({setPos, elemRef, mainSvgProps})
+  useReSizeElement ({id: props.shape.id, setPos, setSize, firstPointRef, secondPointRef, thirdPointRef, fourthPointRef, mainSvgProps})  
 
-  useReSizeElem ({setPos, setSize, firstPointRef, secondPointRef, thirdPointRef, fourthPointRef, mainSvgProps})  
-
+  useEffect(() => {
+      setPos({x: elemPosX, y: elemPosY})
+      setSize({width: elemWidth, height: elemHeight})
+  }, [actualProgState])
   
   let svgElem: JSX.Element = <rect/>
   let outLineRect: JSX.Element = <rect />

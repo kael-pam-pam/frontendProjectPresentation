@@ -1,9 +1,15 @@
-import React, {useRef} from 'react';
-import { actualProgState } from '../Models/dispatcher'
+import React, {useEffect, useRef} from 'react';
+import { actualProgState } from '../../Models/dispatcher'
 import './Slide.css';
-import { Slide} from '../Models/types'
-import { useGetSlideBackground, useGetSlideSvgElems, useGetDivSvgClassNames, } from '../CustomHooks/commonHooks';
-import { useDragAndDropSlides, useLighSlideInsertPlace  } from '../CustomHooks/mouseEventsHooks';
+import { Slide} from '../../Models/types'
+import { useGetSlideBackground, useGetSlideSvgElems, useGetDivSvgClassNames, } from '../../CustomHooks/CommonDifferentHooks';
+import { useDragAndDropSlides, useLighSlideInsertPlace  } from '../../CustomHooks/SlideMouseEvents';
+
+
+export {
+  MainSlide
+}
+
 
 type SlideProps = {
     numberOfSlide: number
@@ -11,7 +17,7 @@ type SlideProps = {
     slidesPanelRef: React.MutableRefObject<HTMLDivElement | null> | null
 }
   
-export function MainSlide(props: SlideProps) {
+function MainSlide(props: SlideProps) {
     
     let currSlide: Slide = actualProgState.currentPresentation.slides[props.numberOfSlide]
     const modelSlideBackground = currSlide.background

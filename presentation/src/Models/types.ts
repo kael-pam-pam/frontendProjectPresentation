@@ -2,6 +2,9 @@ export type Programm = {
     currentPresentation: Presentation,
     selectedSlides: Array<string>,       
     selectedElements: Array<string>
+
+    canDeleteSlides: boolean,
+    elemsMoveCount: number
 }
 
 

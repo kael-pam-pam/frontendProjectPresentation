@@ -138,7 +138,7 @@ function setElementToPagePDF(progSlide:(PictureObj|ShapeObj|TextObj), doc:jsPDF)
         }
         //document.body.prepend(CanEl); 
         let imgData2 = CanEl.toDataURL('image/png');
-        doc.addImage(imgData2, 'PNG', +progSlide.position.x, +progSlide.position.y - CanEl.height, +CanEl.width, +CanEl.height);
+        doc.addImage(imgData2, 'PNG', +progSlide.position.x, +progSlide.position.y , +CanEl.width, +CanEl.height);
     }
     else
     {

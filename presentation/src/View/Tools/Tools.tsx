@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import './Tools.css';
-import { addSlide } from '../Models/slideMoveInProgramm';
-import { dispatch, setGlobalActiveTool } from '../Models/dispatcher';
-import { /*actualArchiveOfState,*/ goBackAchive, goForwardAchive} from '../Models/archive';
-import { addPictureObj, addShapeObj, addTextObj } from '../Models/changeSlideContent';
+import { addSlide } from '../../Models/slideMoveInProgramm';
+import { dispatch, setGlobalActiveTool } from '../../Models/dispatcher';
+import { /*actualArchiveOfState,*/ goBackAchive, goForwardAchive} from '../../Models/archive';
+import { addPictureObj, addShapeObj, addTextObj, setCanDeleteSlide } from '../../Models/changeSlideContent';
 
 
 export type Tool = {
@@ -113,13 +113,14 @@ function Tools() {
 
     return (
         <div className="tools" onClick={() => console.log("ты в инструментах")}>
-          <div key={0} className="tool tool_add-slide" onClick={() => dispatch(addSlide, {})}>
+          <div key={0} className="tool tool_add-slide" onClick={
+            () => {dispatch(addSlide, {}); dispatch(setCanDeleteSlide, true)}}>
             <span className="tool__tooltip">Новый слайд</span>
           </div>
-          <div key={1} className="tool tool_back-history" onClick={() => dispatch(goBackAchive, {})}>
+          <div key={1} className="tool tool_back-history" onMouseDown={(event) => {dispatch(goBackAchive, {}); event.preventDefault()}}>
             <span className="tool__tooltip">Отменить</span>
           </div>
-          <div key={2} className="tool tool_future-history" onClick={() => dispatch(goForwardAchive, {})}>
+          <div key={2} className="tool tool_future-history" onMouseDown={(event) => {dispatch(goForwardAchive, {}); event.preventDefault()}}>
             <span className="tool__tooltip">Повторить</span>
           </div>
           <div key={3} className={"tool tool_cursor "+(activeTool == 0 ? "tool_active" : "")} onClick={() => {setActiveTool(0); setGlobalActiveTool(0); console.log('Курсор')}}>

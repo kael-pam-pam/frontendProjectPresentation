@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react';
 import './MainPanel.css';
 import { MainSlide, } from '../Slide/Slide';
 
-import { searchChangedSlideIndex } from '../Models/commonFunctionsConst';
-import { actualProgState, globalActiveTool } from '../Models/dispatcher'
+import { searchChangedSlideIndex } from '../../Models/commonFunctionsConst';
+import { actualProgState, globalActiveTool } from '../../Models/dispatcher'
 import { useSetPopup, useSetIsVisiblePopup } from '../Popup/PopupContext';
 import { PropsPopup } from '../Popup/Popup'
+
+export {
+  MainPanel
+}
 
 
 function MainPanel() {
@@ -13,6 +17,16 @@ function MainPanel() {
     const changedSlideIndex = searchChangedSlideIndex(actualProgState)
     const setPopup = useSetPopup();
     const setIsVisible = useSetIsVisiblePopup(); 
+
+    let mainSlide: JSX.Element = 
+        <div className='MainSlide'>
+            <svg className='mainSlideSvg'/>    
+        </div>    
+
+    if(actualProgState.currentPresentation.slides.length !== 0)
+    {
+        mainSlide = <MainSlide numberOfSlide={changedSlideIndex} isSmallSlide={false} slidesPanelRef={null}/> 
+    }
 
     return (
         <div className={"MainPanel "+(globalActiveTool != 0 ? "MainPanel_createElement" : "")} onClick={() => ''} 
@@ -52,12 +66,8 @@ function MainPanel() {
                     },
                   }); setIsVisible(true)
                 
-            }}>
-            <MainSlide numberOfSlide={changedSlideIndex} isSmallSlide={false} slidesPanelRef={null}/>      
+            }}>    
+            {mainSlide}    
         </div>
     )
-}
-
-export {
-    MainPanel,
 }

@@ -1,6 +1,16 @@
 import React, {useState, useContext} from 'react'
 import { PropsPopup } from './Popup'
 
+
+export {
+    PopupProvider,
+    usePopup,
+    useSetPopup,
+    useSetIsVisiblePopup,
+    IsVisiblePopup
+}
+
+
 const defaultValue: PropsPopup = {
     items: [
         {
@@ -53,12 +63,4 @@ function PopupProvider({ children }: any) {
             </SetPopupContext.Provider>    
         </PopupContext.Provider>
     )
-}
-
-export {
-    PopupProvider,
-    usePopup,
-    useSetPopup,
-    useSetIsVisiblePopup,
-    IsVisiblePopup,
 }
