@@ -2,12 +2,12 @@ import React, { useCallback } from 'react';
 import './HeaderPanel.css';
 import { Commands, MenuItem } from '../Commands/Commands';
 import { Tools } from '../Tools/Tools';
-import { actualProgState } from '../../Models/dispatcher'
 import { useSetPopup, useSetIsVisiblePopup } from '../Popup/PopupContext';
 import { PropsPopup } from '../Popup/Popup'
-import { addSlide } from '../../Models/slideMoveInProgramm';
-import { dispatch } from '../../Models/dispatcher';
-import { getProgram, savePresentationAsJSON, saveProgramAsPDF } from '../../Models/SetGetPresentation';
+import { addSlide } from '../../Models/ActionCreators/slidesActionCreators';
+import { getProgram, savePresentationAsJSON, saveProgramAsPDF } from '../../Models/CommonFunctions/SetGetPresentation';
+import { store, dispatch, getState } from '../..';
+import { connect } from 'react-redux';
 
 
 export {
@@ -39,7 +39,7 @@ function HeaderPanel() {
           items: [
             {
                 caption: 'Добавить слайд',
-                action: () => dispatch(addSlide, {})
+                action: () => dispatch(addSlide())
             },
             {
               caption: 'Открыть',
@@ -47,11 +47,11 @@ function HeaderPanel() {
             },
             {
                 caption: 'Сохранить',
-                action: () => {dispatch(savePresentationAsJSON, ({}))}
+                action: () => savePresentationAsJSON()
             },
             {
               caption: 'Экспорт в PDF',
-              action: () => {dispatch(saveProgramAsPDF, '')}
+              action: () => saveProgramAsPDF()
           },
           ],
           pos: {
@@ -111,9 +111,15 @@ function HeaderPanel() {
 
     return (
       <div className="header-panel">
-        <span className="title">{actualProgState.currentPresentation.title}</span>
+        <span className="title">{getState().mainProg.currentPresentation.title}</span>
         <Commands menu={menu} />
         <Tools />
       </div>
     )
 }
+
+function mapStateToProps(state = store.getState()) {
+  return { state: state } 
+};
+
+export default connect(mapStateToProps)(HeaderPanel);

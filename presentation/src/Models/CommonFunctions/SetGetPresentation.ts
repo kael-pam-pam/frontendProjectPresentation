@@ -1,5 +1,6 @@
 import {
     Programm,
+    StateTypes,
     Presentation,
     Slide,
     ArchiveOfState,
@@ -9,12 +10,13 @@ import {
     PictureObj,
     TextObj,
     Color,
-    ShapeObj
+    ShapeObj,
+    MainProg
 } from './types';
 
 import { jsPDF } from "jspdf";  //npm install jspdf --save      or      yarn add jspdf
 
-import { dispatch,  loadProgramm } from '../Models/dispatcher';
+import { getState, dispatch } from '../../index';
 
 export {
     //createLoadedProgram,
@@ -25,7 +27,8 @@ export {
 const exportWidth = 1400;
 const exportHeight = 850;
 
-function savePresentationAsJSON(prog:Programm): Programm {
+function savePresentationAsJSON(): MainProg {
+    const prog = getState().mainProg
     const progName = prog.currentPresentation.title + '.json';
     let progFile = new Blob([JSON.stringify(prog)], {type: 'json'});
     if (window.navigator.msSaveOrOpenBlob)
@@ -45,6 +48,13 @@ function savePresentationAsJSON(prog:Programm): Programm {
     return prog;
 }
 
+function loadProgToStore(newProg: Programm) {
+    return {
+        type: StateTypes.LOAD_PROJECT,
+        payload: {...newProg}  
+    }
+}
+
 function getProgram() {
     let input = document.createElement("input");
     input.type = "file";
@@ -58,10 +68,7 @@ function getProgram() {
         reader.onload = function (e) {
             let target: any = e.target;
             let data:Programm = JSON.parse(target.result) as Programm;
-            dispatch(LoadPr, data);
-            function LoadPr():Programm {
-                return data
-            }
+            dispatch(loadProgToStore(data));
         };
         reader.onerror = function (e) {
             alert("Error loading"); // Ошибка загрузки
@@ -76,32 +83,34 @@ function getProgram() {
     }, 0);
 }
 
-function saveDocPDF(prog:Programm, Path:string, doc:jsPDF){
+async function saveDocPDF(Path:string, doc:jsPDF){
+    const prog = getState().mainProg
+    await setPDF(doc)
     doc.save(Path + "/" + prog.currentPresentation.title + ".pdf");
 }
 
-function saveProgramAsPDF(prog:Programm, Path:string):Programm{
+function saveProgramAsPDF() {
+    const prog = getState().mainProg
+    const Path: string = ''
     let doc = new jsPDF({
         orientation: "landscape",
         unit: "px",
         format: /*"a4"*/ [exportWidth, exportHeight],
-      });
-      doc = setPDF(prog, doc);
-      setTimeout(saveDocPDF, 1000, prog, Path, doc);
-      return prog;
+      })  
+    saveDocPDF(Path, doc)
 }
 
-function setPDF(prog:Programm, doc:jsPDF){
+function setPDF(doc: jsPDF) {
+    const prog = getState().mainProg
     for (var i = 0; i < prog.currentPresentation.slides.length; i++){
         doc = setPagePDF(prog.currentPresentation.slides[i], doc);
         if (i + 1 < prog.currentPresentation.slides.length){
             doc.addPage([exportWidth, exportHeight], "landscape");
         }
     }
-    return doc;
 }
 
-function setPagePDF(progSlide:Slide, doc:jsPDF){
+function setPagePDF(progSlide: Slide, doc:jsPDF) {
     if (progSlide.background.type == "picture"){
         let imgData2 = progSlide.background.imgB64;//CanEl.toDataURL('image/png');
             doc.addImage(imgData2, 'PNG', +0, +0, +exportWidth, +exportHeight);

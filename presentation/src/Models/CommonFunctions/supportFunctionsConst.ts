@@ -1,7 +1,10 @@
-import { changeElemPosition } from './changeSlideContent'
-import { setSelectedSlides } from './slideMoveInProgramm'
+import { connect } from 'react-redux'
+import { getState } from '../..'
+import { changeElemPosition } from '../ActionCreators/slideElemActionCreators'
+import { setSelectedSlides } from '../ActionCreators/slidesActionCreators'
 import {
   Programm,
+  MainProg,
   Slide,
   SlideId,
   Point,
@@ -10,7 +13,7 @@ import {
   TextObj,
   Color,
   ShapeObj,
-  ChangedObjPosType
+  ChangedObjPosType,
 } from './types'
 
 
@@ -50,6 +53,14 @@ export {
   getCurrElemSize
 }
 
+
+export let globalActiveTool: number = 0;
+
+export function setGlobalActiveTool(state: number): void {
+    globalActiveTool = state;
+} 
+
+
 const defaultPoint: Point = {
   x: 10,
   y: 10 
@@ -71,17 +82,19 @@ function createSlideId(isSmallSlide: boolean): string {
   return id
 }
 
-function checkSecondSlideIsBeyond(prog: Programm, firstSlideId: string, secondSlideId: string): boolean {
+function checkSecondSlideIsBeyond(firstSlideId: string, secondSlideId: string): boolean {
+  const prog = getState().mainProg
   let secondSlideIsBeyond = false;
-  const firstSlideIndex = searchChangedSlideIndexById(prog, firstSlideId)
-  const secondSlideIndex = searchChangedSlideIndexById(prog, secondSlideId)
+  const firstSlideIndex = searchChangedSlideIndexById(firstSlideId)
+  const secondSlideIndex = searchChangedSlideIndexById(secondSlideId)
   if (secondSlideIndex > firstSlideIndex) {
     secondSlideIsBeyond = true
   }
   return secondSlideIsBeyond
 }
 
-function searchChangedSlideIndexById(prog: Programm, id: string): number {
+function searchChangedSlideIndexById(id: string): number {
+  const prog = getState().mainProg
   const slides = prog.currentPresentation.slides
   const searchSlideId = id
   let changedSlideIndex: number = 0
@@ -94,9 +107,10 @@ function searchChangedSlideIndexById(prog: Programm, id: string): number {
 }
 
 
-function searchChangedSlideIndex(prog: Programm): number {
-  const slides = prog.currentPresentation.slides
-  const selectedSlide = prog.selectedSlides[0]
+function searchChangedSlideIndex(): number {
+  const prog = getState()
+  const slides = prog.mainProg.currentPresentation.slides
+  const selectedSlide = prog.mainProg.selectedSlides[0]
   let changedSlideIndex: number = 0
   for (let i = 0; i < slides.length; i++) {     
       if (slides[i].id == selectedSlide) {
@@ -106,7 +120,8 @@ function searchChangedSlideIndex(prog: Programm): number {
   return changedSlideIndex
 }
 
-function searchChangedElemIndex(prog: Programm, changedSlideIndex: number): number {
+
+function searchChangedElemIndex(prog: MainProg, changedSlideIndex: number): number {
   const elems = prog.currentPresentation.slides[changedSlideIndex].elements
   let selectedElem = prog.selectedElements[prog.selectedElements.length - 1]
   let changedElemIndex: number = -1
@@ -118,7 +133,7 @@ function searchChangedElemIndex(prog: Programm, changedSlideIndex: number): numb
   return changedElemIndex
 }
 
-function searchChangedElemIndexById(prog: Programm, changedSlideIndex: number, id: string): number {
+function searchChangedElemIndexById(prog: MainProg, changedSlideIndex: number, id: string): number {
   const elems = prog.currentPresentation.slides[changedSlideIndex].elements
   let changedElemIndex: number = -1
   for (let i = 0; i < elems.length; i++) {     
@@ -129,10 +144,11 @@ function searchChangedElemIndexById(prog: Programm, changedSlideIndex: number, i
   return changedElemIndex
 }
 
-function getCurrElemPosition(prog: Programm, id: string): Point {
+function getCurrElemPosition(id: string): Point {
+  const prog = getState().mainProg
   let elemX: number = 0
   let elemY: number = 0
-  const changedSlideIndex = searchChangedSlideIndex(prog)
+  const changedSlideIndex = searchChangedSlideIndex()
   const changedElemIndex = searchChangedElemIndexById(prog, changedSlideIndex, id)
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
   if (changedElem != undefined) {
@@ -145,10 +161,11 @@ function getCurrElemPosition(prog: Programm, id: string): Point {
   }
 }
 
-function getCurrElemSize(prog: Programm): {width: number, height: number} {
+function getCurrElemSize(): {width: number, height: number} {
+  const prog = getState().mainProg
   let width: number = 0
   let height: number = 0
-  const changedSlideIndex = searchChangedSlideIndex(prog)
+  const changedSlideIndex = searchChangedSlideIndex()
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
   if (changedElem != undefined) {
@@ -161,10 +178,11 @@ function getCurrElemSize(prog: Programm): {width: number, height: number} {
   }
 }
 
-function checkSelectedElem(prog: Programm, currElemId: string): boolean {
+function checkSelectedElem(currElemId: string): boolean {
+  const prog = getState().mainProg
   let elemIsSelected: boolean = false
   let selectedElemId: string = '-1'
-  const changedSlideIndex = searchChangedSlideIndex(prog)
+  const changedSlideIndex = searchChangedSlideIndex()
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
   if (prog.selectedElements.includes(currElemId))
   {
@@ -189,7 +207,7 @@ function deepFreeze (o: any) {
   return o;
 };
 
-function isProgramm(elem: any): elem is Programm {
+function isProgramm(elem: any): elem is MainProg {
   return elem.currentPresentation !== undefined
 }
 
@@ -226,11 +244,11 @@ function isChangedElemPosType(obj: any): obj is {newX: number, newY: number, id:
 }
 
 
-function getChangedSlideObj(prog: Programm, changedSlideIndex: number): Slide {
+function getChangedSlideObj(prog: MainProg, changedSlideIndex: number): Slide {
   return {...prog.currentPresentation.slides[changedSlideIndex]}
 }
 
-function getSlidesWithoutChangedSlide(prog: Programm, changedSlideIndex: number): Array<Slide> {
+function getSlidesWithoutChangedSlide(prog: MainProg, changedSlideIndex: number): Array<Slide> {
   return [...prog.currentPresentation.slides.filter((elem) => elem != prog.currentPresentation.slides[changedSlideIndex])]
 }
 
@@ -259,16 +277,16 @@ function getNewTextElem(changedElem: TextObj, newParam: string, paramToChange: '
   return newElem
 }
 
-function getElemsWithoutChangedElem(prog: Programm, changedElemIndex: number, changedSlideIndex: number): Array<PictureObj | TextObj | ShapeObj> {
+function getElemsWithoutChangedElem(prog: MainProg, changedElemIndex: number, changedSlideIndex: number): Array<PictureObj | TextObj | ShapeObj> {
   return [...prog.currentPresentation.slides[changedSlideIndex].elements.filter((elem) => 
   elem != prog.currentPresentation.slides[changedSlideIndex].elements[changedElemIndex])] 
 }
 
-function getElemsWithNewElem(prog: Programm, newElem: PictureObj | TextObj | ShapeObj, changedSlideIndex: number): Array<PictureObj | TextObj | ShapeObj> {
+function getElemsWithNewElem(prog: MainProg, newElem: PictureObj | TextObj | ShapeObj, changedSlideIndex: number): Array<PictureObj | TextObj | ShapeObj> {
   return [...prog.currentPresentation.slides[changedSlideIndex].elements, newElem]
 }
 
-function getChangedElem(prog: Programm, changedSlideIndex: number, changedElemIndex: number): PictureObj | TextObj | ShapeObj {
+function getChangedElem(prog: MainProg, changedSlideIndex: number, changedElemIndex: number): PictureObj | TextObj | ShapeObj {
   return prog.currentPresentation.slides[changedSlideIndex].elements[changedElemIndex]
 }
 
@@ -311,14 +329,14 @@ function getNewElemWithNewPosition(changedElem: PictureObj | TextObj | ShapeObj,
   }
 }
 
-function getSlideWithNewBackground(prog: Programm, changedSlideIndex: number, newBackground: Picture | Color): Slide {
+function getSlideWithNewBackground(prog: MainProg, changedSlideIndex: number, newBackground: Picture | Color): Slide {
   return {
     ...prog.currentPresentation.slides[changedSlideIndex],
     background: newBackground
   }
 }
 
-function getSlidesWithChangedSlide(prog: Programm, changedSlide: Slide, changedSlideIndex: number): Array<Slide> {
+function getSlidesWithChangedSlide(prog: MainProg, changedSlide: Slide, changedSlideIndex: number): Array<Slide> {
   let slidesWithChangedSlide: Array<Slide> = [] 
   for(let i = 0; i < prog.currentPresentation.slides.length; i++) {
     i == changedSlideIndex
@@ -328,7 +346,7 @@ function getSlidesWithChangedSlide(prog: Programm, changedSlide: Slide, changedS
   return slidesWithChangedSlide
 }
 
-function getElemsWithChangedElem(prog: Programm, changedSlideIndex: number, changedElemIndex: number, changedElem: PictureObj | TextObj | ShapeObj): Array<PictureObj | TextObj | ShapeObj> {
+function getElemsWithChangedElem(prog: MainProg, changedSlideIndex: number, changedElemIndex: number, changedElem: PictureObj | TextObj | ShapeObj): Array<PictureObj | TextObj | ShapeObj> {
   let changedElemsArr: Array<PictureObj | TextObj | ShapeObj> = []
 
   for(let i = 0; i < prog.currentPresentation.slides[changedSlideIndex].elements.length; i++) {

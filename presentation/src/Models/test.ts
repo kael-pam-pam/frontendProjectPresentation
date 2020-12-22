@@ -10,15 +10,9 @@ import {
   TextObj,
   Color,
   ShapeObj,
-} from './types'
+} from './CommonFunctions/types'
 
 
-import {
-  createProgram,
-  changePresentationTitle,
-  saveProject,
-  loadProject,
-} from './functions'
 
 import {
   setSlideBackground,
@@ -34,7 +28,7 @@ import {
   changeElemPosition,
   setSelectedElement,
   deleteSelectedElements
-} from './changeSlideContent'
+} from './ActionCreators/slideElemActionCreators'
 
 import {
   createDefaultSlide,
@@ -44,7 +38,7 @@ import {
   moveSlide,
   setSelectedSlides,
   deleteSlide
-} from './slideMoveInProgramm'
+} from './ActionCreators/slidesActionCreators'
 
 import {
   defaultPoint,
@@ -54,10 +48,10 @@ import {
   isTextObj,
   isShapeObj,
   isPictureObj
-} from './commonFunctionsConst'
+} from './CommonFunctions/supportFunctionsConst'
 
 
-test('createProgramm', () => {     
+/*test('createProgramm', () => {     
   const newTittle = 'Презентация без названия'
   let newProgState: Programm = createProgram()
 
@@ -443,4 +437,4 @@ test('moveSlide', () => {
   expect(prog.currentPresentation.slides[3].id).toEqual(currSlide4.id)
   expect(prog.currentPresentation.slides[4].id).toEqual(currSlide5.id)
 
-})
+})*/

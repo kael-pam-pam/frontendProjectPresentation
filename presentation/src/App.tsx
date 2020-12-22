@@ -1,20 +1,25 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import { HeaderPanel } from './View/HeaderPanel/HeaderPanel';
 import { SlidesPanel } from './View/SlidesPanel/SlidesPanel';
 import { MainPanel } from './View/MainPanel/MainPanel';
 import { Popup } from './View/Popup/Popup';
 import { PopupProvider } from './View/Popup/PopupContext';
-import { deleteSelectedElements } from './Models/changeSlideContent';
-import { actualProgState, dispatch } from './Models/dispatcher';
 import { useDeleteSelectedElems, useDeleteSelectedSlides, useMouseDownDocumentListner } from './CustomHooks/CommonMouseKeyboardEvents';
-import { deleteSlide } from './Models/slideMoveInProgramm';
+import { connect } from 'react-redux';
+import { getState, store } from '.';
+import { saveStateToArchive } from './Models/CommonFunctions/archive';
+
+
 
 function App() {
 
   useDeleteSelectedElems()
   useDeleteSelectedSlides()
   useMouseDownDocumentListner()
+  
+  saveStateToArchive()
+  
 
   return (
     <PopupProvider>
@@ -36,4 +41,19 @@ function App() {
   );
 }
 
-export default App;
+
+/*const mapDispatchToProps = (dispatch:  Dispatch<TestActionType>) => {
+  return {
+    addSlide: () => store.dispatch(addSlide())
+  }
+}
+
+props: {addSlide: PropsWithChildren<any>}*/
+
+export {App}
+
+function mapStateToProps(state = getState()) {
+  return { state: state } 
+}
+
+export default connect(mapStateToProps)(App)

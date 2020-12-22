@@ -1,9 +1,12 @@
 import React, {useState} from 'react';
 import './Tools.css';
-import { addSlide } from '../../Models/slideMoveInProgramm';
-import { dispatch, setGlobalActiveTool } from '../../Models/dispatcher';
-import { /*actualArchiveOfState,*/ goBackAchive, goForwardAchive} from '../../Models/archive';
-import { addPictureObj, addShapeObj, addTextObj, setCanDeleteSlide } from '../../Models/changeSlideContent';
+import { addSlide } from '../../Models/ActionCreators/slidesActionCreators';
+import { setGlobalActiveTool } from '../../Models/CommonFunctions/supportFunctionsConst';
+import { /*actualArchiveOfState,*/ goBackArchive, goForwardArchive} from '../../Models/CommonFunctions/archive';
+import { addPictureObj, addShapeObj, addTextObj, setCanDeleteSlide } from '../../Models/ActionCreators/slideElemActionCreators';
+import { dispatch, getState } from '../..';
+import { MainProg, Programm } from '../../Models/CommonFunctions/types';
+import { connect } from 'react-redux';
 
 
 export type Tool = {
@@ -15,9 +18,9 @@ export type Tool = {
 function ShapeToolBox() {
   return (
     <div className="ToolShapeObj_shape"> 
-      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj, 'rect')} >Квадрат</span>
-      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj, 'triangle')} >Треугольник</span>
-      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj, 'circle')}>Круг</span>
+      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj('rect'))} >Квадрат</span>
+      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj('triangle'))} >Треугольник</span>
+      <span className="ToolShapeObj_shape_elem " onMouseDown={() => dispatch(addShapeObj('circle'))}>Круг</span>
     </div>
   )        
 }
@@ -69,7 +72,7 @@ function loadPicFromComp() {
         const img = new Image()
         img.onload = function() {
           getBase64(input.files?.item(0), function(base64Data: string){
-            dispatch(addPictureObj, ({url:src, width: img.width, height: img.height, imgB64: base64Data}))
+            dispatch(addPictureObj({url:src, width: img.width, height: img.height, imgB64: base64Data}))
           })
         }
         img.src = src
@@ -108,25 +111,26 @@ function PictureElemWithToolBox(props: PictureElemWithToolBoxProps) {
   ) 
 }
 
+
 function Tools() {
     const [activeTool, setActiveTool] = useState(0) 
 
     return (
         <div className="tools" onClick={() => console.log("ты в инструментах")}>
           <div key={0} className="tool tool_add-slide" onClick={
-            () => {dispatch(addSlide, {}); dispatch(setCanDeleteSlide, true)}}>
+            () => {dispatch(addSlide()); dispatch(setCanDeleteSlide(true))}}> 
             <span className="tool__tooltip">Новый слайд</span>
           </div>
-          <div key={1} className="tool tool_back-history" onMouseDown={(event) => {dispatch(goBackAchive, {}); event.preventDefault()}}>
+          <div key={1} className="tool tool_back-history" onMouseDown={(event) => {dispatch(goBackArchive()); event.preventDefault()}}>
             <span className="tool__tooltip">Отменить</span>
           </div>
-          <div key={2} className="tool tool_future-history" onMouseDown={(event) => {dispatch(goForwardAchive, {}); event.preventDefault()}}>
+          <div key={2} className="tool tool_future-history" onMouseDown={(event) => {dispatch(goForwardArchive()); event.preventDefault()}}>
             <span className="tool__tooltip">Повторить</span>
           </div>
           <div key={3} className={"tool tool_cursor "+(activeTool == 0 ? "tool_active" : "")} onClick={() => {setActiveTool(0); setGlobalActiveTool(0); console.log('Курсор')}}>
             <span className="tool__tooltip">Выбрать</span>
           </div>
-          <div key={4} className={"tool tool_text-obj "+(activeTool == 1 ? "tool_active" : "")} onClick={() => {dispatch(addTextObj, {}); setActiveTool(1); setGlobalActiveTool(1)}}>
+          <div key={4} className={"tool tool_text-obj "+(activeTool == 1 ? "tool_active" : "")} onClick={() => {dispatch(addTextObj()); setActiveTool(1); setGlobalActiveTool(1)}}>
             <span className="tool__tooltip">Текстовое поле</span>
           </div>
           <PictureElemWithToolBox activeTool={activeTool} setActiveTool={setActiveTool}/>
@@ -139,3 +143,5 @@ function Tools() {
 export {
     Tools
 }
+
+

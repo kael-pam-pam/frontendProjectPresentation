@@ -1,8 +1,10 @@
 import React, { useEffect, useRef} from 'react'
-import { changeTextObj, setSelectedElement} from '../../Models/changeSlideContent'
-import { checkSelectedElem } from '../../Models/commonFunctionsConst'
-import { actualProgState, dispatch} from '../../Models/dispatcher'
-import { PictureObj, TextObj, ShapeObj} from '../../Models/types'
+import { connect } from 'react-redux'
+import { store } from '../..'
+import { changeTextObj, setSelectedElement} from '../../Models/ActionCreators/slideElemActionCreators'
+import { checkSelectedElem, searchChangedSlideIndex } from '../../Models/CommonFunctions/supportFunctionsConst'
+
+import { PictureObj, TextObj, ShapeObj} from '../../Models/CommonFunctions/types'
 import './Element.css'
 
 
@@ -153,7 +155,7 @@ function ImgTextObject(props: ImgTextObjectProps) {
 
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   useEffect(() => {
-  if(props.shape.type === 'text' && checkSelectedElem(actualProgState, props.shape.id)) {
+  if(props.shape.type === 'text' && checkSelectedElem(props.shape.id)) {
         inputRef.current?.focus()
       }  
   })
@@ -172,7 +174,7 @@ function ImgTextObject(props: ImgTextObjectProps) {
         ref={inputRef}
         value={props.shape.text}
         onMouseDown={() => inputRef.current?.focus()}
-        onChange={(event) => dispatch(changeTextObj, {newParam: event.target.value, paramToChange: 'text'})}
+        onChange={(event) => store.dispatch(changeTextObj({newParam: event.target.value, paramToChange: 'text'}))}
         style={{
           width: props.width, 
           height: props.height, 

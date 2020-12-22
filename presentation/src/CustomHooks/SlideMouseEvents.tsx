@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
-import { setSelectedElement, setCanDeleteSlide } from '../Models/changeSlideContent'
-import { checkSecondSlideIsBeyond, searchChangedSlideIndexById } from '../Models/commonFunctionsConst'
-import { actualProgState, dispatch } from '../Models/dispatcher'
-import { moveSlide, removeOneElemFromSelectedSlides, setSelectedSlides } from '../Models/slideMoveInProgramm'
-import { Slide } from '../Models/types'
+import { store, getState, dispatch } from '..'
+import { checkSecondSlideIsBeyond, getSlidesWithChangedSlide, searchChangedSlideIndex, searchChangedSlideIndexById } from '../Models/CommonFunctions/supportFunctionsConst'
+import { moveSlide } from '../Models/ActionCreators/slidesActionCreators'
+import { borderLightType, Slide, StateTypes } from '../Models/CommonFunctions/types'
+import { checkSlideForReplace, setSelectedSlidesInHook } from './supportHooksFunctions'
+import { setSlideBorderLight } from '../Models/ActionCreators/slidesActionCreators'
 
 export {
   useDragAndDropSlides,
@@ -26,77 +27,32 @@ function useDragAndDropSlides(props: dragAndDropSlidesProps) {
     }
   })
 
-
   const mouseDownSelectSlide = (event: React.MouseEvent | MouseEvent) => {
     
     if (!event.defaultPrevented ) {
-      if (!actualProgState.canDeleteSlides) {   
-        dispatch(setCanDeleteSlide, true)
-      }
-
-      if (!actualProgState.selectedSlides.includes(props.currSlide.id)) {  
-        if (event.ctrlKey) { 
-          dispatch(setSelectedSlides, ([...actualProgState.selectedSlides, props.currSlide.id]))
-        } else {
-          dispatch(setSelectedSlides, ([props.currSlide.id]))
-        }
-      } else if (actualProgState.selectedSlides.length > 1) {
-        if (event.ctrlKey) {
-          dispatch(removeOneElemFromSelectedSlides, props.currSlide.id)  
-        } else {
-          dispatch(setSelectedSlides, ([props.currSlide.id]))
-        }
-      }   
-      
-      if (actualProgState.selectedElements.length !== 0) {
-        dispatch(setSelectedElement, ([]))
-      }
-
+      setSelectedSlidesInHook(event, props.currSlide.id)
       event.preventDefault()
     }  
   }
 
   useEffect(() => {
-    if (props.isSmallSlide && !actualProgState.selectedSlides.includes(props.currSlide.id)) {
+    const selectedSlides = getState().mainProg.selectedSlides
+    if (props.isSmallSlide && !selectedSlides.includes(props.currSlide.id)) {
       props.svgRef.current?.addEventListener('mouseup', mouseUpSelectSlide)
       return () => props.svgRef.current?.removeEventListener('mouseup', mouseUpSelectSlide)
     }
   })
 
-  function checkMousePosOverSlide(event: React.MouseEvent | MouseEvent): boolean {
-    let canMoveSlide = false;
-    const mousePosY = event.pageY
-    const svgPosY = Number(props.svgRef.current?.getBoundingClientRect().y)
-    const svgHeight = Number(props.svgRef.current?.getBoundingClientRect().height)
-    const selectedSlideId = actualProgState.selectedSlides[0]
-    const otherSlideId = props.currSlide.id
-    const otherSlideIsBeyond = checkSecondSlideIsBeyond(actualProgState, selectedSlideId, otherSlideId)
-
-    const slideHeightLimit = svgPosY + (svgHeight / 2)
-  
-    console.log(otherSlideIsBeyond, mousePosY, svgPosY + (svgHeight / 2))
-    if ((!otherSlideIsBeyond && mousePosY < slideHeightLimit) || (otherSlideIsBeyond && mousePosY > slideHeightLimit)) {
-      canMoveSlide = true
-    }
-
-
-    return canMoveSlide
-  }
-
   const mouseUpSelectSlide = (event: React.MouseEvent | MouseEvent) => {
-    const elemsArrLength = actualProgState.selectedElements.length
-    const slidesArrLength = actualProgState.selectedSlides.length 
+    if (checkSlideForReplace(event, props.svgRef, props.currSlide.id)) {
 
-
-    if (checkMousePosOverSlide(event) && elemsArrLength === 0 && slidesArrLength === 1 && !event.ctrlKey) {
-  
       const secondSlideId: string = props.currSlide.id 
-      const index = searchChangedSlideIndexById(actualProgState, secondSlideId)
-      dispatch(moveSlide, index)
+      const index = searchChangedSlideIndexById(secondSlideId)
+      dispatch(moveSlide(index))
+
     }
   } 
-} 
-
+}
 
 
 interface lighInsertPlaceProps {
@@ -110,34 +66,44 @@ interface lighInsertPlaceProps {
 function useLighSlideInsertPlace(props: lighInsertPlaceProps) {   //переделать через модель
 
   useEffect(() => {
-    if (props.isSmallSlide && actualProgState.selectedSlides[0] !== props.currSlide.id) {
+    const selectedSlides = getState().mainProg.selectedSlides
+    if (props.isSmallSlide && selectedSlides[0] !== props.currSlide.id) {
       props.slidesPanelRef?.current?.addEventListener('mousedown', mouseDownNotSelectSlide)
       return () => props.slidesPanelRef?.current?.removeEventListener('mousedown', mouseDownNotSelectSlide)
     }
   })
 
   const mouseDownNotSelectSlide = (event: React.MouseEvent | MouseEvent) => {
-    if (event.defaultPrevented && actualProgState.selectedSlides.length === 1) {
+    const selectedSlides = getState().mainProg.selectedSlides
+    if (event.defaultPrevented && selectedSlides.length === 1) {
+
       props.svgRef.current?.addEventListener('mouseenter', mouseEnterNotSelectSlide)
       props.divRef.current?.addEventListener('mouseleave', mouseLeaveNotSelectSlide)
       document.addEventListener('mouseup', mouseUpNotSelectSlide)
-      event.preventDefault()
+
+      
     }  
   }
 
+
   const mouseEnterNotSelectSlide = (event: MouseEvent) => {
-    if (props.isSmallSlide && actualProgState.selectedSlides[0] !== props.currSlide.id){
-      const selectedSlideId = actualProgState.selectedSlides[0]
+    const selectedSlides = getState().mainProg.selectedSlides
+
+    if (props.isSmallSlide && selectedSlides[0] !== props.currSlide.id){
+      const selectedSlideId = selectedSlides[0]
       const otherSlideId = props.currSlide.id
-      if (checkSecondSlideIsBeyond(actualProgState, selectedSlideId, otherSlideId)) {
+      if (checkSecondSlideIsBeyond(selectedSlideId, otherSlideId)) {
+        console.log(checkSlideForReplace(event, props.svgRef, props.currSlide.id))
         props.divRef.current?.classList.add('slide-frame_selected__bottom')
       } else {
+        //dispatch(setSlideBorderLight('top', props.currSlide.id))
         props.divRef.current?.classList.add('slide-frame_selected__top')
       }
     }
   }
 
   const mouseLeaveNotSelectSlide = () => {
+    //dispatch(setSlideBorderLight('unset', props.currSlide.id))
     props.divRef.current?.classList.remove('slide-frame_selected__top')
     props.divRef.current?.classList.remove('slide-frame_selected__bottom')
   }

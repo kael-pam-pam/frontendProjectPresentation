@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect} from 'react'
-import { checkSelectedElem } from '../../Models/commonFunctionsConst'
-import { actualProgState } from '../../Models/dispatcher'
-import { PictureObj, TextObj, ShapeObj} from '../../Models/types'
+import { checkSelectedElem, searchChangedSlideIndex } from '../../Models/CommonFunctions/supportFunctionsConst'
+
+import { PictureObj, TextObj, ShapeObj} from '../../Models/CommonFunctions/types'
 import './Element.css'
 import { useDragAndDropElement, useReSizeElement} from '../../CustomHooks/ElemMouseEvents'
 import { useMouseDownDocumentListner} from '../../CustomHooks/CommonMouseKeyboardEvents'
 import { ImgTextObject, OutlineRect, ShapeObject } from './SvgElems'
 import { useNormalizeElemSize } from '../../CustomHooks/CommonDifferentHooks'
+import { getState } from '../../index'
 
 export {
   SmallSlideElement,
@@ -60,6 +61,8 @@ interface BigSlideElementProps {
 }
 
 function BigSlideElement(props: BigSlideElementProps) {
+  const actualProgState = getState().mainProg 
+
   const id = props.shape.id
 
   const mainSvgProps = props.svgProps.current?.getBoundingClientRect()
@@ -96,7 +99,7 @@ function BigSlideElement(props: BigSlideElementProps) {
   let svgElem: JSX.Element = <rect/>
   let outLineRect: JSX.Element = <rect />
 
-  if (checkSelectedElem(actualProgState, id)) {
+  if (checkSelectedElem(id)) {
     outLineRect = <OutlineRect 
       firstPointRef={firstPointRef}
       secondPointRef={secondPointRef}
@@ -137,5 +140,4 @@ function BigSlideElement(props: BigSlideElementProps) {
   
   return (svgElem)
 }
-
 

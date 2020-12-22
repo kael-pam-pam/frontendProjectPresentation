@@ -1,9 +1,11 @@
 import React, {useEffect, useRef} from 'react';
-import { actualProgState } from '../../Models/dispatcher'
 import './Slide.css';
-import { Slide} from '../../Models/types'
-import { useGetSlideBackground, useGetSlideSvgElems, useGetDivSvgClassNames, } from '../../CustomHooks/CommonDifferentHooks';
+import { Slide} from '../../Models/CommonFunctions/types'
+import { getSlideBackground, getSlideSvgElems, getDivSvgClassNames, } from '../commonViewFunctions';
 import { useDragAndDropSlides, useLighSlideInsertPlace  } from '../../CustomHooks/SlideMouseEvents';
+import { store, getState, dispatch } from '../../index';
+import { Program } from 'typescript';
+import { connect } from 'react-redux';
 
 
 export {
@@ -18,17 +20,18 @@ type SlideProps = {
 }
   
 function MainSlide(props: SlideProps) {
-    
+    const actualProgState = getState().mainProg  
+  
     let currSlide: Slide = actualProgState.currentPresentation.slides[props.numberOfSlide]
     const modelSlideBackground = currSlide.background
     const mainSvgRef = useRef<SVGSVGElement | null>(null)
     const mainDivRef = useRef<HTMLDivElement | null>(null)
 
-    const divClassName = useGetDivSvgClassNames(props.isSmallSlide).divClassName
-    const svgClassName = useGetDivSvgClassNames(props.isSmallSlide).svgClassName
-    const svgSlideBackground: string = useGetSlideBackground(modelSlideBackground) 
+    const divClassName = getDivSvgClassNames(props.isSmallSlide).divClassName
+    const svgClassName = getDivSvgClassNames(props.isSmallSlide).svgClassName
+    const svgSlideBackground: string = getSlideBackground(modelSlideBackground) 
 
-    const svgSlideElems: Array<JSX.Element> = useGetSlideSvgElems({
+    const svgSlideElems: Array<JSX.Element> = getSlideSvgElems({
       modelSlideElems: currSlide.elements,
       isSmallSlideElem: props.isSmallSlide,
       svgRef: mainSvgRef
@@ -48,13 +51,3 @@ function MainSlide(props: SlideProps) {
       </div>
     )
   }
-
-
-
-
-
-
-
-
-
-

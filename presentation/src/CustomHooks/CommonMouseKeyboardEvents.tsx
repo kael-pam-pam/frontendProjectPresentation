@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
-import { deleteSelectedElements, setCanDeleteSlide, setSelectedElement } from '../Models/changeSlideContent'
-import { deleteSlide, setSelectedSlides } from '../Models/slideMoveInProgramm'
-import { actualProgState, dispatch } from '../Models/dispatcher'
+import { dispatch, getState } from '..'
+import { deleteSelectedElements, setCanDeleteSlide, setSelectedElement } from '../Models/ActionCreators/slideElemActionCreators'
+import { deleteSlide, setSelectedSlides } from '../Models/ActionCreators/slidesActionCreators'
 
 
 export {
@@ -18,8 +18,8 @@ function useDeleteSelectedSlides() {
   })
 
   const keyDownHandler = (event: KeyboardEvent) => {
-    if (event.key === 'Delete' && actualProgState.canDeleteSlides) {
-      dispatch(deleteSlide, {})
+    if (event.key === 'Delete' && getState().commonDeps.canDeleteSlides) {
+      dispatch(deleteSlide())
     } 
   }
 }
@@ -31,9 +31,10 @@ function useDeleteSelectedElems() {
     return () => document.removeEventListener('keydown', keyDownHandler)
   })
 
+  const selectedElemsLength = getState().mainProg.selectedElements.length
   const keyDownHandler = (event: KeyboardEvent) => {
-    if (event.key === 'Delete' && actualProgState.selectedElements.length !== 0) {
-      dispatch(deleteSelectedElements, {})
+    if (event.key === 'Delete' && selectedElemsLength !== 0) {
+      dispatch(deleteSelectedElements())
     } 
   }
 }
@@ -48,14 +49,18 @@ function useMouseDownDocumentListner() {
   
   const mouseDownResetHandler = (event: React.MouseEvent | MouseEvent) => {
     if (!event.defaultPrevented) {
-      if (actualProgState.canDeleteSlides) {
-        dispatch(setCanDeleteSlide, false)
+      const canDeleteSlides = getState().commonDeps.canDeleteSlides
+      const selectedElemsLength = getState().mainProg.selectedElements.length
+      const selectedSlidesLength = getState().mainProg.selectedSlides.length
+      const firstSlideId = getState().mainProg.selectedSlides[0]
+      if (canDeleteSlides) {
+        dispatch(setCanDeleteSlide(false))
       }
-      if (actualProgState.selectedElements.length !== 0) {
-        dispatch(setSelectedElement, ([]))
+      if (selectedElemsLength !== 0) {
+        dispatch(setSelectedElement([]))
       }  
-      if (actualProgState.selectedSlides.length > 1) {
-        dispatch(setSelectedSlides, ([actualProgState.selectedSlides[0]]))
+      if (selectedSlidesLength > 1) {
+        dispatch(setSelectedSlides([firstSlideId]))
       }
     }  
   }
