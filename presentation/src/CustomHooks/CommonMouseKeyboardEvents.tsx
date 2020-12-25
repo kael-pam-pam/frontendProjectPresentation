@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react'
-import { dispatch, getState } from '..'
+//import { dispatch, getState } from '..'
 import { deleteSelectedElements, setCanDeleteSlide, setSelectedElement } from '../Models/ActionCreators/slideElemActionCreators'
 import { deleteSlide, setSelectedSlides } from '../Models/ActionCreators/slidesActionCreators'
+import { CommonDeps, MainProg, Programm } from '../Models/CommonFunctions/types'
 
 
 export {
@@ -11,36 +12,44 @@ export {
 }
 
 
-function useDeleteSelectedSlides() {
+function useDeleteSelectedSlides(commonDepsState: CommonDeps, deleteSlide: () => void) {
   useEffect(() => {
     document.addEventListener('keydown', keyDownHandler)
     return () => document.removeEventListener('keydown', keyDownHandler)
   })
 
   const keyDownHandler = (event: KeyboardEvent) => {
-    if (event.key === 'Delete' && getState().commonDeps.canDeleteSlides) {
-      dispatch(deleteSlide())
+    if (event.key === 'Delete' && commonDepsState.canDeleteSlides) {
+      deleteSlide()
     } 
   }
 }
 
 
-function useDeleteSelectedElems() {
+function useDeleteSelectedElems(mainProgState: MainProg, deleteSelectedElements: () => void) {
   useEffect(() => {
     document.addEventListener('keydown', keyDownHandler)
     return () => document.removeEventListener('keydown', keyDownHandler)
   })
 
-  const selectedElemsLength = getState().mainProg.selectedElements.length
+  const selectedElemsLength = mainProgState.selectedElements.length
   const keyDownHandler = (event: KeyboardEvent) => {
     if (event.key === 'Delete' && selectedElemsLength !== 0) {
-      dispatch(deleteSelectedElements())
+      deleteSelectedElements()
     } 
   }
 }
 
 
-function useMouseDownDocumentListner() {  
+
+interface useMouseDownProps {
+  state: Programm,
+  setCanDeleteSlide: (canDelete: boolean) => void,
+  setSelectedSlides: (slidesArr: Array<string>) => void,
+  setSelectedElement: (elemsArr: Array<string>) => void
+}
+
+function useMouseDownDocumentListner(props: useMouseDownProps) {  
   useEffect(() => {
     document.addEventListener('mousedown', mouseDownResetHandler)
     return () => document.removeEventListener('mousedown', mouseDownResetHandler)
@@ -49,18 +58,18 @@ function useMouseDownDocumentListner() {
   
   const mouseDownResetHandler = (event: React.MouseEvent | MouseEvent) => {
     if (!event.defaultPrevented) {
-      const canDeleteSlides = getState().commonDeps.canDeleteSlides
-      const selectedElemsLength = getState().mainProg.selectedElements.length
-      const selectedSlidesLength = getState().mainProg.selectedSlides.length
-      const firstSlideId = getState().mainProg.selectedSlides[0]
+      const canDeleteSlides = props.state.commonDeps.canDeleteSlides
+      const selectedElemsLength = props.state.mainProg.selectedElements.length
+      const selectedSlidesLength = props.state.mainProg.selectedSlides.length
+      const firstSlideId = props.state.mainProg.selectedSlides[0]
       if (canDeleteSlides) {
-        dispatch(setCanDeleteSlide(false))
+        props.setCanDeleteSlide(false)
       }
       if (selectedElemsLength !== 0) {
-        dispatch(setSelectedElement([]))
+        props.setSelectedElement([])
       }  
       if (selectedSlidesLength > 1) {
-        dispatch(setSelectedSlides([firstSlideId]))
+        props.setSelectedSlides([firstSlideId])
       }
     }  
   }

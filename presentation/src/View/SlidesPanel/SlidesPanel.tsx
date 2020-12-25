@@ -1,21 +1,18 @@
 import React, { useRef } from 'react';
 import './SlidesPanel.css';
-import { Slide } from '../../Models/CommonFunctions/types'
+import { Programm, Slide } from '../../Models/CommonFunctions/types'
 import { getListSlides } from '../commonViewFunctions';
-import { getState } from '../../index';
+import { connect } from 'react-redux';
 
-export {
-    SlidesPanel
-}
 
-function SlidesPanel() {
-    const actualProgState = getState().mainProg
-    const slides: Array<Slide> = actualProgState.currentPresentation.slides
-    const selectedSlides: Array<string> = actualProgState.selectedSlides;
+function SlidesPanel(props: {state: Programm}) {
+    const actualProgState = props.state
+    const slides: Array<Slide> = actualProgState.mainProg.currentPresentation.slides
+    const selectedSlides: Array<string> = actualProgState.mainProg.selectedSlides;
    
     const slidesPanelRef = useRef<HTMLDivElement | null>(null)
 
-    const slidesList = getListSlides({slides, selectedSlides, slidesPanelRef})
+    const slidesList = getListSlides({state: actualProgState, slides, selectedSlides, slidesPanelRef})
     
     return (
         <div ref={slidesPanelRef} className="slides-panel">
@@ -23,3 +20,10 @@ function SlidesPanel() {
         </div>
     )  
 }
+
+
+function mapStateToProps(state: Programm) {
+    return { state: state } 
+};
+  
+export default connect(mapStateToProps)(SlidesPanel);

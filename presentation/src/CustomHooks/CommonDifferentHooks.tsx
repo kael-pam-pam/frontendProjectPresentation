@@ -1,6 +1,4 @@
 import React, {useEffect} from 'react'
-import { resizeElement} from '../Models/ActionCreators/slideElemActionCreators'
-import { dispatch } from '../index'
 
 
 export {
@@ -9,6 +7,7 @@ export {
 
 
 interface NormalizeImgProps {
+  resizeElement: (newWidth: number, newHeigth: number, newPosX: number, newPosY: number) => void,
   setSize: React.Dispatch<React.SetStateAction<{ width: number; height: number; }>>
   elemWidth: number,
   elemHeight: number, 
@@ -42,7 +41,7 @@ function useNormalizeElemSize(props: NormalizeImgProps) {
         }
       }
      
-      dispatch(resizeElement({newWidth: newImgSize.width, newHeigth: newImgSize.height, newPosX: 10, newPosY: 10}))
+      props.resizeElement(newImgSize.width, newImgSize.height, 10, 10)
       props.setSize(newImgSize)
     } 
   }, [])

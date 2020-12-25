@@ -1,8 +1,13 @@
 import { getState } from "../../index";
+import { re_addShapeObj } from "../ActionCreators/slideElemActionCreators";
+import { re_addSlide, re_moveSlide } from "../ActionCreators/slidesActionCreators";
+import { createProgram } from "../CommonFunctions/mainProgOperations";
 import { borderLightType, MainProg, StateTypes } from "../CommonFunctions/types";
 import { ActionType, Programm } from "../CommonFunctions/types";
 
-export function mainReducer(state: Programm = getState(), action: ActionType): Programm {
+
+
+export function mainReducer(state: Programm = createProgram(), action: ActionType): Programm {
   return {
       mainProg: mainProgState(state.mainProg, action),
       commonDeps: {
@@ -13,23 +18,11 @@ export function mainReducer(state: Programm = getState(), action: ActionType): P
   }
 }
 
-export function slideBorderLight(state: borderLightType, action: ActionType): borderLightType {
-  switch (action.type) {
-    case StateTypes.TOP_SLIDE_BORDER_LIGHT:
-        return action.payload
-    case StateTypes.BOTTOM_SLIDE_BORDER_LIGHT:
-        return action.payload
-    case StateTypes.RESET_SLIDE_BORDER_LIGHT:
-          return action.payload    
-    default:
-        return 'unset'
-  }  
-}
-
-
 export function mainProgState(state: MainProg, action: ActionType): MainProg {
-
   switch (action.type) {
+      case StateTypes.ADD_SLIDE:
+        return re_addSlide(state, action)
+
       case StateTypes.LOAD_PROJECT:
         return action.payload
       case StateTypes.GO_BACK_ARCHIVE:
@@ -37,17 +30,16 @@ export function mainProgState(state: MainProg, action: ActionType): MainProg {
       case StateTypes.GO_FORWARD_ARCHIVE:
         return action.payload.mainProg 
 
-      case StateTypes.ADD_SLIDE:
-        return action.payload
       case StateTypes.SET_SELECTED_SLIDES:
           return action.payload
       case StateTypes.DELETE_SLIDE:
         return action.payload
       case StateTypes.MOVE_SLIDE:
-        return action.payload
+        return re_moveSlide(state, action)
 
       case StateTypes.ADD_SHAPE_OBJ:
-        return action.payload
+        return re_addShapeObj(state, action)
+        
       case StateTypes.CHANGE_ELEM_POSITION:
         return action.payload  
       case StateTypes.SET_SELECTED_ELEMENT:
@@ -81,6 +73,19 @@ export function mainProgState(state: MainProg, action: ActionType): MainProg {
       default:
           return state
   }
+}
+
+export function slideBorderLight(state: borderLightType, action: ActionType): borderLightType {
+  switch (action.type) {
+    case StateTypes.TOP_SLIDE_BORDER_LIGHT:
+        return action.payload
+    case StateTypes.BOTTOM_SLIDE_BORDER_LIGHT:
+        return action.payload
+    case StateTypes.RESET_SLIDE_BORDER_LIGHT:
+          return action.payload    
+    default:
+        return 'unset'
+  }  
 }
 
 

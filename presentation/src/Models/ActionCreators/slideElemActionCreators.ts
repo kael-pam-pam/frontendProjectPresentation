@@ -8,6 +8,7 @@ import {
   Color,
   ShapeObj,
   borderLightType,
+  ActionType,
 } from '../CommonFunctions/types'
 
 import {
@@ -37,12 +38,12 @@ export {
   setCanDeleteSlide,
   setSlideBackground,
   createPictureObj,
-  addPictureObj,
+  re_addPictureObj,
   createEmtyTextObj,
-  addTextObj,
+  re_addTextObj,
   changeTextObj,
   createShapeObj,
-  addShapeObj,
+  re_addShapeObj,
   changeShapeObj,
   resizeElement,
   changeElemPosition,
@@ -68,7 +69,7 @@ function setSlideBackground(newBackground: Picture | Color) {
 
   deepFreeze(prevProgState)
   
-  const changedSlideIndex: number = searchChangedSlideIndex()
+  const changedSlideIndex: number = searchChangedSlideIndex(prevProgState)
 
   const changedSlide =  getSlideWithNewBackground(prevProgState, changedSlideIndex, newBackground)
 
@@ -99,8 +100,7 @@ function createPictureObj(url: string, width: number, height: number, imgB64: st
 }
 
 
-function getSlideWithChangedElems(changedElems: Array<PictureObj | TextObj | ShapeObj>, changedSlideIndex: number): Slide {
-  const prevProgState: MainProg = getState().mainProg
+function getSlideWithChangedElems(prevProgState: MainProg, changedElems: Array<PictureObj | TextObj | ShapeObj>, changedSlideIndex: number): Slide {
   return {
     ...prevProgState.currentPresentation.slides[changedSlideIndex],
     elements: changedElems
@@ -115,18 +115,17 @@ export function getSlideWithChangedBorderLight(borderLight: borderLightType, cha
   }
 }
 
-function addPictureObj(payload: {url: string, width: number, height: number, imgB64: string}) {
+function re_addPictureObj(prevProgState: MainProg, payload: {url: string, width: number, height: number, imgB64: string}) {
   
-  const prevProgState = getState().mainProg
 
   deepFreeze(prevProgState)
 
-  const changedSlideIndex = searchChangedSlideIndex()
+  const changedSlideIndex = searchChangedSlideIndex(prevProgState)
 
   const newPictureObj = createPictureObj(payload.url, payload.width, payload.height, payload.imgB64)
   const changedElems = getElemsWithNewElem(prevProgState, newPictureObj, changedSlideIndex)
 
-  const slideWithChangedElems = getSlideWithChangedElems(changedElems, changedSlideIndex)
+  const slideWithChangedElems = getSlideWithChangedElems(prevProgState, changedElems, changedSlideIndex)
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prevProgState, slideWithChangedElems, changedSlideIndex)
 
   return {
@@ -159,19 +158,18 @@ function createEmtyTextObj(): TextObj {
   }
 }
 
-function addTextObj() {
+function re_addTextObj(prevProgState: MainProg) {
 
-  const prevProgState = getState().mainProg
 
   deepFreeze(prevProgState)
   
-  const changedSlideIndex = searchChangedSlideIndex()
+  const changedSlideIndex = searchChangedSlideIndex(prevProgState)
 
   const newTextObj = createEmtyTextObj()
 
   const changedElems = getElemsWithNewElem(prevProgState, newTextObj, changedSlideIndex)
 
-  const slideWithChangedElems = getSlideWithChangedElems(changedElems, changedSlideIndex)
+  const slideWithChangedElems = getSlideWithChangedElems(prevProgState, changedElems, changedSlideIndex)
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prevProgState, slideWithChangedElems, changedSlideIndex)
 
   return {
@@ -191,7 +189,7 @@ function changeTextObj(payload: {newParam: string, paramToChange: 'text' | 'font
   const prevProgState = getState().mainProg
   deepFreeze(prevProgState)
 
-  const changedSlideIndex = searchChangedSlideIndex()
+  const changedSlideIndex = searchChangedSlideIndex(prevProgState)
   const changedElemIndex = searchChangedElemIndex(prevProgState, changedSlideIndex)
   
   let changedElem = getChangedElem(prevProgState, changedSlideIndex, changedElemIndex)
@@ -200,7 +198,7 @@ function changeTextObj(payload: {newParam: string, paramToChange: 'text' | 'font
   }
 
   const changedElemsArr = getElemsWithChangedElem(prevProgState, changedSlideIndex, changedElemIndex, changedElem)
-  const slideWithChangedElems = getSlideWithChangedElems(changedElemsArr, changedSlideIndex)
+  const slideWithChangedElems = getSlideWithChangedElems(prevProgState, changedElemsArr, changedSlideIndex)
   
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prevProgState, slideWithChangedElems, changedSlideIndex)
 
@@ -233,29 +231,31 @@ function createShapeObj(type: 'rect' | 'triangle' | 'circle'): ShapeObj {
   }
 } 
 
-function addShapeObj(shapeType: 'rect' | 'triangle' | 'circle') {
-  const prevProgState = getState().mainProg
-  deepFreeze(prevProgState)
-  
-  const changedSlideIndex = searchChangedSlideIndex()
+function re_addShapeObj(state: MainProg, action: ActionType) {
 
-  let newShapeObj: ShapeObj
-  newShapeObj = createShapeObj(shapeType)
+  deepFreeze(state)
   
-  const changedElems = getElemsWithNewElem(prevProgState, newShapeObj, changedSlideIndex)
-  const slideWithChangedElems = getSlideWithChangedElems(changedElems, changedSlideIndex)
-  const slidesWithChangedSlide = getSlidesWithChangedSlide(prevProgState, slideWithChangedElems, changedSlideIndex)
+  switch (action.type) {
+    case StateTypes.ADD_SHAPE_OBJ:
+      const changedSlideIndex = searchChangedSlideIndex(state)
 
-  return {
-      type: StateTypes.ADD_SHAPE_OBJ,
-      payload: {
-        ...prevProgState,
+      let newShapeObj: ShapeObj
+      newShapeObj = createShapeObj(action.payload)
+      
+      const changedElems = getElemsWithNewElem(state, newShapeObj, changedSlideIndex)
+      const slideWithChangedElems = getSlideWithChangedElems(state, changedElems, changedSlideIndex)
+      const slidesWithChangedSlide = getSlidesWithChangedSlide(state, slideWithChangedElems, changedSlideIndex)
+
+      return { 
+        ...state,
         currentPresentation: {
-            ...prevProgState.currentPresentation,
+            ...state.currentPresentation,
             slides: slidesWithChangedSlide
         },
         selectedElements: []
       }
+    default:
+      return {...state}  
   }        
 }
 
@@ -263,7 +263,7 @@ function changeShapeObj(newParam: string, paramToChange: 'borderColor' | 'fillCo
   const prevProgState = getState().mainProg
   deepFreeze(prevProgState)
   
-  const changedSlideIndex = searchChangedSlideIndex()
+  const changedSlideIndex = searchChangedSlideIndex(prevProgState)
   const changedElemIndex = searchChangedElemIndex(prevProgState, changedSlideIndex)
   
   let changedElem = getChangedElem(prevProgState, changedSlideIndex, changedElemIndex)
@@ -272,7 +272,7 @@ function changeShapeObj(newParam: string, paramToChange: 'borderColor' | 'fillCo
   }
 
   const changedElemsArr = getElemsWithChangedElem(prevProgState, changedSlideIndex, changedElemIndex, changedElem)
-  const slideWithChangedElems = getSlideWithChangedElems(changedElemsArr, changedSlideIndex)
+  const slideWithChangedElems = getSlideWithChangedElems(prevProgState, changedElemsArr, changedSlideIndex)
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prevProgState, slideWithChangedElems, changedSlideIndex) 
 
   return {
@@ -291,14 +291,14 @@ function resizeElement(payload: {newWidth: number, newHeigth: number, newPosX: n
   const prevProgState = getState().mainProg
   deepFreeze(prevProgState)
 
-  const changedSlideIndex = searchChangedSlideIndex()
+  const changedSlideIndex = searchChangedSlideIndex(prevProgState)
   const changedElemIndex = searchChangedElemIndex(prevProgState, changedSlideIndex)
 
   let changedElem = getChangedElem(prevProgState, changedSlideIndex, changedElemIndex)
   changedElem = getNewResizedElem(changedElem, payload.newWidth, payload.newHeigth, payload.newPosX, payload.newPosY)
 
   const changedElemsArr = getElemsWithChangedElem(prevProgState, changedSlideIndex, changedElemIndex, changedElem)
-  const slideWithChangedElems = getSlideWithChangedElems(changedElemsArr, changedSlideIndex)
+  const slideWithChangedElems = getSlideWithChangedElems(prevProgState, changedElemsArr, changedSlideIndex)
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prevProgState, slideWithChangedElems, changedSlideIndex)
 
   return {
@@ -317,7 +317,7 @@ function changeElemPosition(payload: {newX: number, newY: number, id: string}) {
   const prevProgState = getState().mainProg
   deepFreeze(prevProgState)
 
-  const changedSlideIndex = searchChangedSlideIndex()
+  const changedSlideIndex = searchChangedSlideIndex(prevProgState)
 
   const changedElemIndex = searchChangedElemIndexById(prevProgState, changedSlideIndex, payload.id)
   let changedElem = getChangedElem(prevProgState, changedSlideIndex, changedElemIndex)
@@ -325,7 +325,7 @@ function changeElemPosition(payload: {newX: number, newY: number, id: string}) {
 
   let changedElemsArr = getElemsWithChangedElem(prevProgState, changedSlideIndex, changedElemIndex, changedElem)  
 
-  const slideWithChangedElems = getSlideWithChangedElems(changedElemsArr, changedSlideIndex)
+  const slideWithChangedElems = getSlideWithChangedElems(prevProgState, changedElemsArr, changedSlideIndex)
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prevProgState, slideWithChangedElems, changedSlideIndex) 
 
   return {

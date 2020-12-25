@@ -1,21 +1,20 @@
 import React, { useCallback } from 'react';
 import './HeaderPanel.css';
 import { Commands, MenuItem } from '../Commands/Commands';
-import { Tools } from '../Tools/Tools';
+import  Tools  from '../Tools/Tools';
 import { useSetPopup, useSetIsVisiblePopup } from '../Popup/PopupContext';
 import { PropsPopup } from '../Popup/Popup'
-import { addSlide } from '../../Models/ActionCreators/slidesActionCreators';
+import { addSlide } from '../../Models/ActionCreators/slElActionCreators';
 import { getProgram, savePresentationAsJSON, saveProgramAsPDF } from '../../Models/CommonFunctions/SetGetPresentation';
-import { store, dispatch, getState } from '../..';
 import { connect } from 'react-redux';
+import { Programm } from '../../Models/CommonFunctions/types';
+import { Dispatch } from 'redux';
+import { Program } from 'typescript';
 
 
-export {
-  HeaderPanel
-}
 
 
-function HeaderPanel() {
+function HeaderPanel(props: {addSlide: () => void, state: Programm}) {
     const setPopup = useSetPopup();
     const setIsVisible = useSetIsVisiblePopup();
 
@@ -39,7 +38,7 @@ function HeaderPanel() {
           items: [
             {
                 caption: 'Добавить слайд',
-                action: () => dispatch(addSlide())
+                action: () => props.addSlide()
             },
             {
               caption: 'Открыть',
@@ -111,15 +110,21 @@ function HeaderPanel() {
 
     return (
       <div className="header-panel">
-        <span className="title">{getState().mainProg.currentPresentation.title}</span>
+        <span className="title">{props.state.mainProg.currentPresentation.title}</span>
         <Commands menu={menu} />
         <Tools />
       </div>
     )
 }
 
-function mapStateToProps(state = store.getState()) {
+const mapDispatchToProps = (dispatch: Dispatch) => {
+  return {
+    addSlide: () => dispatch(addSlide()),
+  } 
+}
+
+function mapStateToProps(state: Programm) {
   return { state: state } 
 };
 
-export default connect(mapStateToProps)(HeaderPanel);
+export default connect(mapStateToProps, mapDispatchToProps)(HeaderPanel);

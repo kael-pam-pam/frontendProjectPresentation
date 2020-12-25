@@ -2,6 +2,9 @@ import {
   StateTypes,
   Slide,
   borderLightType,
+  Programm,
+  ActionType,
+  MainProg,
 } from '../CommonFunctions/types'
 
 import {
@@ -10,13 +13,14 @@ import {
 
 import { getState } from '../../index'
 import { getSlideWithChangedBorderLight } from './slideElemActionCreators'
+import { createProgram } from 'typescript'
 
 export {
   createDefaultSlide,
-  addSlide,
+  re_addSlide,
   supportSlidesWithoutSelectedSlides,
   supportSortingSelectedSlides,
-  moveSlide,
+  re_moveSlide,
   setSelectedSlides,
   deleteSlide,
   removeOneElemFromSelectedSlides
@@ -34,26 +38,32 @@ function createDefaultSlide(): Slide {
   }
 }
 
-function addSlide() {  
-  const prevProgState = getState().mainProg     
-  const curSlide: Slide = createDefaultSlide();
-  console.log('add')
-  return {
-      type: StateTypes.ADD_SLIDE,
-      payload: {
-      ...prevProgState,
-      currentPresentation: {
-          ...prevProgState.currentPresentation,
-          slides: [
-              ...prevProgState.currentPresentation.slides,
-              curSlide
-          ]
-      },
-      selectedSlides: [curSlide.id],
-      selectedElements: []
-    }
-  }    
+
+
+function re_addSlide(state: MainProg, action: ActionType) { 
+  switch (action.type) {
+    case StateTypes.ADD_SLIDE: 
+      const prevProgState = state     
+      const curSlide: Slide = createDefaultSlide();
+      console.log('add')
+      return {
+          ...prevProgState,
+          currentPresentation: {
+              ...prevProgState.currentPresentation,
+              slides: [
+                  ...prevProgState.currentPresentation.slides,
+                  curSlide
+              ]
+          },
+          selectedSlides: [curSlide.id],
+          selectedElements: []
+      }
+    default:
+      return {...state}     
+  } 
 }
+
+
 
 function supportSlidesWithoutSelectedSlides(slides: Array<Slide>, selectedSlides: Array<string>): Array<Slide> {
   return [
@@ -71,31 +81,34 @@ function supportSortingSelectedSlides(slides: Array<Slide> , selectedSlides: Arr
   return sortedSelectedSlides
 }
 
-function moveSlide(posBefore: number){
+function re_moveSlide(state: MainProg, action: ActionType) {
 
-  const prog = getState().mainProg
+  switch (action.type) {
+    case StateTypes.MOVE_SLIDE:
+      const prog = state
+      const posBefore = action.payload
 
-  let sortedSelectedSlides: Array<Slide> = supportSortingSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
-  let slidesWithoutSelectedSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
-  
-  return {
-    type: StateTypes.MOVE_SLIDE,
-    payload: {
-      ...prog,
-      currentPresentation: {
-        ...prog.currentPresentation,
-        slides: 
-          (posBefore == 0) 
-            ? [...sortedSelectedSlides, ...slidesWithoutSelectedSlides]
-            : (prog.currentPresentation.slides.length == posBefore)
-            ? [...slidesWithoutSelectedSlides, ...sortedSelectedSlides]
-            : [
-                ...slidesWithoutSelectedSlides.filter((e, i) => i < posBefore),
-                ...sortedSelectedSlides,
-                ...slidesWithoutSelectedSlides.filter((e, i) => i >= posBefore)
-              ]
+      let sortedSelectedSlides: Array<Slide> = supportSortingSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
+      let slidesWithoutSelectedSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(prog.currentPresentation.slides, prog.selectedSlides);
+      
+      return {
+        ...prog,
+        currentPresentation: {
+          ...prog.currentPresentation,
+          slides: 
+            (posBefore == 0) 
+              ? [...sortedSelectedSlides, ...slidesWithoutSelectedSlides]
+              : (prog.currentPresentation.slides.length == posBefore)
+              ? [...slidesWithoutSelectedSlides, ...sortedSelectedSlides]
+              : [
+                  ...slidesWithoutSelectedSlides.filter((e, i) => i < posBefore),
+                  ...sortedSelectedSlides,
+                  ...slidesWithoutSelectedSlides.filter((e, i) => i >= posBefore)
+                ]
+        }
       }
-    }  
+    default:
+      return {...state}  
   }
 }
 
@@ -167,9 +180,8 @@ function removeOneElemFromSelectedSlides(id: string) {
   }
 }
 
-export function setSlideBorderLight(borderLight: borderLightType, slideId: string) {
-  const prevProgState = getState().mainProg
-  const changedSlideIndex: number = searchChangedSlideIndexById(slideId)
+export function setSlideBorderLight(prevProgState: MainProg, borderLight: borderLightType, slideId: string) {
+  const changedSlideIndex: number = searchChangedSlideIndexById(prevProgState, slideId)
   const slideWithChangedBorder: Slide = getSlideWithChangedBorderLight(borderLight, changedSlideIndex)
 
   const slidesWithChangedSlide = getSlidesWithChangedSlide(prevProgState, slideWithChangedBorder, changedSlideIndex)

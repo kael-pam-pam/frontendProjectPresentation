@@ -82,19 +82,17 @@ function createSlideId(isSmallSlide: boolean): string {
   return id
 }
 
-function checkSecondSlideIsBeyond(firstSlideId: string, secondSlideId: string): boolean {
-  const prog = getState().mainProg
+function checkSecondSlideIsBeyond(prog: MainProg, firstSlideId: string, secondSlideId: string): boolean {
   let secondSlideIsBeyond = false;
-  const firstSlideIndex = searchChangedSlideIndexById(firstSlideId)
-  const secondSlideIndex = searchChangedSlideIndexById(secondSlideId)
+  const firstSlideIndex = searchChangedSlideIndexById(prog, firstSlideId)
+  const secondSlideIndex = searchChangedSlideIndexById(prog, secondSlideId)
   if (secondSlideIndex > firstSlideIndex) {
     secondSlideIsBeyond = true
   }
   return secondSlideIsBeyond
 }
 
-function searchChangedSlideIndexById(id: string): number {
-  const prog = getState().mainProg
+function searchChangedSlideIndexById(prog: MainProg, id: string): number {
   const slides = prog.currentPresentation.slides
   const searchSlideId = id
   let changedSlideIndex: number = 0
@@ -107,10 +105,9 @@ function searchChangedSlideIndexById(id: string): number {
 }
 
 
-function searchChangedSlideIndex(): number {
-  const prog = getState()
-  const slides = prog.mainProg.currentPresentation.slides
-  const selectedSlide = prog.mainProg.selectedSlides[0]
+function searchChangedSlideIndex(prog: MainProg): number {
+  const slides = prog.currentPresentation.slides
+  const selectedSlide = prog.selectedSlides[0]
   let changedSlideIndex: number = 0
   for (let i = 0; i < slides.length; i++) {     
       if (slides[i].id == selectedSlide) {
@@ -144,11 +141,10 @@ function searchChangedElemIndexById(prog: MainProg, changedSlideIndex: number, i
   return changedElemIndex
 }
 
-function getCurrElemPosition(id: string): Point {
-  const prog = getState().mainProg
+function getCurrElemPosition(prog: MainProg, id: string): Point {
   let elemX: number = 0
   let elemY: number = 0
-  const changedSlideIndex = searchChangedSlideIndex()
+  const changedSlideIndex = searchChangedSlideIndex(prog)
   const changedElemIndex = searchChangedElemIndexById(prog, changedSlideIndex, id)
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
   if (changedElem != undefined) {
@@ -161,11 +157,11 @@ function getCurrElemPosition(id: string): Point {
   }
 }
 
-function getCurrElemSize(): {width: number, height: number} {
-  const prog = getState().mainProg
+function getCurrElemSize(prog: MainProg): {width: number, height: number} {
+  
   let width: number = 0
   let height: number = 0
-  const changedSlideIndex = searchChangedSlideIndex()
+  const changedSlideIndex = searchChangedSlideIndex(prog)
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
   let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
   if (changedElem != undefined) {
@@ -178,11 +174,10 @@ function getCurrElemSize(): {width: number, height: number} {
   }
 }
 
-function checkSelectedElem(currElemId: string): boolean {
-  const prog = getState().mainProg
+function checkSelectedElem(prog: MainProg, currElemId: string): boolean {
   let elemIsSelected: boolean = false
   let selectedElemId: string = '-1'
-  const changedSlideIndex = searchChangedSlideIndex()
+  const changedSlideIndex = searchChangedSlideIndex(prog)
   const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
   if (prog.selectedElements.includes(currElemId))
   {

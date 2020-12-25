@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import './MainPanel.css';
-import { MainSlide, } from '../Slide/Slide';
+import MainSlide from '../Slide/Slide';
 
 import { searchChangedSlideIndex } from '../../Models/CommonFunctions/supportFunctionsConst';
 import { globalActiveTool } from '../../Models/CommonFunctions/supportFunctionsConst'
 import { useSetPopup, useSetIsVisiblePopup } from '../Popup/PopupContext';
 import { PropsPopup } from '../Popup/Popup'
-import { store, getState, dispatch } from '../../index';
 import { connect } from 'react-redux';
+import { Programm } from '../../Models/CommonFunctions/types';
 
 
-function MainPanel() {
-    const actualProgState = getState().mainProg
-    const changedSlideIndex = searchChangedSlideIndex()
+function MainPanel(props: {state: Programm}) {
+    const actualProgState = props.state.mainProg
+    const changedSlideIndex = searchChangedSlideIndex(actualProgState)
     const setPopup = useSetPopup();
     const setIsVisible = useSetIsVisiblePopup(); 
 
@@ -70,10 +70,10 @@ function MainPanel() {
     )
 }
 
-export {MainPanel}
 
-function mapStateToProps(state = getState()) {
+
+function mapStateToProps(state: Programm) {
     return { state: state } 
-  };
+};
 
 export default connect(mapStateToProps)(MainPanel);

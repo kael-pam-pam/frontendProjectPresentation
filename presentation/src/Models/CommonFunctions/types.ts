@@ -55,7 +55,8 @@ export type MainProg = {
 
 export type CommonDeps = {
     canDeleteSlides: boolean,
-    elemsMoveCount: number
+    elemsMoveCount: number,
+    saveToArch: boolean,
 }
 
 

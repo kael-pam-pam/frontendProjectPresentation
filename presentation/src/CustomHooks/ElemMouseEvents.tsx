@@ -1,8 +1,6 @@
 import React, {useEffect, useRef} from 'react'
-import { dispatch, getState, store } from '..'
-import { changeElemPosition, resizeElement, setCanDeleteSlide, setSelectedElement } from '../Models/ActionCreators/slideElemActionCreators'
 import { checkSelectedElem, getCurrElemPosition, getCurrElemSize } from '../Models/CommonFunctions/supportFunctionsConst'
-import { Point } from '../Models/CommonFunctions/types'
+import { MainProg, Point, Programm } from '../Models/CommonFunctions/types'
 import { setSelectedElemsInHook } from './supportHooksFunctions'
 
 
@@ -13,6 +11,12 @@ export {
 
 
 interface dragAndDropProps {
+  state: Programm,
+  setCanDeleteSlide: (canDelete: boolean) => void,
+  setSelectedElement: (elemsArr: Array<string>) => void,
+  changeElemPosition: (newX: number, newY: number, id: string) => void,
+  resizeElement: (newWidth: number, newHeigth: number, newPosX: number, newPosY: number) => void,
+  removeOneElemFromSelectedElems: (elemId: string) => void,
   id: string,
   pos: {x: number, y:number}
   setPos: React.Dispatch<React.SetStateAction<Point>>
@@ -25,7 +29,7 @@ function useDragAndDropElement(props: dragAndDropProps) {
   const leftSvgBorder = Number(mainSvgProps?.x)
   const topSvgBorder = Number(mainSvgProps?.y)
 
-  const selectedElemsLength = store.getState().mainProg.selectedElements.length
+  const selectedElemsLength = props.state.mainProg.selectedElements.length
 
   let startPos = {
     x: 0,
@@ -45,7 +49,7 @@ function useDragAndDropElement(props: dragAndDropProps) {
   })
 
   const mouseDownAllElemsHandler = (event: React.MouseEvent | MouseEvent) => {
-    if (event.defaultPrevented && checkSelectedElem(props.id)) {
+    if (event.defaultPrevented && checkSelectedElem(props.state.mainProg, props.id)) {
       startPos = {
         x: event.pageX - leftSvgBorder,
         y: event.pageY - topSvgBorder
@@ -65,10 +69,10 @@ function useDragAndDropElement(props: dragAndDropProps) {
 
   const mouseDownHandler = (event: React.MouseEvent | MouseEvent) => {
 
-    const prevProgState = getState().mainProg
+    const prevProgState = props.state.mainProg
 
-    if (getState().commonDeps.canDeleteSlides) {
-      dispatch(setCanDeleteSlide(false))
+    if (props.state.commonDeps.canDeleteSlides) {
+      props.setCanDeleteSlide(false)
     }
 
     if (!event.defaultPrevented){
@@ -77,7 +81,13 @@ function useDragAndDropElement(props: dragAndDropProps) {
         y: event.pageY - topSvgBorder
       }
 
-      setSelectedElemsInHook(event, props.id)
+      setSelectedElemsInHook({
+        mainProgState: props.state.mainProg,
+        setSelectedElement: props.setSelectedElement,
+        removeOneElemFromSelectedElems: props.removeOneElemFromSelectedElems,
+        event, 
+        elemId: props.id
+      })
       
 
       document.addEventListener('mousemove', mouseMoveHandler)
@@ -91,8 +101,8 @@ function useDragAndDropElement(props: dragAndDropProps) {
   const mouseMoveHandler = (event: React.MouseEvent | MouseEvent) => {
 
     const modelPos = {
-      x: getCurrElemPosition(props.id).x,
-      y: getCurrElemPosition(props.id).y
+      x: getCurrElemPosition(props.state.mainProg, props.id).x,
+      y: getCurrElemPosition(props.state.mainProg, props.id).y
     }
 
     const delta = {
@@ -108,9 +118,9 @@ function useDragAndDropElement(props: dragAndDropProps) {
     props.setPos(newPos)   
   }
 
-  const mouseUpHandler = (event: React.MouseEvent | MouseEvent) => {
+  const mouseUpHandler = () => {
     if (startPos.x !== newPos.x && startPos.y !== newPos.y && newPos.x !== 0) {
-      dispatch(changeElemPosition({newX: newPos.x, newY: newPos.y, id: props.id})) 
+      props.changeElemPosition(newPos.x, newPos.y, props.id) 
     } 
     document.removeEventListener('mousemove', mouseMoveHandler)
     document.removeEventListener('mouseup', mouseUpHandler)
@@ -118,6 +128,9 @@ function useDragAndDropElement(props: dragAndDropProps) {
 }
 
 interface resizeProps {
+  mainProgState: MainProg,
+  setSelectedElement: (elemsArr: Array<string>) => void,
+  resizeElement: (newWidth: number, newHeigth: number, newPosX: number, newPosY: number) => void,
   id: string
   setPos: React.Dispatch<React.SetStateAction<Point>>
   setSize: React.Dispatch<React.SetStateAction<{ width: number; height: number; }>>
@@ -170,10 +183,10 @@ function useReSizeElement(props: resizeProps) {
   })
 
   const addListnersPreventMouseDown = (event: React.MouseEvent | MouseEvent) => {
-    const selectedElemsLength = getState().mainProg.selectedElements.length
+    const selectedElemsLength = props.mainProgState.selectedElements.length
     if (!event.defaultPrevented) {
       if (selectedElemsLength > 1) {
-        dispatch(setSelectedElement([props.id]))
+        props.setSelectedElement([props.id])
       }
       document.addEventListener('mousemove', mouseMoveResizeHandler)
       document.addEventListener('mouseup', mouseUpResizeHandler)
@@ -212,44 +225,44 @@ function useReSizeElement(props: resizeProps) {
       newElemPos = newCursPos
     
       newElemSize = {
-        width: getCurrElemSize().width + getCurrElemPosition(props.id).x - newCursPos.x,
-        height: getCurrElemSize().height + getCurrElemPosition(props.id).y - newCursPos.y
+        width: getCurrElemSize(props.mainProgState).width + getCurrElemPosition(props.mainProgState, props.id).x - newCursPos.x,
+        height: getCurrElemSize(props.mainProgState).height + getCurrElemPosition(props.mainProgState, props.id).y - newCursPos.y
       }
     }
 
     if(point === 2) {
       newElemPos = {
-        x: getCurrElemPosition(props.id).x,
+        x: getCurrElemPosition(props.mainProgState, props.id).x,
         y: newCursPos.y
       }
   
       newElemSize = {
-        width: newCursPos.x - getCurrElemPosition(props.id).x,
-        height: getCurrElemSize().height + (getCurrElemPosition(props.id).y - newCursPos.y)
+        width: newCursPos.x - getCurrElemPosition(props.mainProgState, props.id).x,
+        height: getCurrElemSize(props.mainProgState).height + (getCurrElemPosition(props.mainProgState, props.id).y - newCursPos.y)
       }
     }
 
     if(point === 3) {
       newElemPos = {
       x: newCursPos.x,
-      y: getCurrElemPosition(props.id).y
+      y: getCurrElemPosition(props.mainProgState, props.id).y
       }
 
       newElemSize = {
-        width: getCurrElemSize().width + getCurrElemPosition(props.id).x - newCursPos.x,
-        height: newCursPos.y - getCurrElemPosition(props.id).y
+        width: getCurrElemSize(props.mainProgState).width + getCurrElemPosition(props.mainProgState, props.id).x - newCursPos.x,
+        height: newCursPos.y - getCurrElemPosition(props.mainProgState, props.id).y
       }
     }
 
     if(point === 4) {
       newElemPos = {
-        x: getCurrElemPosition(props.id).x,
-        y: getCurrElemPosition(props.id).y
+        x: getCurrElemPosition(props.mainProgState, props.id).x,
+        y: getCurrElemPosition(props.mainProgState, props.id).y
       }
 
       newElemSize = {
-        width: newCursPos.x - getCurrElemPosition(props.id).x,
-        height: newCursPos.y - getCurrElemPosition(props.id).y
+        width: newCursPos.x - getCurrElemPosition(props.mainProgState, props.id).x,
+        height: newCursPos.y - getCurrElemPosition(props.mainProgState, props.id).y
       }
     }
 
@@ -261,11 +274,12 @@ function useReSizeElement(props: resizeProps) {
 
   const mouseUpResizeHandler = () => {
     if (prevSizeRef.current.width !== newElemSize.width && prevSizeRef.current.height !== newElemSize.height) {
-        dispatch(resizeElement({
-          newWidth: newElemSize.width, 
-          newHeigth: newElemSize.height, 
-          newPosX: newElemPos.x, newPosY: newElemPos.y
-        }))  
+          props.resizeElement(
+          newElemSize.width, 
+          newElemSize.height, 
+          newElemPos.x,
+          newElemPos.y
+        )  
     }
     prevSizeRef.current = newElemSize
     document.removeEventListener('mousemove', mouseMoveResizeHandler)

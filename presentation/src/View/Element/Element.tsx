@@ -1,17 +1,17 @@
 import React, { useState, useRef, useEffect} from 'react'
-import { checkSelectedElem, searchChangedSlideIndex } from '../../Models/CommonFunctions/supportFunctionsConst'
+import { checkSelectedElem } from '../../Models/CommonFunctions/supportFunctionsConst'
 
-import { PictureObj, TextObj, ShapeObj} from '../../Models/CommonFunctions/types'
+import { PictureObj, TextObj, ShapeObj, Programm} from '../../Models/CommonFunctions/types'
 import './Element.css'
 import { useDragAndDropElement, useReSizeElement} from '../../CustomHooks/ElemMouseEvents'
-import { useMouseDownDocumentListner} from '../../CustomHooks/CommonMouseKeyboardEvents'
 import { ImgTextObject, OutlineRect, ShapeObject } from './SvgElems'
 import { useNormalizeElemSize } from '../../CustomHooks/CommonDifferentHooks'
-import { getState } from '../../index'
+import { Dispatch } from 'redux'
+import { connect } from 'react-redux'
+import { changeElemPosition, removeOneElemFromSelectedElems, resizeElement, setCanDeleteSlide, setSelectedElement } from '../../Models/ActionCreators/slideElemActionCreators'
 
 export {
-  SmallSlideElement,
-  BigSlideElement
+  SmallSlideElement
 }
 
 
@@ -56,12 +56,18 @@ function SmallSlideElement(shape: PictureObj | TextObj | ShapeObj) {
 
 
 interface BigSlideElementProps {
+  state: Programm,
+  setCanDeleteSlide: (canDelete: boolean) => void,
+  setSelectedElement: (elemsArr: Array<string>) => void,
+  changeElemPosition: (newX: number, newY: number, id: string) => void,
+  resizeElement: (newWidth: number, newHeigth: number, newPosX: number, newPosY: number) => void,
+  removeOneElemFromSelectedElems: (elemId: string) => void,
   shape: PictureObj | TextObj | ShapeObj
   svgProps: React.MutableRefObject<SVGSVGElement | null>
 }
 
 function BigSlideElement(props: BigSlideElementProps) {
-  const actualProgState = getState().mainProg 
+  const actualProgState = props.state.mainProg 
 
   const id = props.shape.id
 
@@ -85,11 +91,32 @@ function BigSlideElement(props: BigSlideElementProps) {
   const[elemSize, setSize] = useState({width: elemWidth, height: elemHeight})
 
 
-  useNormalizeElemSize({setSize, elemWidth, elemHeight, svgWidth, svgHeight})
+  useNormalizeElemSize({resizeElement: props.resizeElement, setSize, elemWidth, elemHeight, svgWidth, svgHeight})
 
-  useDragAndDropElement({id: props.shape.id, pos, setPos, elemRef, mainSvgProps})
+  useDragAndDropElement({
+    state: props.state,
+    setCanDeleteSlide: props.setCanDeleteSlide,
+    setSelectedElement: props.setSelectedElement,
+    changeElemPosition: props.changeElemPosition,
+    resizeElement: props.resizeElement,
+    removeOneElemFromSelectedElems: props.removeOneElemFromSelectedElems,
+    id: props.shape.id,
+    pos, 
+    setPos, 
+    elemRef, 
+    mainSvgProps
+  })
 
-  useReSizeElement ({id: props.shape.id, setPos, setSize, firstPointRef, secondPointRef, thirdPointRef, fourthPointRef, mainSvgProps})  
+  useReSizeElement ({
+    mainProgState: props.state.mainProg,
+    setSelectedElement: props.setSelectedElement,
+    resizeElement: props.resizeElement,
+    id: props.shape.id, 
+    setPos,
+    setSize, 
+    firstPointRef, secondPointRef, thirdPointRef, fourthPointRef,
+    mainSvgProps
+  })  
 
   useEffect(() => {
       setPos({x: elemPosX, y: elemPosY})
@@ -99,7 +126,7 @@ function BigSlideElement(props: BigSlideElementProps) {
   let svgElem: JSX.Element = <rect/>
   let outLineRect: JSX.Element = <rect />
 
-  if (checkSelectedElem(id)) {
+  if (checkSelectedElem(actualProgState, id)) {
     outLineRect = <OutlineRect 
       firstPointRef={firstPointRef}
       secondPointRef={secondPointRef}
@@ -141,3 +168,23 @@ function BigSlideElement(props: BigSlideElementProps) {
   return (svgElem)
 }
 
+
+
+const mapDispatchToProps = (dispatch: Dispatch) => {
+  return {
+    setCanDeleteSlide: (canDelete: boolean) => dispatch(setCanDeleteSlide(canDelete)),
+    setSelectedElement: (elemsArr: Array<string>) => dispatch(setSelectedElement(elemsArr)),
+    changeElemPosition: (newX: number, newY: number, id: string) => dispatch(changeElemPosition({newX, newY, id})),
+    resizeElement: (newWidth: number, newHeigth: number, newPosX: number, newPosY: number) => dispatch(resizeElement({newWidth, newHeigth, newPosX, newPosY})),
+    removeOneElemFromSelectedElems: (elemId: string) => dispatch(removeOneElemFromSelectedElems(elemId))
+    
+  } 
+}
+
+function mapStateToProps(state: Programm) {
+  return { 
+    state: state,
+  } 
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BigSlideElement)

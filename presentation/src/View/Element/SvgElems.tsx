@@ -1,10 +1,10 @@
 import React, { useEffect, useRef} from 'react'
 import { connect } from 'react-redux'
-import { store } from '../..'
+import { getState, store } from '../..'
 import { changeTextObj, setSelectedElement} from '../../Models/ActionCreators/slideElemActionCreators'
 import { checkSelectedElem, searchChangedSlideIndex } from '../../Models/CommonFunctions/supportFunctionsConst'
 
-import { PictureObj, TextObj, ShapeObj} from '../../Models/CommonFunctions/types'
+import { PictureObj, TextObj, ShapeObj, MainProg} from '../../Models/CommonFunctions/types'
 import './Element.css'
 
 
@@ -155,7 +155,7 @@ function ImgTextObject(props: ImgTextObjectProps) {
 
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   useEffect(() => {
-  if(props.shape.type === 'text' && checkSelectedElem(props.shape.id)) {
+  if(props.shape.type === 'text' && checkSelectedElem(getState().mainProg, props.shape.id)) {
         inputRef.current?.focus()
       }  
   })
