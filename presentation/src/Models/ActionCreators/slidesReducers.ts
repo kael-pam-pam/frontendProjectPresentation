@@ -11,8 +11,7 @@ import {
   createNewId, getSlidesWithChangedSlide, searchChangedSlideIndex, searchChangedSlideIndexById
 } from '../CommonFunctions/supportFunctionsConst'
 
-import { getState } from '../../index'
-import { getSlideWithChangedBorderLight } from './slideElemActionCreators'
+import { getSlideWithChangedBorderLight } from '../Reducers/slideElemReducers'
 import { createProgram } from 'typescript'
 
 export {
@@ -21,9 +20,9 @@ export {
   supportSlidesWithoutSelectedSlides,
   supportSortingSelectedSlides,
   re_moveSlide,
-  setSelectedSlides,
-  deleteSlide,
-  removeOneElemFromSelectedSlides
+  re_setSelectedSlides,
+  re_deleteSlide,
+  re_removeOneElemFromSelectedSlides
 }
 
 function createDefaultSlide(): Slide {  
@@ -34,7 +33,6 @@ function createDefaultSlide(): Slide {
           type: 'color'
       },
       elements: [],
-      slideBorderLight: 'unset'
   }
 }
 
@@ -112,61 +110,51 @@ function re_moveSlide(state: MainProg, action: ActionType) {
   }
 }
 
-function setSelectedSlides(selectedSlides: Array<string>) {
-  const prevProgState = getState().mainProg
+function re_setSelectedSlides(state: MainProg, action: ActionType) {
   return {
-    type: StateTypes.SET_SELECTED_SLIDES,
-    payload: {
-      ...prevProgState,
-      selectedSlides: selectedSlides,
+      ...state,
+      selectedSlides: action.payload,
       selectedElements: []
-    }  
   }
 }
 
-function deleteSlide() {
+function re_deleteSlide(state: MainProg) {
 
-  const prevProgState = getState().mainProg
 
-  let oldPos: number = prevProgState.currentPresentation.slides.length - 1;
+  let oldPos: number = state.currentPresentation.slides.length - 1;
 
-  for (let i = 0; i < prevProgState.currentPresentation.slides.length; i++) {
-    if ((prevProgState.selectedSlides.includes(prevProgState.currentPresentation.slides[i].id)) && (oldPos >= i)) {
+  for (let i = 0; i < state.currentPresentation.slides.length; i++) {
+    if ((state.selectedSlides.includes(state.currentPresentation.slides[i].id)) && (oldPos >= i)) {
       oldPos = i;
     }
   }
 
-  const slidesWithoutSelectedSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(prevProgState.currentPresentation.slides, prevProgState.selectedSlides)
+  const slidesWithoutSelectedSlides: Array<Slide> = supportSlidesWithoutSelectedSlides(state.currentPresentation.slides, state.selectedSlides)
 
   return {
-    type: StateTypes.DELETE_SLIDE,
-    payload: {
-      ...prevProgState,
-      currentPresentation: {
-      ...prevProgState.currentPresentation,
-      slides: slidesWithoutSelectedSlides
-      },
-      selectedSlides:
-        (slidesWithoutSelectedSlides.length === 0) 
-        ? []
-        : (slidesWithoutSelectedSlides.length - 1 < oldPos)
-        ? [slidesWithoutSelectedSlides[oldPos - 1].id]
-        : (slidesWithoutSelectedSlides.length - 1 == oldPos)
-        ? [slidesWithoutSelectedSlides[oldPos].id]
-        : [slidesWithoutSelectedSlides[slidesWithoutSelectedSlides.length - 1].id]
+    ...state,
+    currentPresentation: {
+    ...state.currentPresentation,
+    slides: slidesWithoutSelectedSlides
+    },
+    selectedSlides:
+      (slidesWithoutSelectedSlides.length === 0) 
+      ? []
+      : (slidesWithoutSelectedSlides.length - 1 < oldPos)
+      ? [slidesWithoutSelectedSlides[oldPos - 1].id]
+      : (slidesWithoutSelectedSlides.length - 1 == oldPos)
+      ? [slidesWithoutSelectedSlides[oldPos].id]
+      : [slidesWithoutSelectedSlides[slidesWithoutSelectedSlides.length - 1].id]
     }    
-  } 
 }
 
 
-function removeOneElemFromSelectedSlides(id: string) {
+function re_removeOneElemFromSelectedSlides(state: MainProg, action: ActionType) {
 
-  const prevProgState = getState().mainProg
-
-  const selectedSlides: Array<string> = [...prevProgState.selectedSlides]
+  const selectedSlides: Array<string> = [...state.selectedSlides]
   let newSlides: Array<string> = []
   for(let i = 0; i < selectedSlides.length; i++) {
-    if (selectedSlides[i] !== id) {
+    if (selectedSlides[i] !== action.payload) {
       newSlides.push(selectedSlides[i])
     }
   }
@@ -174,17 +162,17 @@ function removeOneElemFromSelectedSlides(id: string) {
   return {
     type: StateTypes.REMOVE_ONE_ELEM_FROM_SELECTED_SLIDES,
     payload: {
-      ...prevProgState,
+      ...state,
       selectedSlides: newSlides
     }  
   }
 }
 
-export function setSlideBorderLight(prevProgState: MainProg, borderLight: borderLightType, slideId: string) {
-  const changedSlideIndex: number = searchChangedSlideIndexById(prevProgState, slideId)
-  const slideWithChangedBorder: Slide = getSlideWithChangedBorderLight(borderLight, changedSlideIndex)
+export function setSlideBorderLight(state: MainProg, borderLight: borderLightType, slideId: string) {
+  const changedSlideIndex: number = searchChangedSlideIndexById(state.currentPresentation.slides, slideId)
+  const slideWithChangedBorder: Slide = getSlideWithChangedBorderLight(state, borderLight, changedSlideIndex)
 
-  const slidesWithChangedSlide = getSlidesWithChangedSlide(prevProgState, slideWithChangedBorder, changedSlideIndex)
+  const slidesWithChangedSlide = getSlidesWithChangedSlide(state, slideWithChangedBorder, changedSlideIndex)
   let borderLightAction = StateTypes.RESET_SLIDE_BORDER_LIGHT
 
   if (borderLight == 'top') {
@@ -197,9 +185,9 @@ export function setSlideBorderLight(prevProgState: MainProg, borderLight: border
   return {
     type: borderLightAction,
     payload: {
-      ...prevProgState,
+      ...state,
       currentPresentation: {
-      ...prevProgState.currentPresentation,
+      ...state.currentPresentation,
       slides: slidesWithChangedSlide
       }
     } 

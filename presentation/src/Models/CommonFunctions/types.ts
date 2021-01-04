@@ -42,6 +42,7 @@ export type Programm = {
         canDeleteSlides: boolean,
         elemsMoveCount: number,
         saveToArch: boolean,
+        slideBorderLight: borderLightType,
     }
 }
 
@@ -75,8 +76,7 @@ export type SlideElements = Array<PictureObj | ShapeObj | TextObj>
 export type Slide = {
     id: string,
     background: Picture | Color,
-    elements: SlideElements,
-    slideBorderLight: borderLightType,
+    elements: SlideElements
 }
 
 export type Point = {
@@ -92,7 +92,6 @@ export type ElementObj = {
 }
 
 export type Picture = {
-    url: string,
     imgB64: string,
     type: 'picture',
 }

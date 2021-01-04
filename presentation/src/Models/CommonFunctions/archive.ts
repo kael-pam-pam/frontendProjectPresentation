@@ -1,10 +1,9 @@
-import { getState } from '../../index';
-
 import {
     Programm,
     StateTypes,
     ArchiveOfState,
 } from '../CommonFunctions/types'; 
+import { createProgram } from './mainProgOperations';
 
 
 
@@ -61,7 +60,7 @@ function goForwardArchive() {
 //если в "будущем" есть записи и мы текущими действиями его не повторяем, то оно впредь нам уже не доступно.
 //теперь у нас новое будущее, которое неопределено.
 function saveStateToArchive() {
-    const actualProgState = getState()
+    const actualProgState = createProgram()//getState()
     const currState = actualProgState.mainProg
     const prevState = actualArchiveOfState.past[actualArchiveOfState.past.length - 1]?.mainProg
     const saveToArch = actualProgState.commonDeps.saveToArch 

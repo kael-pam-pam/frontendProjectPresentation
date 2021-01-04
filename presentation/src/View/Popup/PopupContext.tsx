@@ -33,7 +33,7 @@ const SetPopupContext = React.createContext((nP: PropsPopup) => {})
 const IsVisiblePopupContext = React.createContext(visible);
 const SetIsVisiblePopupContext = React.createContext((nV: boolean) => {})
 
-const usePopup = () => useContext(PopupContext)
+const usePopup = () => useContext(PopupContext)  
 const IsVisiblePopup = () => useContext(IsVisiblePopupContext)
 
 

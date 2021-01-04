@@ -1,10 +1,8 @@
 import React, {useState} from 'react';
 import './Tools.css';
-import { addSlide, addPictureObj, addTextObj, addShapeObj } from '../../Models/ActionCreators/slElActionCreators';
+import { addSlide, addPictureObj, addTextObj, addShapeObj, setCanDeleteSlide } from '../../Models/ActionCreators/actionCreators';
 import { setGlobalActiveTool } from '../../Models/CommonFunctions/supportFunctionsConst';
 import { /*actualArchiveOfState,*/ goBackArchive, goForwardArchive} from '../../Models/CommonFunctions/archive';
-import { setCanDeleteSlide } from '../../Models/ActionCreators/slideElemActionCreators';
-//import { dispatch, getState } from '../..';
 import { MainProg, Programm } from '../../Models/CommonFunctions/types';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -64,7 +62,7 @@ function getBase64 (file: any, callback: any) {
   reader.readAsDataURL(file);
 }
 
-function loadPicFromComp() {
+function loadPicFromComp(addPictureObj: (imgData: {width: number, height: number, imgB64: string}) => void) {
   let input = document.createElement("input")
   input.type = "file"
   input.id = "inputFile"
@@ -76,28 +74,28 @@ function loadPicFromComp() {
     } else {
         const src = URL.createObjectURL(input.files?.item(0))
         const img = new Image()
-        img.onload = function() {
-          getBase64(input.files?.item(0), function(base64Data: string){
-            //dispatch(addPictureObj({url:src, width: img.width, height: img.height, imgB64: base64Data}))
-          })
+        img.onload = () => {
+          getBase64(input.files?.item(0), 
+          (base64Data: string) => addPictureObj({width: img.width, height: img.height, imgB64: base64Data}))
         }
         img.src = src
     }
   }
 }
 
-function PictureToolBox() {
+function PictureToolBox(props: {addPictureObj: (imgData: {width: number, height: number, imgB64: string}) => void}) {
   return (
       <div className="ToolShapeObj_shape"> 
         <span className="ToolShapeObj_shape_elem " onClick={() => null} >по ссылке</span>
-        <span className="ToolShapeObj_shape_elem " onMouseDown={() => loadPicFromComp()} >с компьютера</span>
+        <span className="ToolShapeObj_shape_elem " onMouseDown={() => loadPicFromComp(props.addPictureObj)} >с компьютера</span>
       </div>
   )        
 }
 
 interface PictureElemWithToolBoxProps {
   activeTool: number,
-  setActiveTool: React.Dispatch<React.SetStateAction<number>>
+  setActiveTool: React.Dispatch<React.SetStateAction<number>>,
+  addPictureObj: (imgData: {width: number, height: number, imgB64: string}) => void
 }
 
 function PictureElemWithToolBox(props: PictureElemWithToolBoxProps) {
@@ -117,7 +115,7 @@ function PictureElemWithToolBox(props: PictureElemWithToolBoxProps) {
         document.addEventListener('mouseup', mouseUpHandler)
     }}>
       <span className="tool__tooltip">Вставить изображение</span> 
-      {toolBoxIsOpen && <PictureToolBox />}
+      {toolBoxIsOpen && <PictureToolBox addPictureObj={props.addPictureObj}/>}
     </div>
   ) 
 }
@@ -127,7 +125,7 @@ interface toolsProps {
   addSlide: () => void,
   addTextObj: () => void,
   addShapeObj: (shape: 'rect' | 'triangle' | 'circle') => void,
-  addPictureObj: () => void,
+  addPictureObj: (imgData: {width: number, height: number, imgB64: string}) => void,
   goBackArchive: () => void,
   goForwardArchive: () => void,
   setCanDeleteSlide: (canDelete: boolean) => void
@@ -154,7 +152,7 @@ function Tools(props: toolsProps) {
           <div key={4} className={"tool tool_text-obj "+(activeTool == 1 ? "tool_active" : "")} onClick={() => {props.addTextObj(); setActiveTool(1); setGlobalActiveTool(1)}}>
             <span className="tool__tooltip">Текстовое поле</span>
           </div>
-          <PictureElemWithToolBox activeTool={activeTool} setActiveTool={setActiveTool}/>
+          <PictureElemWithToolBox activeTool={activeTool} setActiveTool={setActiveTool} addPictureObj={props.addPictureObj}/>
           <ToolElemWithToolBox activeTool={activeTool} setActiveTool={setActiveTool} addShapeObj={props.addShapeObj}/>
           <div key={7} className="splitter"></div>
         </div>    
@@ -167,7 +165,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
     addSlide: () => dispatch(addSlide()),
     addTextObj: () => dispatch(addTextObj()),
     addShapeObj: (shape: 'rect' | 'triangle' | 'circle') => dispatch(addShapeObj(shape)),
-    addPictureObj: () => dispatch(addPictureObj()),
+    addPictureObj: (imgData: {width: number, height: number, imgB64: string}) => dispatch(addPictureObj(imgData)),
     goBackArchive: () => dispatch(goBackArchive()),
     goForwardArchive: () => dispatch(goForwardArchive()),
     setCanDeleteSlide: (canDelete: boolean) => dispatch(setCanDeleteSlide(canDelete))

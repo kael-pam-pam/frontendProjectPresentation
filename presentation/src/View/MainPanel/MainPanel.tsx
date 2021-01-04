@@ -7,12 +7,11 @@ import { globalActiveTool } from '../../Models/CommonFunctions/supportFunctionsC
 import { useSetPopup, useSetIsVisiblePopup } from '../Popup/PopupContext';
 import { PropsPopup } from '../Popup/Popup'
 import { connect } from 'react-redux';
-import { Programm } from '../../Models/CommonFunctions/types';
+import { Programm, Slide } from '../../Models/CommonFunctions/types';
 
 
-function MainPanel(props: {state: Programm}) {
-    const actualProgState = props.state.mainProg
-    const changedSlideIndex = searchChangedSlideIndex(actualProgState)
+function MainPanel(props: {slides: Array<Slide>, selectedSlides: Array<string>}) {
+    const changedSlideIndex = searchChangedSlideIndex(props.slides, props.selectedSlides)
     const setPopup = useSetPopup();
     const setIsVisible = useSetIsVisiblePopup(); 
 
@@ -21,7 +20,7 @@ function MainPanel(props: {state: Programm}) {
             <svg className='mainSlideSvg'/>    
         </div>    
 
-    if(actualProgState.currentPresentation.slides.length !== 0)
+    if(props.slides.length !== 0)
     {
         mainSlide = <MainSlide numberOfSlide={changedSlideIndex} isSmallSlide={false} slidesPanelRef={null}/> 
     }
@@ -72,8 +71,9 @@ function MainPanel(props: {state: Programm}) {
 
 
 
-function mapStateToProps(state: Programm) {
-    return { state: state } 
-};
+const mapStateToProps = (state: Programm) => ({
+    slides: state.mainProg.currentPresentation.slides,
+    selectedSlides: state.mainProg.selectedSlides 
+})
 
 export default connect(mapStateToProps)(MainPanel);

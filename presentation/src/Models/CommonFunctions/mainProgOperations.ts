@@ -1,11 +1,11 @@
 import {
     StateTypes,
     Programm,
-    Slide
+    Slide,
+    MainProg
 } from '../CommonFunctions/types';
 
-import {createDefaultSlide,} from '../ActionCreators/slidesActionCreators'
-import { getState } from '../../index';
+import {createDefaultSlide,} from '../Reducers/slidesReducers'
 
 export {
     createProgram,
@@ -27,12 +27,13 @@ function createProgram(): Programm {
             canDeleteSlides: false,
             elemsMoveCount: 0,
             saveToArch: true,
+            slideBorderLight: 'unset',
         }    
     }
 }
 
-function changePresentationTitle(newTitle: string) {
-    const prevProgState = getState().mainProg
+function changePresentationTitle(prevProgState: MainProg, newTitle: string) {
+    
     return {
         type: StateTypes.CHANGE_PRESENTATION_TITLE,
         payload: {

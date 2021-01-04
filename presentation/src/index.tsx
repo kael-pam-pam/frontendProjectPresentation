@@ -6,16 +6,12 @@ import * as serviceWorker from './serviceWorker';
 
 
 import { createStore } from 'redux';
-import { Provider } from 'react-redux';
+import { connect, Provider } from 'react-redux';
 import { mainReducer } from './Models/Reducers/commonReducers';
-import { createProgram } from './Models/CommonFunctions/mainProgOperations';
 
 
 
-export const store = createStore(mainReducer, createProgram())
-export const dispatch = store.dispatch
-export const getState = store.getState
-
+export const store = createStore(mainReducer)
 
 ReactDOM.render(
   <Provider store={store}>

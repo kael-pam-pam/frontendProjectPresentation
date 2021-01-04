@@ -17,28 +17,18 @@ import {
 import {
   setSlideBackground,
   createPictureObj,
-  addPictureObj,
   createEmtyTextObj,
-  addTextObj,
   changeTextObj,
   createShapeObj,
-  addShapeObj,
   changeShapeObj,
-  resizeElement,
-  changeElemPosition,
-  setSelectedElement,
-  deleteSelectedElements
-} from './ActionCreators/slideElemActionCreators'
+} from './Reducers/slideElemReducers'
 
 import {
   createDefaultSlide,
-  addSlide,
   supportSlidesWithoutSelectedSlides,
   supportSortingSelectedSlides,
-  moveSlide,
-  setSelectedSlides,
-  deleteSlide
-} from './ActionCreators/slidesActionCreators'
+
+} from './Reducers/slidesReducers'
 
 import {
   defaultPoint,

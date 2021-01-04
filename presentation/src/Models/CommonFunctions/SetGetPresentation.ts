@@ -16,10 +16,8 @@ import {
 
 import { jsPDF } from "jspdf";  //npm install jspdf --save      or      yarn add jspdf
 
-import { getState, dispatch } from '../../index';
 
 export {
-    //createLoadedProgram,
     saveProgramAsPDF,
     savePresentationAsJSON,
     getProgram
@@ -27,8 +25,7 @@ export {
 const exportWidth = 1400;
 const exportHeight = 850;
 
-function savePresentationAsJSON(): MainProg {
-    const prog = getState().mainProg
+function savePresentationAsJSON(prog: MainProg): MainProg {
     const progName = prog.currentPresentation.title + '.json';
     let progFile = new Blob([JSON.stringify(prog)], {type: 'json'});
     if (window.navigator.msSaveOrOpenBlob)
@@ -54,7 +51,7 @@ function loadProgToStore(newProg: Programm) {
         payload: {...newProg}  
     }
 }
-
+// sideEffects  hooks
 function getProgram() {
     let input = document.createElement("input");
     input.type = "file";
@@ -68,7 +65,7 @@ function getProgram() {
         reader.onload = function (e) {
             let target: any = e.target;
             let data:Programm = JSON.parse(target.result) as Programm;
-            dispatch(loadProgToStore(data));
+            //dispatch(loadProgToStore(data));
         };
         reader.onerror = function (e) {
             alert("Error loading"); // Ошибка загрузки
@@ -80,28 +77,25 @@ function getProgram() {
 
     setTimeout(function () {
         document.body.removeChild(input);
-    }, 0);
+    }, 0);  //hidden input  component   
 }
 
-async function saveDocPDF(Path:string, doc:jsPDF){
-    const prog = getState().mainProg
-    await setPDF(doc)
+async function saveDocPDF(prog: MainProg, Path:string, doc:jsPDF){
+    await setPDF(prog, doc)
     doc.save(Path + "/" + prog.currentPresentation.title + ".pdf");
 }
 
-function saveProgramAsPDF() {
-    const prog = getState().mainProg
+function saveProgramAsPDF(prog: MainProg) {
     const Path: string = ''
     let doc = new jsPDF({
         orientation: "landscape",
         unit: "px",
         format: /*"a4"*/ [exportWidth, exportHeight],
       })  
-    saveDocPDF(Path, doc)
+    saveDocPDF(prog, Path, doc)
 }
 
-function setPDF(doc: jsPDF) {
-    const prog = getState().mainProg
+function setPDF(prog: MainProg , doc: jsPDF) {
     for (var i = 0; i < prog.currentPresentation.slides.length; i++){
         doc = setPagePDF(prog.currentPresentation.slides[i], doc);
         if (i + 1 < prog.currentPresentation.slides.length){

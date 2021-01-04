@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { store } from '../..';
 import './Popup.css';
 import { usePopup, useSetPopup, IsVisiblePopup, useSetIsVisiblePopup } from './PopupContext'
 

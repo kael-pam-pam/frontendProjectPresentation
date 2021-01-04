@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import {store} from './index'
 import './App.css';
 import  HeaderPanel  from './View/HeaderPanel/HeaderPanel';
 import  SlidesPanel  from './View/SlidesPanel/SlidesPanel';
@@ -7,16 +8,16 @@ import { Popup } from './View/Popup/Popup';
 import { PopupProvider } from './View/Popup/PopupContext';
 import { useDeleteSelectedElems, useDeleteSelectedSlides, useMouseDownDocumentListner } from './CustomHooks/CommonMouseKeyboardEvents';
 import { connect } from 'react-redux';
-import { getState, store } from '.';
 import { saveStateToArchive } from './Models/CommonFunctions/archive';
 import { Dispatch } from 'redux';
-import { deleteSelectedElements, setCanDeleteSlide, setSelectedElement } from './Models/ActionCreators/slideElemActionCreators';
-import { deleteSlide, setSelectedSlides } from './Models/ActionCreators/slidesActionCreators';
 import { Programm } from './Models/CommonFunctions/types';
+import { setSelectedElement, deleteSelectedElements, setCanDeleteSlide, deleteSlide, setSelectedSlides   } from './Models/ActionCreators/actionCreators';
 
 
 interface AppProps {
-  state: Programm,
+  canDeleteSlides: boolean,
+  selectedSlides: Array<string>,
+  selectedElements: Array<string>,
   setSelectedSlides: (slidesArr: Array<string>) => void,
   setCanDeleteSlide: (canDelete: boolean) => void,
   setSelectedElement: (elemsArr: Array<string>) => void,
@@ -27,10 +28,12 @@ interface AppProps {
 
 function App(props: AppProps) {
 
-  useDeleteSelectedElems(props.state.mainProg, props.deleteSelectedElements)
-  useDeleteSelectedSlides(props.state.commonDeps, props.deleteSlide)
+  useDeleteSelectedElems(props.selectedElements, props.deleteSelectedElements)
+  useDeleteSelectedSlides(props.canDeleteSlides, props.deleteSlide)
   useMouseDownDocumentListner({
-    state: props.state,
+    canDeleteSlides: props.canDeleteSlides,
+    selectedSlides: props.selectedSlides,
+    selectedElements: props.selectedElements,
     setCanDeleteSlide: props.setCanDeleteSlide,
     setSelectedSlides: props.setSelectedSlides,
     setSelectedElement: props.setSelectedElement
@@ -38,7 +41,9 @@ function App(props: AppProps) {
   
   saveStateToArchive()
   
+  // popup layer
 
+  console.log('render')
   return (
     <PopupProvider>
     <div className="App">
@@ -60,19 +65,21 @@ function App(props: AppProps) {
 }
 
 
-const mapDispatchToProps = (dispatch: Dispatch) => {
-  return {
-    setSelectedSlides: (slidesArr: Array<string>) => dispatch(setSelectedSlides(slidesArr)),
-    setCanDeleteSlide: (canDelete: boolean) => dispatch(setCanDeleteSlide(canDelete)),
-    setSelectedElement: (elemsArr: Array<string>) => dispatch(setSelectedElement(elemsArr)),
-    deleteSelectedElements: () => dispatch(deleteSelectedElements()),
-    deleteSlide: () => dispatch(deleteSlide())
-  }
+const mapDispatchToProps = {
+    setSelectedSlides,
+    setCanDeleteSlide,
+    setSelectedElement,
+    deleteSelectedElements,
+    deleteSlide
 }
 
 
-function mapStateToProps(state = getState()) {
-  return { state: state } 
-}
+
+const mapStateToProps = (state: Programm) => ({ 
+  selectedElements: state.mainProg.selectedElements,
+  selectedSlides: state.mainProg.selectedSlides,
+  canDeleteSlides: state.commonDeps.canDeleteSlides 
+}) 
+
 
 export default connect(mapStateToProps,  mapDispatchToProps)(App)

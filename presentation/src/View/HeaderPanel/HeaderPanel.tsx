@@ -4,17 +4,17 @@ import { Commands, MenuItem } from '../Commands/Commands';
 import  Tools  from '../Tools/Tools';
 import { useSetPopup, useSetIsVisiblePopup } from '../Popup/PopupContext';
 import { PropsPopup } from '../Popup/Popup'
-import { addSlide } from '../../Models/ActionCreators/slElActionCreators';
+import { addSlide } from '../../Models/ActionCreators/actionCreators';
 import { getProgram, savePresentationAsJSON, saveProgramAsPDF } from '../../Models/CommonFunctions/SetGetPresentation';
 import { connect } from 'react-redux';
-import { Programm } from '../../Models/CommonFunctions/types';
+import { Programm, Slide } from '../../Models/CommonFunctions/types';
 import { Dispatch } from 'redux';
 import { Program } from 'typescript';
 
 
 
 
-function HeaderPanel(props: {addSlide: () => void, state: Programm}) {
+function HeaderPanel(props: {addSlide: () => void, title: string}) {
     const setPopup = useSetPopup();
     const setIsVisible = useSetIsVisiblePopup();
 
@@ -46,11 +46,11 @@ function HeaderPanel(props: {addSlide: () => void, state: Programm}) {
             },
             {
                 caption: 'Сохранить',
-                action: () => savePresentationAsJSON()
+                action: () => {}//savePresentationAsJSON()
             },
             {
               caption: 'Экспорт в PDF',
-              action: () => saveProgramAsPDF()
+              action: () => {}//saveProgramAsPDF()
           },
           ],
           pos: {
@@ -110,21 +110,19 @@ function HeaderPanel(props: {addSlide: () => void, state: Programm}) {
 
     return (
       <div className="header-panel">
-        <span className="title">{props.state.mainProg.currentPresentation.title}</span>
+        <span className="title">{props.title}</span>
         <Commands menu={menu} />
         <Tools />
       </div>
     )
 }
 
-const mapDispatchToProps = (dispatch: Dispatch) => {
-  return {
-    addSlide: () => dispatch(addSlide()),
-  } 
+const mapDispatchToProps = {
+    addSlide,
 }
 
-function mapStateToProps(state: Programm) {
-  return { state: state } 
-};
+const mapStateToProps = (state: Programm) => ({
+  title: state.mainProg.currentPresentation.title 
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(HeaderPanel);

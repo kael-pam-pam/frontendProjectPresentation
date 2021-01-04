@@ -10,7 +10,10 @@ export {
 
 
 interface dragAndDropSlidesProps {
-  state: Programm,
+  slides: Array<Slide>,
+  selectedSlides: Array<string>,
+  selectedElements: Array<string>,
+  canDeleteSlides: boolean,
   moveSlide: (index: number) => void,
   setSelectedSlides: (slidesArr: Array<string>) => void,
   setCanDeleteSlide: (canDelete: boolean) => void,
@@ -35,13 +38,16 @@ function useDragAndDropSlides(props: dragAndDropSlidesProps) {
     if (!event.defaultPrevented ) {
 
       setSelectedSlidesInHook({
-        state: props.state,
+        event, 
+        slideId: props.currSlide.id,
+        slides: props.slides,
+        selectedSlides: props.selectedSlides,
+        selectedElements: props.selectedElements,
+        canDeleteSlides: props.canDeleteSlides,
         setSelectedSlides: props.setSelectedSlides,
         setCanDeleteSlide: props.setCanDeleteSlide,
         removeOneElemFromSelectedSlides: props.removeOneElemFromSelectedSlides,
-        setSelectedElement: props.setSelectedElement,  
-        event, 
-        slideId: props.currSlide.id,
+        setSelectedElement: props.setSelectedElement
       })
 
       event.preventDefault()
@@ -49,7 +55,7 @@ function useDragAndDropSlides(props: dragAndDropSlidesProps) {
   }
 
   useEffect(() => {
-    const selectedSlides = props.state.mainProg.selectedSlides
+    const selectedSlides = props.selectedSlides
     if (props.isSmallSlide && !selectedSlides.includes(props.currSlide.id)) {
       props.svgRef.current?.addEventListener('mouseup', mouseUpSelectSlide)
       return () => props.svgRef.current?.removeEventListener('mouseup', mouseUpSelectSlide)
@@ -57,9 +63,16 @@ function useDragAndDropSlides(props: dragAndDropSlidesProps) {
   })
 
   const mouseUpSelectSlide = (event: React.MouseEvent | MouseEvent) => {
-    if (checkSlideForReplace({mainProgState: props.state.mainProg, event, svgRef: props.svgRef, slideId: props.currSlide.id})) {
+    if (checkSlideForReplace({
+        slides: props.slides,
+        selectedSlides: props.selectedSlides,
+        selectedElements: props.selectedElements,
+        event, 
+        svgRef: props.svgRef, 
+        slideId: props.currSlide.id
+        })) {
       const secondSlideId: string = props.currSlide.id 
-      const index = searchChangedSlideIndexById(props.state.mainProg, secondSlideId)
+      const index = searchChangedSlideIndexById(props.slides, secondSlideId)
       console.log(index)
       props.moveSlide(index)
 
@@ -69,18 +82,19 @@ function useDragAndDropSlides(props: dragAndDropSlidesProps) {
 
 
 interface lighInsertPlaceProps {
-  mainProgState: MainProg
-  currSlide: Slide
-  svgRef: React.MutableRefObject<SVGSVGElement | null>
-  divRef: React.MutableRefObject<HTMLDivElement | null>
-  slidesPanelRef: React.MutableRefObject<HTMLDivElement | null> | null
+  slides: Array<Slide>,
+  selectedSlides: Array<string>,
+  currSlide: Slide,
+  svgRef: React.MutableRefObject<SVGSVGElement | null>,
+  divRef: React.MutableRefObject<HTMLDivElement | null>,
+  slidesPanelRef: React.MutableRefObject<HTMLDivElement | null> | null,
   isSmallSlide: boolean
 } 
 
 function useLighSlideInsertPlace(props: lighInsertPlaceProps) {   //переделать через модель
 
   useEffect(() => {
-    const selectedSlides = props.mainProgState.selectedSlides
+    const selectedSlides = props.selectedSlides
     if (props.isSmallSlide && selectedSlides[0] !== props.currSlide.id) {
       props.slidesPanelRef?.current?.addEventListener('mousedown', mouseDownNotSelectSlide)
       return () => props.slidesPanelRef?.current?.removeEventListener('mousedown', mouseDownNotSelectSlide)
@@ -88,7 +102,7 @@ function useLighSlideInsertPlace(props: lighInsertPlaceProps) {   //переде
   })
 
   const mouseDownNotSelectSlide = (event: React.MouseEvent | MouseEvent) => {
-    const selectedSlides = props.mainProgState.selectedSlides
+    const selectedSlides = props.selectedSlides
     if (event.defaultPrevented && selectedSlides.length === 1) {
 
       props.svgRef.current?.addEventListener('mouseenter', mouseEnterNotSelectSlide)
@@ -101,12 +115,12 @@ function useLighSlideInsertPlace(props: lighInsertPlaceProps) {   //переде
 
 
   const mouseEnterNotSelectSlide = (event: MouseEvent) => {
-    const selectedSlides = props.mainProgState.selectedSlides
+    const selectedSlides = props.selectedSlides
 
     if (props.isSmallSlide && selectedSlides[0] !== props.currSlide.id){
       const selectedSlideId = selectedSlides[0]
       const otherSlideId = props.currSlide.id
-      if (checkSecondSlideIsBeyond(props.mainProgState, selectedSlideId, otherSlideId)) {
+      if (checkSecondSlideIsBeyond(props.slides, selectedSlideId, otherSlideId)) {
       
         props.divRef.current?.classList.add('slide-frame_selected__bottom')
       } else {

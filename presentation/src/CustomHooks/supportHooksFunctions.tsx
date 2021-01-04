@@ -1,6 +1,6 @@
 import React  from 'react'
 import { checkSecondSlideIsBeyond, checkSelectedElem } from '../Models/CommonFunctions/supportFunctionsConst'
-import { MainProg, Programm } from '../Models/CommonFunctions/types'
+import { MainProg, Programm, Slide } from '../Models/CommonFunctions/types'
 
 
 export {
@@ -11,7 +11,7 @@ export {
 
 
 interface setSelectedElemsProps {
-  mainProgState: MainProg,
+  selectedElements: Array<string>,
   setSelectedElement: (elemsArr: Array<string>) => void,
   removeOneElemFromSelectedElems: (elemId: string) => void,
   event: React.MouseEvent | MouseEvent, 
@@ -20,20 +20,22 @@ interface setSelectedElemsProps {
 
 
 function setSelectedElemsInHook(props: setSelectedElemsProps) {
-  const prevProgState = props.mainProgState
-  if (!checkSelectedElem(props.mainProgState, props.elemId)) {
+  if (!checkSelectedElem(props.selectedElements, props.elemId)) {
     if (props.event.ctrlKey) { 
-      props.setSelectedElement([...prevProgState.selectedElements, props.elemId]) 
+      props.setSelectedElement([...props.selectedElements, props.elemId]) 
     } else {
       props.setSelectedElement([props.elemId])
     } 
   } else if (props.event.ctrlKey) {
-    props.removeOneElemFromSelectedElems(props.elemId)
+    //props.removeOneElemFromSelectedElems(props.elemId)
   }
 }
 
 interface setSelectedSlidesProps {
-  state: Programm,
+  slides: Array<Slide>,
+  selectedSlides: Array<string>,
+  selectedElements: Array<string>,
+  canDeleteSlides: boolean,
   setSelectedSlides: (slidesArr: Array<string>) => void,
   setCanDeleteSlide: (canDelete: boolean) => void,
   removeOneElemFromSelectedSlides: (slideId: string) => void,
@@ -44,9 +46,9 @@ interface setSelectedSlidesProps {
 }
 
 function setSelectedSlidesInHook(props: setSelectedSlidesProps) {
-  const canDeleteSlides = props.state.commonDeps.canDeleteSlides
-  const selectedSlides = props.state.mainProg.selectedSlides
-  const selectedElements = props.state.mainProg.selectedElements
+  const canDeleteSlides = props.canDeleteSlides
+  const selectedSlides = props.selectedSlides
+  const selectedElements = props.selectedElements
   if (!canDeleteSlides) {   
     props.setCanDeleteSlide(true)
   }
@@ -72,26 +74,28 @@ function setSelectedSlidesInHook(props: setSelectedSlidesProps) {
 
 
 
-interface chekSkideReplaceProps {
-  mainProgState: MainProg,
+interface chekSlideReplaceProps {
+  slides: Array<Slide>,
+  selectedSlides: Array<string>,
+  selectedElements: Array<string>,
   event: React.MouseEvent | MouseEvent,
   svgRef: React.MutableRefObject<SVGSVGElement | null>, 
   slideId: string
 }
 
 
-function checkSlideForReplace(props: chekSkideReplaceProps): boolean {
+function checkSlideForReplace(props: chekSlideReplaceProps): boolean {
   let canMoveSlide = false;
   let correctCursorPos = false;
   const mousePosY = props.event.pageY
   const svgPosY = Number(props.svgRef.current?.getBoundingClientRect().y)
   const svgHeight = Number(props.svgRef.current?.getBoundingClientRect().height)
-  const selectedSlideId = props.mainProgState.selectedSlides[0]
+  const selectedSlideId = props.selectedSlides[0]
   const otherSlideId = props.slideId
-  const otherSlideIsBeyond = checkSecondSlideIsBeyond(props.mainProgState, selectedSlideId, otherSlideId)
+  const otherSlideIsBeyond = checkSecondSlideIsBeyond(props.slides, selectedSlideId, otherSlideId)
 
-  const elemsArrLength = props.mainProgState.selectedElements.length
-  const slidesArrLength = props.mainProgState.selectedSlides.length
+  const elemsArrLength = props.selectedElements.length
+  const slidesArrLength = props.selectedSlides.length
 
   const slideHeightLimit = svgPosY + (svgHeight / 2)
 

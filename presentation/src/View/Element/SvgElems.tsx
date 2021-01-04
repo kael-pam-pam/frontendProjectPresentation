@@ -1,10 +1,8 @@
 import React, { useEffect, useRef} from 'react'
 import { connect } from 'react-redux'
-import { getState, store } from '../..'
-import { changeTextObj, setSelectedElement} from '../../Models/ActionCreators/slideElemActionCreators'
 import { checkSelectedElem, searchChangedSlideIndex } from '../../Models/CommonFunctions/supportFunctionsConst'
 
-import { PictureObj, TextObj, ShapeObj, MainProg} from '../../Models/CommonFunctions/types'
+import { PictureObj, TextObj, ShapeObj, MainProg, Programm} from '../../Models/CommonFunctions/types'
 import './Element.css'
 
 
@@ -53,6 +51,8 @@ function OutlineRect(props: OutlineRectProps) {
     </>
   return outLineRect
 }
+
+
 
 interface ShapeObjProps {
   shape: PictureObj | TextObj | ShapeObj
@@ -155,7 +155,7 @@ function ImgTextObject(props: ImgTextObjectProps) {
 
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
   useEffect(() => {
-  if(props.shape.type === 'text' && checkSelectedElem(getState().mainProg, props.shape.id)) {
+  if(props.shape.type === 'text'){ //&& checkSelectedElem(, props.shape.id)) {
         inputRef.current?.focus()
       }  
   })
@@ -174,7 +174,7 @@ function ImgTextObject(props: ImgTextObjectProps) {
         ref={inputRef}
         value={props.shape.text}
         onMouseDown={() => inputRef.current?.focus()}
-        onChange={(event) => store.dispatch(changeTextObj({newParam: event.target.value, paramToChange: 'text'}))}
+        //onChange={(event) => store.dispatch(changeTextObj({newParam: event.target.value, paramToChange: 'text'}))}
         style={{
           width: props.width, 
           height: props.height, 

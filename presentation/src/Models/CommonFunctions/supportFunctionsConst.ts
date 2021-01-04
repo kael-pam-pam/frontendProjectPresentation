@@ -1,7 +1,5 @@
 import { connect } from 'react-redux'
-import { getState } from '../..'
-import { changeElemPosition } from '../ActionCreators/slideElemActionCreators'
-import { setSelectedSlides } from '../ActionCreators/slidesActionCreators'
+
 import {
   Programm,
   MainProg,
@@ -82,18 +80,17 @@ function createSlideId(isSmallSlide: boolean): string {
   return id
 }
 
-function checkSecondSlideIsBeyond(prog: MainProg, firstSlideId: string, secondSlideId: string): boolean {
+function checkSecondSlideIsBeyond(slides: Array<Slide>, firstSlideId: string, secondSlideId: string): boolean {
   let secondSlideIsBeyond = false;
-  const firstSlideIndex = searchChangedSlideIndexById(prog, firstSlideId)
-  const secondSlideIndex = searchChangedSlideIndexById(prog, secondSlideId)
+  const firstSlideIndex = searchChangedSlideIndexById(slides, firstSlideId)
+  const secondSlideIndex = searchChangedSlideIndexById(slides, secondSlideId)
   if (secondSlideIndex > firstSlideIndex) {
     secondSlideIsBeyond = true
   }
   return secondSlideIsBeyond
 }
 
-function searchChangedSlideIndexById(prog: MainProg, id: string): number {
-  const slides = prog.currentPresentation.slides
+function searchChangedSlideIndexById(slides: Array<Slide>, id: string): number {
   const searchSlideId = id
   let changedSlideIndex: number = 0
   for (let i = 0; i < slides.length; i++) {     
@@ -105,9 +102,8 @@ function searchChangedSlideIndexById(prog: MainProg, id: string): number {
 }
 
 
-function searchChangedSlideIndex(prog: MainProg): number {
-  const slides = prog.currentPresentation.slides
-  const selectedSlide = prog.selectedSlides[0]
+function searchChangedSlideIndex(slides: Array<Slide>, selectedSlides: Array<string>): number {
+  const selectedSlide = selectedSlides[0]
   let changedSlideIndex: number = 0
   for (let i = 0; i < slides.length; i++) {     
       if (slides[i].id == selectedSlide) {
@@ -130,8 +126,8 @@ function searchChangedElemIndex(prog: MainProg, changedSlideIndex: number): numb
   return changedElemIndex
 }
 
-function searchChangedElemIndexById(prog: MainProg, changedSlideIndex: number, id: string): number {
-  const elems = prog.currentPresentation.slides[changedSlideIndex].elements
+function searchChangedElemIndexById(slides: Array<Slide>, changedSlideIndex: number, id: string): number {
+  const elems = slides[changedSlideIndex].elements
   let changedElemIndex: number = -1
   for (let i = 0; i < elems.length; i++) {     
     if (elems[i].id === id) {
@@ -141,12 +137,12 @@ function searchChangedElemIndexById(prog: MainProg, changedSlideIndex: number, i
   return changedElemIndex
 }
 
-function getCurrElemPosition(prog: MainProg, id: string): Point {
+function getCurrElemPosition(slides: Array<Slide>, selectedSlides: Array<string>, id: string): Point {
   let elemX: number = 0
   let elemY: number = 0
-  const changedSlideIndex = searchChangedSlideIndex(prog)
-  const changedElemIndex = searchChangedElemIndexById(prog, changedSlideIndex, id)
-  let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
+  const changedSlideIndex = searchChangedSlideIndex(slides, selectedSlides)
+  const changedElemIndex = searchChangedElemIndexById(slides, changedSlideIndex, id)
+  let changedElem = getChangedElem(slides, changedSlideIndex, changedElemIndex)
   if (changedElem != undefined) {
     elemX = changedElem.position.x
     elemY = changedElem.position.y
@@ -157,13 +153,13 @@ function getCurrElemPosition(prog: MainProg, id: string): Point {
   }
 }
 
-function getCurrElemSize(prog: MainProg): {width: number, height: number} {
+function getCurrElemSize(slides: Array<Slide>, selectedSlides: Array<string>, id: string): {width: number, height: number} {
   
   let width: number = 0
   let height: number = 0
-  const changedSlideIndex = searchChangedSlideIndex(prog)
-  const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
-  let changedElem = getChangedElem(prog, changedSlideIndex, changedElemIndex)
+  const changedSlideIndex = searchChangedSlideIndex(slides, selectedSlides)
+  const changedElemIndex = searchChangedElemIndexById(slides, changedSlideIndex, id)
+  let changedElem = getChangedElem(slides, changedSlideIndex, changedElemIndex)
   if (changedElem != undefined) {
     width = changedElem.wigth
     height = changedElem.height
@@ -174,12 +170,11 @@ function getCurrElemSize(prog: MainProg): {width: number, height: number} {
   }
 }
 
-function checkSelectedElem(prog: MainProg, currElemId: string): boolean {
+function checkSelectedElem(selectedElements: Array<String>, currElemId: string): boolean {
   let elemIsSelected: boolean = false
   let selectedElemId: string = '-1'
-  const changedSlideIndex = searchChangedSlideIndex(prog)
-  const changedElemIndex = searchChangedElemIndex(prog, changedSlideIndex)
-  if (prog.selectedElements.includes(currElemId))
+  
+  if (selectedElements.includes(currElemId))
   {
     elemIsSelected = true
   }
@@ -281,8 +276,8 @@ function getElemsWithNewElem(prog: MainProg, newElem: PictureObj | TextObj | Sha
   return [...prog.currentPresentation.slides[changedSlideIndex].elements, newElem]
 }
 
-function getChangedElem(prog: MainProg, changedSlideIndex: number, changedElemIndex: number): PictureObj | TextObj | ShapeObj {
-  return prog.currentPresentation.slides[changedSlideIndex].elements[changedElemIndex]
+function getChangedElem(slides: Array<Slide>, changedSlideIndex: number, changedElemIndex: number): PictureObj | TextObj | ShapeObj {
+  return slides[changedSlideIndex].elements[changedElemIndex]
 }
 
 function getNewShapeElem(changedElem: ShapeObj, newParam: string, paramToChange: 'borderColor' | 'fillColor'): ShapeObj {

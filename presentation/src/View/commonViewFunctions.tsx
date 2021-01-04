@@ -3,7 +3,6 @@ import BigSlideElement, { SmallSlideElement } from './Element/Element'
 import { isColor, isPictureObj, } from '../Models/CommonFunctions/supportFunctionsConst'
 import { Color, Picture, SlideElements, Slide, MainProg, Programm } from '../Models/CommonFunctions/types'
 import MainSlide from './Slide/Slide'
-import { getState, dispatch } from '../index'
 
 
 export {
@@ -38,7 +37,7 @@ function getSlideBackground(modelSlideBackground: Picture | Color): string {
     svgSlideBackground = modelSlideBackground.hexColor
   }
   if (isPictureObj(modelSlideBackground)) {
-    svgSlideBackground = modelSlideBackground.url
+    svgSlideBackground = modelSlideBackground.imgB64
   }
 
   return svgSlideBackground
@@ -71,22 +70,28 @@ function getSlideSvgElems(payload: getSlideElemsPayload): Array<JSX.Element> {
 
 
 interface getListSlidesProps {
-  state: Programm
-  slides: Array<Slide>
-  selectedSlides: Array<string>
+  slideBorderLight: string,
+  slides: Array<Slide>,
+  selectedSlides: Array<string>,
+  canDeleteSlides: boolean,
   slidesPanelRef: React.MutableRefObject<HTMLDivElement | null> | null
 }
 
 function getListSlides(props: getListSlidesProps): Array<JSX.Element> {
-  const actualProgState = props.state
+
+  const selectedSlides = props.selectedSlides
+  const slides = props.slides
+  const canDeleteSlides = props.canDeleteSlides
+  const slideBorderLight = props.slideBorderLight
+  const slidesPanelRef = props.slidesPanelRef
 
   let slidesList: Array<JSX.Element> = []
-  const slidesLength = Object.keys(props.slides).length
+  const slidesLength = Object.keys(slides).length
 
   function getDivClassname(i: number): string {
-    let borderLight = actualProgState.mainProg.currentPresentation.slides[i].slideBorderLight
-    let className = "slide-frame " + (props.selectedSlides.includes(props.slides[i].id) ? "slide-frame_selected" : "")
-    if (borderLight == 'top') {
+    
+    let className = "slide-frame " + (selectedSlides.includes(slides[i].id) ? "slide-frame_selected" : "")
+    if (slideBorderLight == 'top') {
       className =  "slide-frame, slide-frame_selected__top"
     }
     return className
@@ -94,10 +99,10 @@ function getListSlides(props: getListSlidesProps): Array<JSX.Element> {
 
   for(let i = 0; i < slidesLength; i++) {
     slidesList.push(
-      <div key={props.slides[i].id} className={getDivClassname(i)}> 
+      <div key={slides[i].id} className={getDivClassname(i)}> 
         <span className="slide-frame__number">{i + 1}</span>
-        <div className={"slide " + (props.selectedSlides.includes(props.slides[i].id) && actualProgState.commonDeps.canDeleteSlides ? "slide_selected" : "")}>
-          <MainSlide key={props.slides[i].id} numberOfSlide={i} isSmallSlide={true} slidesPanelRef={props.slidesPanelRef}/>
+        <div className={"slide " + (selectedSlides.includes(slides[i].id) && canDeleteSlides ? "slide_selected" : "")}>
+          <MainSlide key={slides[i].id} numberOfSlide={i} isSmallSlide={true} slidesPanelRef={slidesPanelRef}/>
         </div>
       </div>
     )

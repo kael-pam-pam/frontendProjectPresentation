@@ -4,26 +4,38 @@ import { Programm, Slide } from '../../Models/CommonFunctions/types'
 import { getListSlides } from '../commonViewFunctions';
 import { connect } from 'react-redux';
 
+interface slidesPanelProps {
+  slides: Array<Slide>,
+  selectedSlides: Array<string>,
+  canDeleteSlides: boolean,
+  slideBorderLight: string
+}
 
-function SlidesPanel(props: {state: Programm}) {
-    const actualProgState = props.state
-    const slides: Array<Slide> = actualProgState.mainProg.currentPresentation.slides
-    const selectedSlides: Array<string> = actualProgState.mainProg.selectedSlides;
-   
-    const slidesPanelRef = useRef<HTMLDivElement | null>(null)
+function SlidesPanel(props: slidesPanelProps) {
 
-    const slidesList = getListSlides({state: actualProgState, slides, selectedSlides, slidesPanelRef})
-    
-    return (
-        <div ref={slidesPanelRef} className="slides-panel">
-            {slidesList}
-        </div>
-    )  
+  const slidesPanelRef = useRef<HTMLDivElement | null>(null)
+
+  const slidesList = getListSlides({
+      slideBorderLight: props.slideBorderLight, 
+      slides: props.slides, 
+      selectedSlides: props.selectedSlides, 
+      canDeleteSlides: props.canDeleteSlides,
+      slidesPanelRef 
+  })
+
+  return (
+      <div ref={slidesPanelRef} className="slides-panel">
+          {slidesList}
+      </div>
+  )  
 }
 
 
-function mapStateToProps(state: Programm) {
-    return { state: state } 
-};
+const mapStateToProps = (state: Programm) => ({
+  slides: state.mainProg.currentPresentation.slides,
+  selectedSlides: state.mainProg.selectedSlides,
+  canDeleteSlides: state.commonDeps.canDeleteSlides,
+  slideBorderLight: state.commonDeps.slideBorderLight
+})
   
 export default connect(mapStateToProps)(SlidesPanel);
