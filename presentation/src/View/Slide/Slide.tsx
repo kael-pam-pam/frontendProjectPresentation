@@ -5,6 +5,7 @@ import { getSlideBackground, getSlideSvgElems, getDivSvgClassNames, } from '../c
 import { useDragAndDropSlides, useLighSlideInsertPlace  } from '../../CustomHooks/SlideMouseEvents';
 import { connect } from 'react-redux';
 import { moveSlide, setSelectedElement, setCanDeleteSlide, removeOneElemFromSelectedSlides, setSelectedSlides } from '../../Models/ActionCreators/actionCreators';
+import { saveStateToArchive } from '../../Models/CommonFunctions/archive';
 
 
 
@@ -27,8 +28,6 @@ interface SlideProps  {
 
 
 function MainSlide(props: SlideProps) {
-  
-
   
     let currSlide: Slide = props.slides[props.numberOfSlide]
     const modelSlideBackground = currSlide.background

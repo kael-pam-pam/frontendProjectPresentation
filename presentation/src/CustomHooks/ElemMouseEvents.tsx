@@ -151,13 +151,6 @@ function useReSizeElement(props: resizeProps) {
   const mainSvgProps = props.mainSvgProps 
   const leftSvgBorder = Number(mainSvgProps?.x)
   const topSvgBorder = Number(mainSvgProps?.y)
-
-  const modelProgState = store.getState().mainProg
-  const slides = modelProgState.currentPresentation.slides
-  const selectedSlides = modelProgState.selectedSlides
-
-  const modelElemSize = getCurrElemSize(slides, selectedSlides, props.id)
-  const modelElemPosition = getCurrElemPosition(slides, selectedSlides, props.id)
   
 
   let newCursPos = {
@@ -232,6 +225,13 @@ function useReSizeElement(props: resizeProps) {
 
   const mouseMoveResizeHandler = (event: React.MouseEvent | MouseEvent) => {
   
+    const modelProgState = store.getState().mainProg
+    const slides = modelProgState.currentPresentation.slides
+    const selectedSlides = modelProgState.selectedSlides
+
+    const modelElemSize = getCurrElemSize(slides, selectedSlides, props.id)
+    const modelElemPosition = getCurrElemPosition(slides, selectedSlides, props.id)
+
     newCursPos = {
       x: event.pageX - leftSvgBorder,
       y: event.pageY - topSvgBorder

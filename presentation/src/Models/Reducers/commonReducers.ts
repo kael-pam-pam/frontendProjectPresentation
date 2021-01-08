@@ -3,18 +3,29 @@ import { re_addSlide, re_deleteSlide, re_moveSlide, re_setSelectedSlides } from 
 import { createProgram } from "../CommonFunctions/mainProgOperations";
 import { borderLightType, CommonDeps, MainProg, StateTypes } from "../CommonFunctions/types";
 import { ActionType, Programm } from "../CommonFunctions/types";
+import { re_goBackArchive, re_goForwardArchive} from "../CommonFunctions/archive";
 
 
 
-export function mainReducer(state: Programm = createProgram(), action: ActionType): Programm {
-  return {
-      mainProg: mainProgState(state.mainProg, action),
-      commonDeps: {
-        canDeleteSlides: canDeleteSlide(state.commonDeps, action),
-        elemsMoveCount: 0,//elemsMoveCount(state, action),
-        saveToArch: false,//saveToArch(state, action),
-        slideBorderLight: 'unset',
-      }   
+export function mainReducer(state: Programm = createProgram(), action: ActionType) {
+  switch (action.type) {
+
+    case StateTypes.GO_BACK_ARCHIVE:
+        return re_goBackArchive()
+        
+    case StateTypes.GO_FORWARD_ARCHIVE:
+        return re_goForwardArchive()
+
+    default:    
+        return {
+            mainProg: mainProgState(state.mainProg, action),
+            commonDeps: {
+              canDeleteSlides: canDeleteSlide(state.commonDeps, action),
+              elemsMoveCount: elemsMoveCount(state, action),
+              saveToArch: saveToArch(state, action),
+              slideBorderLight: state.commonDeps.slideBorderLight
+            }   
+        }    
   }
 }
 
@@ -23,14 +34,8 @@ function mainProgState(state: MainProg, action: ActionType): MainProg {
       case StateTypes.ADD_SLIDE:
         return re_addSlide(state, action)
 
-      /*case StateTypes.LOAD_PROJECT:
+      case StateTypes.LOAD_PROJECT:
         return action.payload
-
-      case StateTypes.GO_BACK_ARCHIVE:
-        return action.payload.mainProg
-        
-      case StateTypes.GO_FORWARD_ARCHIVE:
-        return action.payload.mainProg*/ 
 
       case StateTypes.SET_SELECTED_SLIDES:
         return re_setSelectedSlides(state, action)
@@ -61,11 +66,11 @@ function mainProgState(state: MainProg, action: ActionType): MainProg {
 
       case StateTypes.CHANGE_TEXT_OBJ:
         return re_changeTextObj(state, action)
+
       //case StateTypes.CHANGE_SHAPE_OBJ:
         //return action.payload
 
-      case StateTypes.RESIZE_ELEMENT:    
-        //console.log(state.currentPresentation.slides[0].elements[0].position, action.payload.newPosX, action.payload.newPosY)    
+      case StateTypes.RESIZE_ELEMENT:        
         return re_resizeElement(state, action)
 
       case StateTypes.DELETE_SELECTED_ELEMENTS:
@@ -82,7 +87,7 @@ function mainProgState(state: MainProg, action: ActionType): MainProg {
             return action.payload*/
 
       default:
-          return {...state}
+          return state
   }
 }
 
@@ -108,14 +113,14 @@ function saveToArch(state: Programm, action: ActionType): boolean {
       return false
     case StateTypes.GO_BACK_ARCHIVE: 
       return false 
-    /*case StateTypes.CHANGE_ELEM_POSITION:
+    case StateTypes.CHANGE_ELEM_POSITION:
       let saveToArch = true
       let selectElemsArrLength = state.mainProg.selectedElements.length
       let elemsMoveCount = state.commonDeps.elemsMoveCount
       if (selectElemsArrLength > 1 && elemsMoveCount < selectElemsArrLength) {
         saveToArch = false
       }
-      return saveToArch*/     
+      return saveToArch     
     default:
       return true
   }
@@ -124,10 +129,6 @@ function saveToArch(state: Programm, action: ActionType): boolean {
 
 export function canDeleteSlide(state: CommonDeps, action: ActionType): boolean {
   switch (action.type) {
-    /*case StateTypes.GO_BACK_ARCHIVE:
-        return action.payload.commonDeps.canDeleteSlides
-    case StateTypes.GO_FORWARD_ARCHIVE:
-        return action.payload.commonDeps.canDeleteSlides*/  
     case StateTypes.SET_CAN_DELETE_SLIDE:
       return re_setCanDeleteSlide(state, action).canDeleteSlides
     default:
@@ -149,18 +150,14 @@ function calcElemsIterations(iterCount: number, elemsCount:number): number {
 
 function elemsMoveCount(state: Programm, action: ActionType): number {
   switch (action.type) {
-    case StateTypes.GO_BACK_ARCHIVE:
-        return action.payload.commonDeps.elemsMoveCount
-    case StateTypes.GO_FORWARD_ARCHIVE:
-        return action.payload.commonDeps.elemsMoveCount 
-    /*case StateTypes.CHANGE_ELEM_POSITION:
+    case StateTypes.CHANGE_ELEM_POSITION:
 
         let iterCount = state.commonDeps.elemsMoveCount
         const selectedEelemLength = state.mainProg.selectedElements.length
         iterCount = calcElemsIterations(iterCount, selectedEelemLength)
 
-        return iterCount*/
+        return iterCount
     default:
-        return {...state.commonDeps}.elemsMoveCount
+        return state.commonDeps.elemsMoveCount
   }
 }

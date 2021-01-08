@@ -12,6 +12,7 @@ import { saveStateToArchive } from './Models/CommonFunctions/archive';
 import { Dispatch } from 'redux';
 import { Programm } from './Models/CommonFunctions/types';
 import { setSelectedElement, deleteSelectedElements, setCanDeleteSlide, deleteSlide, setSelectedSlides   } from './Models/ActionCreators/actionCreators';
+import  Archive  from './View/ArchiveElem';
 
 
 interface AppProps {
@@ -39,13 +40,12 @@ function App(props: AppProps) {
     setSelectedElement: props.setSelectedElement
   })
   
-  saveStateToArchive()
-  
   // popup layer
 
-  console.log('render')
+
   return (
     <PopupProvider>
+    <Archive />
     <div className="App">
       <div className="App-header">      
         <HeaderPanel />
@@ -61,7 +61,7 @@ function App(props: AppProps) {
       </div>
     </div>
     </PopupProvider>
-  );
+  )
 }
 
 

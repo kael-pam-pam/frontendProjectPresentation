@@ -130,10 +130,10 @@ function BigSlideElement(props: BigSlideElementProps) {
     setSize
   })  
 
-  /*useEffect(() => {
+  useEffect(() => {
       setPos({x: elemPosX, y: elemPosY})
       setSize({width: elemWidth, height: elemHeight})
-  }, [actualProgState])*/
+  }, [props.slides])
   
   let svgElem: JSX.Element = <rect/>
   let outLineRect: JSX.Element = <rect/>
@@ -191,7 +191,6 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (state: Programm) => {
-  console.log(state.mainProg.currentPresentation.slides[0]?.elements[0].position)
   return {
     slides: state.mainProg.currentPresentation.slides,
     selectedElements: state.mainProg.selectedElements,

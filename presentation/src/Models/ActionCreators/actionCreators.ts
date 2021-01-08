@@ -154,3 +154,14 @@ export function loadProgToStore(newProg: Programm) {
   }
 }
 
+export function goForwardArchive() {
+  return {
+    type: StateTypes.GO_FORWARD_ARCHIVE
+  }
+}
+
+export function goBackArchive() {
+  return {
+    type: StateTypes.GO_BACK_ARCHIVE
+  }
+}

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './Tools.css';
 import { addSlide, addPictureObj, addTextObj, addShapeObj, setCanDeleteSlide } from '../../Models/ActionCreators/actionCreators';
 import { setGlobalActiveTool } from '../../Models/CommonFunctions/supportFunctionsConst';
-import { /*actualArchiveOfState,*/ goBackArchive, goForwardArchive} from '../../Models/CommonFunctions/archive';
+import { /*actualArchiveOfState,*/ goBackArchive, goForwardArchive} from '../../Models/ActionCreators/actionCreators';
 import { MainProg, Programm } from '../../Models/CommonFunctions/types';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';

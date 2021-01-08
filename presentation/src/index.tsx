@@ -8,10 +8,12 @@ import * as serviceWorker from './serviceWorker';
 import { createStore } from 'redux';
 import { connect, Provider } from 'react-redux';
 import { mainReducer } from './Models/Reducers/commonReducers';
+import { saveStateToArchive } from './Models/CommonFunctions/archive';
 
 
 
 export const store = createStore(mainReducer)
+
 
 ReactDOM.render(
   <Provider store={store}>

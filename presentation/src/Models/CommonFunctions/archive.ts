@@ -1,15 +1,16 @@
+import { store } from '../..';
 import {
     Programm,
     StateTypes,
     ArchiveOfState,
 } from '../CommonFunctions/types'; 
-import { createProgram } from './mainProgOperations';
+
 
 
 
 export {
-    goBackArchive,
-    goForwardArchive,
+    re_goBackArchive,
+    re_goForwardArchive,
     saveStateToArchive,
 }
 
@@ -20,7 +21,7 @@ let actualArchiveOfState: ArchiveOfState = {
 }
 
 
-function goBackArchive() {
+function re_goBackArchive() {
     //past: [...прощлые состояния, текущее состояние]
     //если в "прошлом" не было ни одной записи - возвращаем текущее состояние
     if (actualArchiveOfState.past.length != 1) {
@@ -32,12 +33,11 @@ function goBackArchive() {
     }
     const newCurrentState: Programm = actualArchiveOfState.past[actualArchiveOfState.past.length - 1];
     return {
-        type: StateTypes.GO_BACK_ARCHIVE,
-        payload: {...newCurrentState}
+        ...newCurrentState
     }
 }
 
-function goForwardArchive() {
+function re_goForwardArchive() {
     //если в "будущем" нет ни одной записи - возвращаем текущее состояние
     let state: Programm;
     if (actualArchiveOfState.future.length != 0) { 
@@ -50,8 +50,7 @@ function goForwardArchive() {
         state = actualArchiveOfState.past[actualArchiveOfState.past.length - 1]
     }
     return {
-        type: StateTypes.GO_FORWARD_ARCHIVE,
-        payload: {...state}
+      ...state
     }
 }
 
@@ -59,16 +58,15 @@ function goForwardArchive() {
 
 //если в "будущем" есть записи и мы текущими действиями его не повторяем, то оно впредь нам уже не доступно.
 //теперь у нас новое будущее, которое неопределено.
-function saveStateToArchive() {
-    const actualProgState = createProgram()//getState()
-    const currState = actualProgState.mainProg
+function saveStateToArchive(state: Programm) {
+    //const state = store.getState()
+    const currState = state.mainProg
     const prevState = actualArchiveOfState.past[actualArchiveOfState.past.length - 1]?.mainProg
-    const saveToArch = actualProgState.commonDeps.saveToArch 
-
+    const saveToArch = state.commonDeps.saveToArch 
 
     if (currState != prevState && saveToArch) {
-
-        if (actualArchiveOfState.future.length != 0 && actualArchiveOfState.future[0] != actualProgState) {
+        console.log('saved')
+        if (actualArchiveOfState.future.length != 0 && actualArchiveOfState.future[0] != state) {
             actualArchiveOfState = {
                 past: [...actualArchiveOfState.past],
                 future: [],
@@ -76,7 +74,7 @@ function saveStateToArchive() {
                     
         } 
         actualArchiveOfState = {
-            past: [...actualArchiveOfState.past, {...actualProgState}],
+            past: [...actualArchiveOfState.past, {...state}],
             future: [...actualArchiveOfState.future],
         }
     }         
